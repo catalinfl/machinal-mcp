@@ -1,0 +1,150 @@
+{
+ "id": "blocks-north-korea-locked-down",
+ "nativePath": "blocks/north-korea-locked-down.svelte",
+ "sourceVersion": "sha256:9df83db7c1c77322e8aae6d5f0b9e58652f9308a7f1de32296f461269ec2b140",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/north-korea-locked-down/north-korea-locked-down.html",
+  "registry/blocks/north-korea-locked-down/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:9df83db7c1c77322e8aae6d5f0b9e58652f9308a7f1de32296f461269ec2b140",
+   "runtimeVersion": "sha256:4d16031cba3e306f0ee3ec69932e3be3d896e2fa050e6b2195601f53b49e6dc6",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 168122,
+       "sha256": "0a65b235d42adbdd3975e12e8866057a2864a5fb1b599b270c04f242e782e2da"
+      },
+      {
+       "frame": 84,
+       "bytes": 205669,
+       "sha256": "fa2725eb5d1abb60e4ead34ebf8a80ffcb4c1ef4409a423093741a24ca5f91f5"
+      },
+      {
+       "frame": 168,
+       "bytes": 749179,
+       "sha256": "ffa18b937bc11dea6bf084ede52a2695b55d17b3e880f5b2c16610cf306e0485"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 114041,
+       "sha256": "c2964ab92592091a57693d40159fa5e783d62f7c9cd210e4eb38b3c93071a0f8"
+      },
+      {
+       "frame": 84,
+       "bytes": 130799,
+       "sha256": "470c43d98719a7e5222273ebb34658bf77f6ae99f8a9c9226bb61e1c4f9775ab"
+      },
+      {
+       "frame": 168,
+       "bytes": 438345,
+       "sha256": "b02830d0dbeccd037cff48f89fa60a5c34532cdef5ce2d5a24af71085d328b09"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 168122,
+      "sha256": "0a65b235d42adbdd3975e12e8866057a2864a5fb1b599b270c04f242e782e2da"
+     },
+     {
+      "frame": 84,
+      "bytes": 205669,
+      "sha256": "fa2725eb5d1abb60e4ead34ebf8a80ffcb4c1ef4409a423093741a24ca5f91f5"
+     },
+     {
+      "frame": 168,
+      "bytes": 749179,
+      "sha256": "ffa18b937bc11dea6bf084ede52a2695b55d17b3e880f5b2c16610cf306e0485"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 114041,
+      "sha256": "c2964ab92592091a57693d40159fa5e783d62f7c9cd210e4eb38b3c93071a0f8"
+     },
+     {
+      "frame": 84,
+      "bytes": 130799,
+      "sha256": "470c43d98719a7e5222273ebb34658bf77f6ae99f8a9c9226bb61e1c4f9775ab"
+     },
+     {
+      "frame": 168,
+      "bytes": 438345,
+      "sha256": "b02830d0dbeccd037cff48f89fa60a5c34532cdef5ce2d5a24af71085d328b09"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/korea-map.png",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 7,
+  "captionSafeArea": false
+ }
+}

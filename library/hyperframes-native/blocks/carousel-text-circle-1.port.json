@@ -1,0 +1,260 @@
+{
+ "id": "blocks-carousel-text-circle-1",
+ "nativePath": "blocks/carousel-text-circle-1.svelte",
+ "sourceVersion": "sha256:f1f6f63f65c510d7e7de55a98e980d63c9e9c92e6d7eb3185f66a2935f91a804",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/carousel-text-circle-1/carousel-text-circle-1.html",
+  "registry/blocks/carousel-text-circle-1/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.background",
+  "design.image1",
+  "design.image10",
+  "design.image11",
+  "design.image12",
+  "design.image2",
+  "design.image3",
+  "design.image4",
+  "design.image5",
+  "design.image6",
+  "design.image7",
+  "design.image8",
+  "design.image9",
+  "design.line1",
+  "design.line2",
+  "design.speed"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "OFL font files are installed from pinned local Fontsource packages; no font CDN is required.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:f1f6f63f65c510d7e7de55a98e980d63c9e9c92e6d7eb3185f66a2935f91a804",
+   "runtimeVersion": "sha256:8825203de37fba80f401633b02c7ccec0563f0adc833e40d155c35bc00e99109",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 40089,
+       "sha256": "49430a9a799304958eb1175ff8856cef999e733833c22aec3731a8d4c971eb16"
+      },
+      {
+       "frame": 60,
+       "bytes": 137586,
+       "sha256": "365595a3f07f2d27eb60550ea7b8cabe9ec004e2dbc7ec7df4159fa5816482f8"
+      },
+      {
+       "frame": 120,
+       "bytes": 53280,
+       "sha256": "6b06789bbe32b5f98150eab16cdcabd5448c685fa40392ef83fd442f3b345401"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 32333,
+       "sha256": "7cde4e49d97b0e1d036245b3e6bbf6ca34a9fac12f9d3e270b20f4ae8dc011ba"
+      },
+      {
+       "frame": 60,
+       "bytes": 65156,
+       "sha256": "3c80096f332791066074e61be47dacd49498fa7faed9e61987f355bc81155001"
+      },
+      {
+       "frame": 120,
+       "bytes": 39813,
+       "sha256": "ffd77371b743b9fb7c34a9bc2de223b85cc0f46ee31a928402b8b245c1c51281"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 40089,
+      "sha256": "49430a9a799304958eb1175ff8856cef999e733833c22aec3731a8d4c971eb16"
+     },
+     {
+      "frame": 60,
+      "bytes": 137586,
+      "sha256": "365595a3f07f2d27eb60550ea7b8cabe9ec004e2dbc7ec7df4159fa5816482f8"
+     },
+     {
+      "frame": 120,
+      "bytes": 53280,
+      "sha256": "6b06789bbe32b5f98150eab16cdcabd5448c685fa40392ef83fd442f3b345401"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 32333,
+      "sha256": "7cde4e49d97b0e1d036245b3e6bbf6ca34a9fac12f9d3e270b20f4ae8dc011ba"
+     },
+     {
+      "frame": 60,
+      "bytes": 65156,
+      "sha256": "3c80096f332791066074e61be47dacd49498fa7faed9e61987f355bc81155001"
+     },
+     {
+      "frame": 120,
+      "bytes": 39813,
+      "sha256": "ffd77371b743b9fb7c34a9bc2de223b85cc0f46ee31a928402b8b245c1c51281"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/carousel-images/artist-bob-seger.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-dire-straits.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-faces.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-little-feat.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-north-mississippi-allstars.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-sea-level.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-taj-mahal.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-tool.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-van-morrison.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-10-songs.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-bangers.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-bhindi-bhagee.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-bob-seger.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-dire-straits.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-faces.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-little-feat.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-north-mississippi-allstars.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-sea-level.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-taj-mahal.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-tool.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-van-morrison.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-10-songs.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-bangers.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-bhindi-bhagee.jpg",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 5,
+  "captionSafeArea": false
+ }
+}

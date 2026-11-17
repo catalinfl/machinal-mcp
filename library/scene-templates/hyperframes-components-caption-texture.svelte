@@ -1,0 +1,281 @@
+<!-- Modified Svelte adaptation of registry/components/caption-texture/caption-texture.html; upstream 8ec98be29a64e88239a0c05f7e5d09f36e181493, Apache-2.0; original licence and CREDITS in hyperframes-library/.
+     Subject markup, stylesheet declarations and the source animation are retained; fonts, media and initialization are localized
+     as recorded in the sidecar. Host variables map to `design`, the timeline follows the scene clock, and document-level selectors
+     (html/body/:root/*) are retargeted to `.hf-port` so the port cannot restyle the host page. -->
+<svelte:options preserveWhitespace={true} />
+<script>
+  import { untrack } from 'svelte';
+  import { gsap } from 'gsap';
+  import { loadHyperframeFonts, hyperframeFontSource } from '@machinal/hyperframes/assets';
+  import __hfFonts from '@machinal/hyperframes/fonts/components-caption-texture';
+  import __hfAsset from '@machinal/hyperframes/media/components-caption-texture';
+  import { SceneCanvas, useScene } from '@machinal/scenes/svelte';
+
+  let { design = {} } = $props();
+  const __hfScene = useScene();
+  let root = $state();
+  let timeline = $state.raw();
+
+  // Host shim: the upstream page reads its editable variables from the
+  // HyperFrames host. In the port they come from the approved `design` prop.
+  const __hfHost = { getVariables: () => (design || {}), variables: design || {}, assetUrl: path => __hfAsset(path) };
+
+  // The upstream page publishes its timeline into the host registry,
+  // sometimes from a callback that runs after mount (once fonts are ready).
+  // Pause it at time zero so the scene controller is its only clock source.
+  let __hfTimelineSlot = { set() {}, get: () => undefined };
+
+  $effect(() => {
+    if (!root) return;
+    let live = true;
+    __hfTimelineSlot = {
+      set(value) {
+        if (live) {
+          timeline = value;
+          queueMicrotask(() => {
+            if (live && timeline === value) {
+              value?.pause(0);
+              value?.seek(0, false);
+            }
+          });
+        }
+      },
+      get() {
+        return untrack(() => timeline);
+      },
+    };
+    const context = gsap.context(() => {
+      untrack(() => __hfScene.resources.track(initialize(__hfTimelineSlot, root)));
+    }, root);
+    return () => {
+      live = false;
+      timeline?.kill?.();
+      context.revert();
+      timeline = undefined;
+    };
+  });
+
+  $effect(() => {
+    const active = timeline;
+    const time = __hfScene.frame.time;
+    if (active) untrack(() => {
+      active.seek(time, false);
+      const waits = [];
+      window.dispatchEvent(new CustomEvent('hf-seek', { detail: { time, waitUntil: promise => waits.push(promise) } }));
+      if (typeof window.__hf_page_composite_resolve === 'function') waits.push(window.__hf_page_composite_resolve());
+      if (waits.length) __hfScene.resources.track(Promise.all(waits));
+    });
+  });
+
+  async function initialize(__hfTimelineSlot, __hfRootElement) {
+    const __hfRegistry = new Proxy({}, { get: () => __hfTimelineSlot.get() });
+    const __hfListen = (type, listener, options = {}) => window.addEventListener(type, listener,
+      { ...options, signal: __hfScene.resources.signal });
+    await loadHyperframeFonts(__hfFonts);
+
+          (function () {
+            
+
+            var vars =
+              __hfHost && __hfHost.getVariables
+                ? __hfHost.getVariables()
+                : {};
+            var TEXTURE = vars.texture || "lava";
+            var TEXTURE_URL = "compositions/components/" + TEXTURE + ".png";
+
+            var _fitCanvas = document.createElement("canvas");
+            var _fitCtx = _fitCanvas.getContext("2d");
+            function fitFontSize(text, baseFontSize, fontWeight, fontFamily, maxWidth) {
+              var size = baseFontSize;
+              var minSize = Math.floor(baseFontSize * 0.45);
+              while (size > minSize) {
+                _fitCtx.font = fontWeight + " " + size + "px " + fontFamily;
+                if (_fitCtx.measureText(text).width <= maxWidth) return size;
+                size -= 2;
+              }
+              return minSize;
+            }
+
+            var WORDS = [
+              { text: "Every", start: 0.0, end: 0.3 },
+              { text: "great", start: 0.3, end: 0.55 },
+              { text: "video", start: 0.55, end: 0.85 },
+              { text: "starts", start: 0.85, end: 1.1 },
+              { text: "with", start: 1.1, end: 1.25 },
+              { text: "a", start: 1.25, end: 1.35 },
+              { text: "single", start: 1.35, end: 1.65 },
+              { text: "frame.", start: 1.65, end: 2.0 },
+              { text: "HyperFrames", start: 2.1, end: 2.65 },
+              { text: "lets", start: 2.65, end: 2.85 },
+              { text: "you", start: 2.85, end: 2.95 },
+              { text: "write", start: 2.95, end: 3.15 },
+              { text: "HTML", start: 3.15, end: 3.55 },
+              { text: "and", start: 3.55, end: 3.65 },
+              { text: "render", start: 3.65, end: 3.95 },
+              { text: "professional", start: 3.95, end: 4.45 },
+              { text: "video.", start: 4.45, end: 4.8 },
+              { text: "No", start: 4.9, end: 5.05 },
+              { text: "timeline.", start: 5.05, end: 5.45 },
+              { text: "No", start: 5.5, end: 5.65 },
+              { text: "drag", start: 5.65, end: 5.85 },
+              { text: "and", start: 5.85, end: 5.95 },
+              { text: "drop.", start: 5.95, end: 6.25 },
+              { text: "Just", start: 6.35, end: 6.55 },
+              { text: "code", start: 6.55, end: 6.8 },
+              { text: "that", start: 6.8, end: 6.95 },
+              { text: "becomes", start: 6.95, end: 7.3 },
+              { text: "cinema.", start: 7.3, end: 7.7 },
+            ];
+
+            var KEYWORDS = new Set([8, 12, 15, 24, 27]);
+
+            var container = document.getElementById("lv-container");
+            var tl = gsap.timeline({ paused: true });
+
+            WORDS.forEach(function (w, wi) {
+              var txt = w.text.toUpperCase();
+              var fontSize = fitFontSize(txt, 200, "400", "'Anton', sans-serif", 1720);
+
+              var shadow = document.createElement("div");
+              shadow.className = "lv-shadow";
+              shadow.id = "lv-shadow-" + wi;
+              gsap.set(shadow, { yPercent: -50 });
+
+              var wordEl = document.createElement("div");
+              wordEl.className = "hf-texture-text lv-texture-override lv-word";
+              wordEl.id = "lv-word-" + wi;
+              wordEl.textContent = txt;
+              wordEl.style.fontSize = fontSize + "px";
+              wordEl.style.webkitMaskImage = ("url('" + __hfAsset(TEXTURE_URL) + "')");
+              wordEl.style.maskImage = ("url('" + __hfAsset(TEXTURE_URL) + "')");
+              if (KEYWORDS.has(wi)) wordEl.style.color = "#FFAA44";
+
+              shadow.appendChild(wordEl);
+              container.appendChild(shadow);
+
+              var dur = Math.max(w.end - w.start + 0.3, 0.4);
+
+              tl.set(shadow, { visibility: "visible", opacity: 0 }, w.start);
+              tl.fromTo(
+                shadow,
+                { opacity: 0, scale: 0.88 },
+                { opacity: 1, scale: 1, duration: 0.18, ease: "power3.out" },
+                w.start,
+              );
+              tl.set(wordEl, { "--mask-position": "0% 50%" }, w.start);
+              tl.to(
+                wordEl,
+                { "--mask-position": "100% 50%", duration: dur, ease: "sine.inOut" },
+                w.start,
+              );
+
+              tl.to(shadow, { opacity: 0, scale: 1.08, duration: 0.1, ease: "power2.in" }, w.end);
+              tl.set(shadow, { opacity: 0, visibility: "hidden" }, w.end + 0.1);
+            });
+
+            tl.seek(0);
+            __hfTimelineSlot.set(tl);
+          })();
+        
+    __hfRootElement.querySelectorAll("img").forEach(image => { image.src = __hfAsset(image.getAttribute("src")); });
+    if (window.__hf?.buildReady) await Promise.all(Object.values(window.__hf.buildReady));
+  }
+</script>
+
+<SceneCanvas background="transparent">
+  <div class="hf-port" data-hf-embedded-fonts bind:this={root}>
+    <div
+          id="caption-texture"
+          data-composition-id="caption-texture"
+          data-timeline-locked
+          data-start="0"
+          data-duration="8"
+          data-fps="30"
+          data-width="1920"
+          data-height="1080"
+          data-composition-variables='[&#123;"id":"texture","type":"string","label":"Texture","default":"lava"&#125;]'
+        >
+          <div class="lv-overlay"></div>
+          <div id="lv-container"></div>
+        </div>
+  </div>
+</SceneCanvas>
+
+<style>
+:global {
+  .hf-port {
+    position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; overflow: hidden;
+  }
+  .hf-texture-text {
+    color: #fff;
+    -webkit-mask-size: var(--mask-size, cover);
+    mask-size: var(--mask-size, cover);
+    -webkit-mask-position: var(--mask-position, center);
+    mask-position: var(--mask-position, center);
+    -webkit-mask-mode: luminance;
+    mask-mode: luminance;
+    filter: contrast(var(--mask-contrast, 1));
+  }
+
+  .hf-port, .hf-port *, .hf-port *::before, .hf-port *::after {
+    box-sizing: border-box;
+  }
+  .hf-port {
+    width: 1920px;
+    height: 1080px;
+    margin: 0;
+    overflow: hidden;
+    background: transparent;
+  }
+  #texture-lava {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: transparent;
+  }
+  .lv-overlay {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    z-index: 1;
+    pointer-events: none;
+  }
+  #lv-container {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .lv-texture-override {
+    -webkit-mask-size: 200% 200%;
+    mask-size: 200% 200%;
+    -webkit-mask-position: 0% 50%;
+    mask-position: 0% 50%;
+    -webkit-mask-mode: luminance;
+    mask-mode: luminance;
+    filter: contrast(1.2);
+  }
+
+  .lv-shadow {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    top: 50%;
+    filter: drop-shadow(0 4px 24px rgba(255, 100, 20, 0.55));
+    opacity: 0;
+    visibility: hidden;
+  }
+  .lv-word {
+    font-family: "Anton", sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: #ffd0a0;
+    display: inline-block;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+}
+</style>

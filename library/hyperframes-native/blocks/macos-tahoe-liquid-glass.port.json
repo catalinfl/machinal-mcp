@@ -1,0 +1,219 @@
+{
+ "id": "blocks-macos-tahoe-liquid-glass",
+ "nativePath": "blocks/macos-tahoe-liquid-glass.svelte",
+ "sourceVersion": "sha256:fe83c9ee4cb4226b4209c770710430f543146ff14511413da06479efdbf2b334",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/macos-tahoe-liquid-glass/macos-tahoe-liquid-glass.html",
+  "registry/blocks/macos-tahoe-liquid-glass/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Markup built by the upstream script with innerHTML is reproduced by the same script, so the DOM is identical.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:fe83c9ee4cb4226b4209c770710430f543146ff14511413da06479efdbf2b334",
+   "runtimeVersion": "sha256:910b0d1b71becc2fa8a2f67a3de1c22f5fbc329bc85fbc4d24fdf5b38edf1661",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 388470,
+       "sha256": "edd0c212c6770a1eaeae9e5d386d1c5c1919eddd4cb654155d904c04e49ddbf1"
+      },
+      {
+       "frame": 180,
+       "bytes": 397492,
+       "sha256": "7c49324d1cb10445f8931b7afa9cd3dd9347cf2923c5fd7ac31c649cfb56f6c2"
+      },
+      {
+       "frame": 360,
+       "bytes": 568519,
+       "sha256": "73fbfab9b50424e1832c52d1251f3a77795b32bc152868e0a3fd074b70d1b274"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 223442,
+       "sha256": "dd4cea4835f1929e861ab5eb9aa262982c262fa067bb2cee54c74e4be489abc5"
+      },
+      {
+       "frame": 180,
+       "bytes": 245687,
+       "sha256": "e088da09a0afed1ae2de58b8a73c08b38b39af12093fc43b756497f8368bbbfb"
+      },
+      {
+       "frame": 360,
+       "bytes": 376706,
+       "sha256": "8f9f0c44da47b806acea1f4b9180c55bd705c21dfc29eb44435e05bc53482c71"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 388470,
+      "sha256": "edd0c212c6770a1eaeae9e5d386d1c5c1919eddd4cb654155d904c04e49ddbf1"
+     },
+     {
+      "frame": 180,
+      "bytes": 397492,
+      "sha256": "7c49324d1cb10445f8931b7afa9cd3dd9347cf2923c5fd7ac31c649cfb56f6c2"
+     },
+     {
+      "frame": 360,
+      "bytes": 568519,
+      "sha256": "73fbfab9b50424e1832c52d1251f3a77795b32bc152868e0a3fd074b70d1b274"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 223442,
+      "sha256": "dd4cea4835f1929e861ab5eb9aa262982c262fa067bb2cee54c74e4be489abc5"
+     },
+     {
+      "frame": 180,
+      "bytes": 245687,
+      "sha256": "e088da09a0afed1ae2de58b8a73c08b38b39af12093fc43b756497f8368bbbfb"
+     },
+     {
+      "frame": 360,
+      "bytes": 376706,
+      "sha256": "8f9f0c44da47b806acea1f4b9180c55bd705c21dfc29eb44435e05bc53482c71"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/wallpapers/golden-gate-bridge-san-francisco-5k-0g.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/toast-messages.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/finder.png",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/files.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/safari.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/mail.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/photos.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/music.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/dock-finder.png",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/dock-safari.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/dock-mail.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/calendar.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/dock-photos.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/messages.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/dock-music.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/brave.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/slack.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "models/macbook.glb",
+   "replacement": "locally authored generic macbook model"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 15,
+  "captionSafeArea": false
+ }
+}

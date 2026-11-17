@@ -1,0 +1,152 @@
+{
+ "id": "examples-kinetic-type",
+ "nativePath": "examples/kinetic-type.svelte",
+ "sourceVersion": "sha256:f52839781ecc304ef492145fa652f846d9346343578236746ae95868137f2018",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/examples/kinetic-type/compositions/main-graphics.html",
+  "registry/examples/kinetic-type/index.html",
+  "registry/examples/kinetic-type/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "OFL font files are installed from pinned local Fontsource packages; no font CDN is required.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:f52839781ecc304ef492145fa652f846d9346343578236746ae95868137f2018",
+   "runtimeVersion": "sha256:90b447365157fdd75b65a1dc0791a7dae24650d0ff6d76f37c2eb77add5f08df",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 8514,
+       "sha256": "808afe35a0a0f52f8f5aa061f1bdef36307b281143d272765bfc63d024b6576a"
+      },
+      {
+       "frame": 180,
+       "bytes": 1382669,
+       "sha256": "e50dc0e0e0488450bbdb0713280ad52a0be7d8dc84dd65b3ca1c3cdc7beeb0dc"
+      },
+      {
+       "frame": 360,
+       "bytes": 380344,
+       "sha256": "3aa3af10b2afb4a293ca2f7c77bd447d8983dc4e47a4f6aaac94d86c6f7979e7"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 10224,
+       "sha256": "294e577c7e304c05d429a765f3933f1d00b4f883d26812cc65354ab60dc495eb"
+      },
+      {
+       "frame": 180,
+       "bytes": 830196,
+       "sha256": "8982801950c13e11e3d833b8c38ecee841939d8ff3f8d9c32e42c34f57384b54"
+      },
+      {
+       "frame": 360,
+       "bytes": 240648,
+       "sha256": "a38212ad81d828cd2db82141f1d96ec372cbbbb2932444ecc3b4411b8d917df7"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 8514,
+      "sha256": "808afe35a0a0f52f8f5aa061f1bdef36307b281143d272765bfc63d024b6576a"
+     },
+     {
+      "frame": 180,
+      "bytes": 1382669,
+      "sha256": "e50dc0e0e0488450bbdb0713280ad52a0be7d8dc84dd65b3ca1c3cdc7beeb0dc"
+     },
+     {
+      "frame": 360,
+      "bytes": 380344,
+      "sha256": "3aa3af10b2afb4a293ca2f7c77bd447d8983dc4e47a4f6aaac94d86c6f7979e7"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 10224,
+      "sha256": "294e577c7e304c05d429a765f3933f1d00b4f883d26812cc65354ab60dc495eb"
+     },
+     {
+      "frame": 180,
+      "bytes": 830196,
+      "sha256": "8982801950c13e11e3d833b8c38ecee841939d8ff3f8d9c32e42c34f57384b54"
+     },
+     {
+      "frame": 360,
+      "bytes": 240648,
+      "sha256": "a38212ad81d828cd2db82141f1d96ec372cbbbb2932444ecc3b4411b8d917df7"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "https://static.heygen.ai/astral_assets/uploaded_assets/67cf5a05_e134ec83a57042b38776c952da595870.mp4",
+   "replacement": "locally authored silent motion sample"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 15,
+  "captionSafeArea": false
+ }
+}

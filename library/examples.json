@@ -1,0 +1,107 @@
+[
+  {
+    "id": "client-scene",
+    "description": "Place client-authored Svelte source without a server AI fee; server scene rendering and video encoding remain billed",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "cinematic-sequence",
+    "description": "Uniform sequence, fine-film, motion override and 600ms overlap",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "social-hook",
+    "description": "Explicit clips, short transition, look/motion rules and a supplied title",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "tutorial-clean",
+    "description": "Readable step label, static treatment and source audio",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "caption-audio",
+    "description": "Verified example word timings and percent-volume looping music",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "montage-v3",
+    "description": "Whole source ranges, exact duration tolerance and deterministic presets",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "modify-snapshot",
+    "description": "Synthetic current-shaped compiler snapshot, trim and motion commands",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "scene-generation",
+    "description": "Pending paid portrait scene brief and staged placement",
+    "pendingGeneration": true,
+    "requirements": 1,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "scene-three-explainer",
+    "description": "Art-directed procedural Three.js mechanism with timed assembly, independent motion, lighting and camera orbit",
+    "pendingGeneration": true,
+    "requirements": 1,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "scene-image-insert",
+    "description": "Footage with a timed animated Svelte scene, independently moving objects and an uploaded image attachment",
+    "pendingGeneration": true,
+    "requirements": 1,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "scene-generated-image",
+    "description": "Generate a complex subject image before embedding it in a genuine Three.js scene",
+    "pendingGeneration": true,
+    "requirements": 2,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "scene-edit",
+    "description": "Pending paid edit of an existing live scene, preserving other content",
+    "pendingGeneration": true,
+    "requirements": 1,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "generated-media",
+    "description": "Pending paid image, speech and after-stage captions",
+    "pendingGeneration": true,
+    "requirements": 3,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "narration-timing",
+    "description": "Pass 1: Romanian speech and requested measured captions only, without visual generation",
+    "pendingGeneration": true,
+    "requirements": 2,
+    "syntheticMetadata": true
+  },
+  {
+    "id": "narrated-documentary",
+    "description": "Pass 2: preserve resolved voice/captions, then generate an image and a cue-bound Three.js scene with an FHD heading",
+    "pendingGeneration": true,
+    "requirements": 2,
+    "syntheticMetadata": true
+  }
+]

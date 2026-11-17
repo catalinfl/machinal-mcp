@@ -1,0 +1,157 @@
+{
+ "id": "examples-warm-grain",
+ "nativePath": "examples/warm-grain.svelte",
+ "sourceVersion": "sha256:88317f43b4bc3e3eef94cc8cef5620424ab682d2c50a7bc5b4d3589111f9e7c0",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/examples/warm-grain/compositions/captions.html",
+  "registry/examples/warm-grain/compositions/graphics.html",
+  "registry/examples/warm-grain/compositions/intro.html",
+  "registry/examples/warm-grain/index.html",
+  "registry/examples/warm-grain/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:88317f43b4bc3e3eef94cc8cef5620424ab682d2c50a7bc5b4d3589111f9e7c0",
+   "runtimeVersion": "sha256:023e2c6b3ad1b058e907b87b7c514f996a21f65d1706aebd28e71350fc4b045c",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 676102,
+       "sha256": "6befb2393ffce907f49bee5794bc7dd9206dc27273338a00b7c84b01e3d74414"
+      },
+      {
+       "frame": 30,
+       "bytes": 915302,
+       "sha256": "5015b0b6621695ae6ebeb57461aefcd7978367a0f01311ec9ef3877a4389cd35"
+      },
+      {
+       "frame": 60,
+       "bytes": 1017489,
+       "sha256": "062c839e97814092bc73f29f9e8b9bbf29f38c167e35d348a2bc1149ef77a1dc"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 299884,
+       "sha256": "9937bfc061aa6111c5292ac0db957d62703628d81e84ba6f3fcc474829952803"
+      },
+      {
+       "frame": 30,
+       "bytes": 368750,
+       "sha256": "0b4a038f161783f424ff09514df91eee9a780e7195fbf0036d7f0f256ad35908"
+      },
+      {
+       "frame": 60,
+       "bytes": 519092,
+       "sha256": "f3023b08ef59c3ff4ec4ce4dca8c0673347e49a4c55dec33fcec2f10223df7bb"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 676102,
+      "sha256": "6befb2393ffce907f49bee5794bc7dd9206dc27273338a00b7c84b01e3d74414"
+     },
+     {
+      "frame": 30,
+      "bytes": 915302,
+      "sha256": "5015b0b6621695ae6ebeb57461aefcd7978367a0f01311ec9ef3877a4389cd35"
+     },
+     {
+      "frame": 60,
+      "bytes": 1017489,
+      "sha256": "062c839e97814092bc73f29f9e8b9bbf29f38c167e35d348a2bc1149ef77a1dc"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 299884,
+      "sha256": "9937bfc061aa6111c5292ac0db957d62703628d81e84ba6f3fcc474829952803"
+     },
+     {
+      "frame": 30,
+      "bytes": 368750,
+      "sha256": "0b4a038f161783f424ff09514df91eee9a780e7195fbf0036d7f0f256ad35908"
+     },
+     {
+      "frame": 60,
+      "bytes": 519092,
+      "sha256": "f3023b08ef59c3ff4ec4ce4dca8c0673347e49a4c55dec33fcec2f10223df7bb"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "__VIDEO_SRC__",
+   "replacement": "locally authored silent motion sample"
+  },
+  {
+   "path": "https://www.transparenttextures.com/patterns/natural-paper.png",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 2.5,
+  "captionSafeArea": false
+ }
+}

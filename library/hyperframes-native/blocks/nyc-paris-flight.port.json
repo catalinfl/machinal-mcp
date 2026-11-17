@@ -1,0 +1,154 @@
+{
+ "id": "blocks-nyc-paris-flight",
+ "nativePath": "blocks/nyc-paris-flight.svelte",
+ "sourceVersion": "sha256:9cc89f3868ae63e19116f895cc039b3bc7b263cd1397f8f7aca27a7eae2c5547",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/nyc-paris-flight/nyc-paris-flight.html",
+  "registry/blocks/nyc-paris-flight/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:9cc89f3868ae63e19116f895cc039b3bc7b263cd1397f8f7aca27a7eae2c5547",
+   "runtimeVersion": "sha256:5a6b11e9faae924f311cb205e6971cbc30142afc86ab73db4fb19d0874050ec8",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 199325,
+       "sha256": "4c1f93f06d07c16eb0488b5c4a56f6e06777852aeb0e2ecd509645a790114fcc"
+      },
+      {
+       "frame": 72,
+       "bytes": 328645,
+       "sha256": "bc28d2a3f798b1d4ea2801ef14d68eeaf85f554d71da943437ef62510a4f921f"
+      },
+      {
+       "frame": 144,
+       "bytes": 388832,
+       "sha256": "021e6e39c4e963f20a0a5494bbe42be3c85889ec11cd646503e5363e52911f6e"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 125625,
+       "sha256": "61035922b289c753ea27d9c46928e4cdc534c04619db7c7c4ac22eb46a4541cf"
+      },
+      {
+       "frame": 72,
+       "bytes": 225304,
+       "sha256": "7ec057b9294302a030bfbd860a771af421492eb6ff6fbd50e7f04818f38a3588"
+      },
+      {
+       "frame": 144,
+       "bytes": 231554,
+       "sha256": "4fbd8dac22b125afceb2726cf9fb483e9a61480ac93ded8aff840a41aeb3caa1"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 199325,
+      "sha256": "4c1f93f06d07c16eb0488b5c4a56f6e06777852aeb0e2ecd509645a790114fcc"
+     },
+     {
+      "frame": 72,
+      "bytes": 328645,
+      "sha256": "bc28d2a3f798b1d4ea2801ef14d68eeaf85f554d71da943437ef62510a4f921f"
+     },
+     {
+      "frame": 144,
+      "bytes": 388832,
+      "sha256": "021e6e39c4e963f20a0a5494bbe42be3c85889ec11cd646503e5363e52911f6e"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 125625,
+      "sha256": "61035922b289c753ea27d9c46928e4cdc534c04619db7c7c4ac22eb46a4541cf"
+     },
+     {
+      "frame": 72,
+      "bytes": 225304,
+      "sha256": "7ec057b9294302a030bfbd860a771af421492eb6ff6fbd50e7f04818f38a3588"
+     },
+     {
+      "frame": 144,
+      "bytes": 231554,
+      "sha256": "4fbd8dac22b125afceb2726cf9fb483e9a61480ac93ded8aff840a41aeb3caa1"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/map-nyc-paris.png",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/sfx-mix.wav",
+   "replacement": "silent audio sample (missing original audio)"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 6,
+  "captionSafeArea": false
+ }
+}

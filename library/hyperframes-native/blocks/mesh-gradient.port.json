@@ -1,0 +1,146 @@
+{
+ "id": "blocks-mesh-gradient",
+ "nativePath": "blocks/mesh-gradient.svelte",
+ "sourceVersion": "sha256:04600b321114c16ca83e775cc9643a2ae4a90058574e21db133cbd8d95382f9b",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/mesh-gradient/lib/shaders.THIRD-PARTY-LICENSES.txt",
+  "registry/blocks/mesh-gradient/lib/shaders.iife.js",
+  "registry/blocks/mesh-gradient/mesh-gradient.html",
+  "registry/blocks/mesh-gradient/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Original MIT WebGPU shader is bundled locally; initialization, seeking, GPU completion and cleanup use the existing scene resource scope.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "Requires a working Chromium WebGPU adapter and Dawn shader compiler; fails explicitly rather than rendering a blank fallback.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:04600b321114c16ca83e775cc9643a2ae4a90058574e21db133cbd8d95382f9b",
+   "runtimeVersion": "sha256:37d12bdb05b08aae60a5772dfabbfe7bde6795af0f17af77c659599e857f2ae7",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 1498423,
+       "sha256": "6e313c3bfe1a70a9319a29d5101cceaddbe0b707abacd7715584033f5c8c16d7"
+      },
+      {
+       "frame": 24,
+       "bytes": 1493229,
+       "sha256": "b0f72b6bf4330839b63e5b36ce61538932fd2b37261fabc73bf660b6230e2f1f"
+      },
+      {
+       "frame": 48,
+       "bytes": 1495194,
+       "sha256": "2f7ff133630e15ab3b31cc18a124c0b2df2b50941e554caca7c61e3cb3c5b456"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 486143,
+       "sha256": "f4a5be0560de26119582c51f75a2933b6525c7b96561848247c93f9bf9f72401"
+      },
+      {
+       "frame": 24,
+       "bytes": 487871,
+       "sha256": "66c8f2722dd8989daa2efd4cf4c0fc6b206fa58b00fee9b5848249c0f6aab124"
+      },
+      {
+       "frame": 48,
+       "bytes": 488928,
+       "sha256": "aa0fcc3d41d2c62f82b1e1d443de7c277220d52949a7c81f70d143bb4d827855"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 1498423,
+      "sha256": "6e313c3bfe1a70a9319a29d5101cceaddbe0b707abacd7715584033f5c8c16d7"
+     },
+     {
+      "frame": 24,
+      "bytes": 1493229,
+      "sha256": "b0f72b6bf4330839b63e5b36ce61538932fd2b37261fabc73bf660b6230e2f1f"
+     },
+     {
+      "frame": 48,
+      "bytes": 1495194,
+      "sha256": "2f7ff133630e15ab3b31cc18a124c0b2df2b50941e554caca7c61e3cb3c5b456"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 486143,
+      "sha256": "f4a5be0560de26119582c51f75a2933b6525c7b96561848247c93f9bf9f72401"
+     },
+     {
+      "frame": 24,
+      "bytes": 487871,
+      "sha256": "66c8f2722dd8989daa2efd4cf4c0fc6b206fa58b00fee9b5848249c0f6aab124"
+     },
+     {
+      "frame": 48,
+      "bytes": 488928,
+      "sha256": "aa0fcc3d41d2c62f82b1e1d443de7c277220d52949a7c81f70d143bb4d827855"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "webgpu",
+ "mediaReplacements": [],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 2,
+  "captionSafeArea": false
+ }
+}

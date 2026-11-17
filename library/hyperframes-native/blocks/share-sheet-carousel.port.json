@@ -1,0 +1,177 @@
+{
+ "id": "blocks-share-sheet-carousel",
+ "nativePath": "blocks/share-sheet-carousel.svelte",
+ "sourceVersion": "sha256:9cea40e0b3cf3cc807ab4c3f5f9e0cfdd3c42b58990d226edc0ddfec38d9e7dd",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/share-sheet-carousel/TEMPLATE.md",
+  "registry/blocks/share-sheet-carousel/assets/hyperframes-logo-black.svg",
+  "registry/blocks/share-sheet-carousel/registry-item.json",
+  "registry/blocks/share-sheet-carousel/share-sheet-carousel.html"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.acceptLabel",
+  "design.brandLogo",
+  "design.declineLabel",
+  "design.itemLabel",
+  "design.senderName",
+  "design.shareTitle",
+  "design.slideImage1",
+  "design.slideImage2",
+  "design.slideImage3",
+  "design.slideImage4",
+  "design.stripText"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "Markup built by the upstream script with innerHTML is reproduced by the same script, so the DOM is identical.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:9cea40e0b3cf3cc807ab4c3f5f9e0cfdd3c42b58990d226edc0ddfec38d9e7dd",
+   "runtimeVersion": "sha256:5b4a16402b4ce7109305d7c1dbe39b3a8eda48a465bf36b4b28b4e8d251e914d",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 135793,
+       "sha256": "fdf6b73c4d82b68f6836e294e9d19c1e50c87bdc875736498edb88ccf6065a97"
+      },
+      {
+       "frame": 86,
+       "bytes": 130566,
+       "sha256": "ffb51da156fa15c1d26734ad7f9cb65bb6db36645ac7d6fb36a6882ca3791827"
+      },
+      {
+       "frame": 173,
+       "bytes": 161019,
+       "sha256": "2e58df3cd27c015058ef4adf5f076d59aad299527ecd4b90fd84b85ebe5ad705"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 295443,
+       "sha256": "182b5837bad9988438ecb4c3bae2462e58a0c4c7e08c0270340f7af0b64624fa"
+      },
+      {
+       "frame": 86,
+       "bytes": 260790,
+       "sha256": "ce8a81d72cb6bd8171d5d8ce4ff6af5a70bab25b57955f13e328f2a94edb4355"
+      },
+      {
+       "frame": 173,
+       "bytes": 279090,
+       "sha256": "c98f50c2faf50449b9f3ed58774ed94a2503fdd1ec8ae6ccfa7ffadf45f0be15"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 135793,
+      "sha256": "fdf6b73c4d82b68f6836e294e9d19c1e50c87bdc875736498edb88ccf6065a97"
+     },
+     {
+      "frame": 86,
+      "bytes": 130566,
+      "sha256": "ffb51da156fa15c1d26734ad7f9cb65bb6db36645ac7d6fb36a6882ca3791827"
+     },
+     {
+      "frame": 173,
+      "bytes": 161019,
+      "sha256": "2e58df3cd27c015058ef4adf5f076d59aad299527ecd4b90fd84b85ebe5ad705"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 295443,
+      "sha256": "182b5837bad9988438ecb4c3bae2462e58a0c4c7e08c0270340f7af0b64624fa"
+     },
+     {
+      "frame": 86,
+      "bytes": 260790,
+      "sha256": "ce8a81d72cb6bd8171d5d8ce4ff6af5a70bab25b57955f13e328f2a94edb4355"
+     },
+     {
+      "frame": 173,
+      "bytes": 279090,
+      "sha256": "c98f50c2faf50449b9f3ed58774ed94a2503fdd1ec8ae6ccfa7ffadf45f0be15"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/slide-01.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/slide-02.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/slide-03.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/slide-04.jpg",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "duration": 7.2333,
+  "captionSafeArea": false
+ }
+}

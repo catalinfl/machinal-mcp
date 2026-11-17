@@ -1,0 +1,175 @@
+{
+ "id": "blocks-message-thread-reveal",
+ "nativePath": "blocks/message-thread-reveal.svelte",
+ "sourceVersion": "sha256:400969131d97d288dcd8e99bdc5e5b8721ac74b0ea4e240d592e6cb1b5ceb7e5",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/message-thread-reveal/TEMPLATE.md",
+  "registry/blocks/message-thread-reveal/assets/hyperframes-logo-black.svg",
+  "registry/blocks/message-thread-reveal/message-thread-reveal.html",
+  "registry/blocks/message-thread-reveal/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.benefitMessage",
+  "design.brandLogo",
+  "design.cardDomain",
+  "design.cardImage",
+  "design.cardTitle",
+  "design.contactName",
+  "design.discoveryMessage",
+  "design.ecCta",
+  "design.ecFeature1",
+  "design.ecFeature2",
+  "design.ecFeature3",
+  "design.ecProof",
+  "design.installMessage",
+  "design.ownershipMessage",
+  "design.questionMessage",
+  "design.reactionEmoji",
+  "design.reactionMessage",
+  "design.sourceMessage",
+  "design.teaserMessage",
+  "design.thanksMessage",
+  "design.workflowMessage"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "Markup built by the upstream script with innerHTML is reproduced by the same script, so the DOM is identical.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:400969131d97d288dcd8e99bdc5e5b8721ac74b0ea4e240d592e6cb1b5ceb7e5",
+   "runtimeVersion": "sha256:ff77cbeaab777a259aa41e5f34ea5260c1fcab4b08e98ce1f72104dd5255f1a3",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 189922,
+       "sha256": "010e4954896739ff288de4c0dce9182a494efa5d1da82a6781c6f9d5d20210cf"
+      },
+      {
+       "frame": 309,
+       "bytes": 217145,
+       "sha256": "522c2d9486c700d635d9589f78a09c23b852a98b109cd7ee592ab6ef16af43db"
+      },
+      {
+       "frame": 618,
+       "bytes": 236742,
+       "sha256": "aada0f8638d3642c07a7428801ddde554068c92beea36a2ca0e80432f13afcc1"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 265303,
+       "sha256": "74bc44cb0224ad3d0f533e2d4682ca25a47de2377164e91b2e3703f74ae571a5"
+      },
+      {
+       "frame": 309,
+       "bytes": 330439,
+       "sha256": "886b47ada15adedfe220406228b16476cbe4832de0671421a0df6e4d64b1f6a5"
+      },
+      {
+       "frame": 618,
+       "bytes": 346057,
+       "sha256": "03c2d911388f6ad1d83c54b9c21e21f04bba1cbf3eaa4c896c6f781a17536849"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 189922,
+      "sha256": "010e4954896739ff288de4c0dce9182a494efa5d1da82a6781c6f9d5d20210cf"
+     },
+     {
+      "frame": 309,
+      "bytes": 217145,
+      "sha256": "522c2d9486c700d635d9589f78a09c23b852a98b109cd7ee592ab6ef16af43db"
+     },
+     {
+      "frame": 618,
+      "bytes": 236742,
+      "sha256": "aada0f8638d3642c07a7428801ddde554068c92beea36a2ca0e80432f13afcc1"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 265303,
+      "sha256": "74bc44cb0224ad3d0f533e2d4682ca25a47de2377164e91b2e3703f74ae571a5"
+     },
+     {
+      "frame": 309,
+      "bytes": 330439,
+      "sha256": "886b47ada15adedfe220406228b16476cbe4832de0671421a0df6e4d64b1f6a5"
+     },
+     {
+      "frame": 618,
+      "bytes": 346057,
+      "sha256": "03c2d911388f6ad1d83c54b9c21e21f04bba1cbf3eaa4c896c6f781a17536849"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/card-image.jpg",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "duration": 25.7667,
+  "captionSafeArea": false
+ }
+}

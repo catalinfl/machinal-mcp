@@ -1,0 +1,365 @@
+{
+ "id": "blocks-carousel-orbit-5",
+ "nativePath": "blocks/carousel-orbit-5.svelte",
+ "sourceVersion": "sha256:9375e5fea2bfa23627784d71c572f5f72b3cac05ee4f6703488d864760179946",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/carousel-orbit-5/carousel-orbit-5.html",
+  "registry/blocks/carousel-orbit-5/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.background",
+  "design.image1",
+  "design.image10",
+  "design.image11",
+  "design.image12",
+  "design.image13",
+  "design.image14",
+  "design.image15",
+  "design.image16",
+  "design.image17",
+  "design.image18",
+  "design.image19",
+  "design.image2",
+  "design.image20",
+  "design.image21",
+  "design.image22",
+  "design.image23",
+  "design.image24",
+  "design.image3",
+  "design.image4",
+  "design.image5",
+  "design.image6",
+  "design.image7",
+  "design.image8",
+  "design.image9",
+  "design.speed"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:9375e5fea2bfa23627784d71c572f5f72b3cac05ee4f6703488d864760179946",
+   "runtimeVersion": "sha256:a96552b678be73e868a95358aa2a6cdf489d4f099e90ee870e0d1802013070ce",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 27798,
+       "sha256": "51ab3e2b55092273d2a51014a6da71eccd70e3bff245a3737c955b4d0af20cb3"
+      },
+      {
+       "frame": 72,
+       "bytes": 43157,
+       "sha256": "f4b24d8c69127c0f1bf57c6f10fcce732ca8f8ec2473781ae640a641c9276a93"
+      },
+      {
+       "frame": 144,
+       "bytes": 41369,
+       "sha256": "2a0eadf18e52b053f782042d5b86cb7ad39a2c095f8f9c84e28b7dd43163b732"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 29259,
+       "sha256": "facf96b31fa0bfe0e0af07ec9748796d43abc29ff0831bcd9346e25e437560f9"
+      },
+      {
+       "frame": 72,
+       "bytes": 44146,
+       "sha256": "2bd51fcd427dd5007779d342db95325e359ed0a13beff656a54ac532d0ade266"
+      },
+      {
+       "frame": 144,
+       "bytes": 42431,
+       "sha256": "d4f377c5e1e445a2ed4368057184bdc675cf287a8946c35316265ca3b7c56dc5"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 27798,
+      "sha256": "51ab3e2b55092273d2a51014a6da71eccd70e3bff245a3737c955b4d0af20cb3"
+     },
+     {
+      "frame": 72,
+      "bytes": 43157,
+      "sha256": "f4b24d8c69127c0f1bf57c6f10fcce732ca8f8ec2473781ae640a641c9276a93"
+     },
+     {
+      "frame": 144,
+      "bytes": 41369,
+      "sha256": "2a0eadf18e52b053f782042d5b86cb7ad39a2c095f8f9c84e28b7dd43163b732"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 29259,
+      "sha256": "facf96b31fa0bfe0e0af07ec9748796d43abc29ff0831bcd9346e25e437560f9"
+     },
+     {
+      "frame": 72,
+      "bytes": 44146,
+      "sha256": "2bd51fcd427dd5007779d342db95325e359ed0a13beff656a54ac532d0ade266"
+     },
+     {
+      "frame": 144,
+      "bytes": 42431,
+      "sha256": "d4f377c5e1e445a2ed4368057184bdc675cf287a8946c35316265ca3b7c56dc5"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/carousel-images/artist-bob-seger.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-dire-straits.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-faces.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-little-feat.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-north-mississippi-allstars.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-sea-level.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-taj-mahal.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-tool.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/artist-van-morrison.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-10-songs.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-bangers.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-bhindi-bhagee.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-chb-2.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-chb.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-homework.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-sleeping.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/pl-y2k.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/track-back-together.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/track-bitter-with-the-sweet.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/track-cleaning-windows.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/track-dixie-chicken-live-at-the-rainbow-theatre-london-u.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/track-dweller-on-the-threshold.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/track-far-east-man.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/carousel-images/track-funky-shit.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-bob-seger.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-dire-straits.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-faces.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-little-feat.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-north-mississippi-allstars.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-sea-level.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-taj-mahal.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-tool.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "artist-van-morrison.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-10-songs.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-bangers.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-bhindi-bhagee.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-chb-2.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-chb.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-homework.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-sleeping.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "pl-y2k.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "track-back-together.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "track-bitter-with-the-sweet.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "track-cleaning-windows.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "track-dixie-chicken-live-at-the-rainbow-theatre-london-u.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "track-dweller-on-the-threshold.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "track-far-east-man.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "track-funky-shit.jpg",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 6,
+  "captionSafeArea": false
+ }
+}

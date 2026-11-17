@@ -1,0 +1,134 @@
+[
+  {
+    "id": "machinal-choreography",
+    "label": "machinal-choreography",
+    "description": "Implement deterministic Svelte motion with anticipation, staged action, restrained easing, secondary movement and readable holds; repair timing without changing captions.",
+    "sourcePath": "skills/machinal-choreography.md"
+  },
+  {
+    "id": "machinal-cinema",
+    "label": "machinal-cinema",
+    "description": "Use for every video creation or editing request in any language, not only explicitly cinematic briefs. In OpenCode, machinal_prepare_video loads this skill as part of required production preparation. Use 66 film styles, directing guides and visual helpers for staging, camera, materials, rhythm and motion. Respect minimal, photo-only and no-generation briefs. Adapt to existing Svelte/Three.js MCP; not a local FFmpeg pipeline or model training.",
+    "sourcePath": "skills/machinal-cinema.md"
+  },
+  {
+    "id": "machinal-credits",
+    "label": "machinal-credits",
+    "description": "Handle machinal post-usage credits, approximate estimates, low balances, pending/final costs and idempotent recovery. No wallet reservations or exact advance AI quotes. Never purchase credits automatically.",
+    "sourcePath": "skills/machinal-credits.md"
+  },
+  {
+    "id": "machinal-editing",
+    "label": "machinal-editing",
+    "description": "Clarify the video brief, integrate images with animated Svelte/Three.js scenes and implement expressive machinal effects, transitions, looks, motion, typography and audio. Use for image-led videos, stronger visual impact, cinematic, social, tutorial, minimal or documentary edits. Pair with machinal-recipes/scenes and credit awareness.",
+    "sourcePath": "skills/machinal-editing.md"
+  },
+  {
+    "id": "machinal-hyperframes",
+    "label": "machinal-hyperframes",
+    "description": "Use the installed Hyperframes components, blocks, examples and skills alongside Cinema; adapt original HTML/GSAP to editable machinal Svelte/SceneThree scenes.",
+    "sourcePath": "skills/machinal-hyperframes.md"
+  },
+  {
+    "id": "machinal-hyperframes-cli",
+    "label": "machinal-hyperframes-cli",
+    "description": "Translate Hyperframes authoring, lint, preview and render concepts to the existing machinal MCP tools without installing another engine.",
+    "sourcePath": "skills/machinal-hyperframes-cli.md"
+  },
+  {
+    "id": "machinal-hyperframes-figma",
+    "label": "machinal-hyperframes-figma",
+    "description": "Translate approved supplied Figma/design exports into editable native scenes, respecting layer hierarchy, artwork and the machinal runtime.",
+    "sourcePath": "skills/machinal-hyperframes-figma.md"
+  },
+  {
+    "id": "machinal-hyperframes-media-use",
+    "label": "machinal-hyperframes-media-use",
+    "description": "Adapt Hyperframes media and licence guidance to approved machinal images, footage, models and audio without activating HeyGen accounts or providers.",
+    "sourcePath": "skills/machinal-hyperframes-media-use.md"
+  },
+  {
+    "id": "machinal-hyperframes-registry",
+    "label": "machinal-hyperframes-registry",
+    "description": "Discover reusable Hyperframes effects, charts, titles, UI scenes, captions and transitions in the complete bundled source catalog.",
+    "sourcePath": "skills/machinal-hyperframes-registry.md"
+  },
+  {
+    "id": "machinal-hyperframes-remotion-to-hyperframes",
+    "label": "machinal-hyperframes-remotion-to-hyperframes",
+    "description": "Adapt supplied Remotion or Hyperframes source concepts directly to native machinal Svelte/SceneThree without adding a competing render engine.",
+    "sourcePath": "skills/machinal-hyperframes-remotion-to-hyperframes.md"
+  },
+  {
+    "id": "machinal-hyperframes-reverse-any-video",
+    "label": "machinal-hyperframes-reverse-any-video",
+    "description": "Decompose an explicitly approved reference video into shots, spatial hierarchy and measured motion, then implement the result in machinal.",
+    "sourcePath": "skills/machinal-hyperframes-reverse-any-video.md"
+  },
+  {
+    "id": "machinal-hyperframes-slideshow",
+    "label": "machinal-hyperframes-slideshow",
+    "description": "Build an approved image-led sequence with measured timing, readable holds and deliberate handoffs in the existing machinal timeline.",
+    "sourcePath": "skills/machinal-hyperframes-slideshow.md"
+  },
+  {
+    "id": "machinal-hyperframes-style-sampling",
+    "label": "machinal-hyperframes-style-sampling",
+    "description": "Sample approved reference palette, typography, materials, camera and rhythm, pairing Hyperframes construction references with Cinema direction.",
+    "sourcePath": "skills/machinal-hyperframes-style-sampling.md"
+  },
+  {
+    "id": "machinal-media",
+    "label": "machinal-media",
+    "description": "Safely browse machinal media with consent, upload client sources to the server volume and deliver opaque expiring links or explicitly requested client-local downloads. Use for media permissions, S3/volume decisions, link revocation, output folders and expired links.",
+    "sourcePath": "skills/machinal-media.md"
+  },
+  {
+    "id": "machinal-motion",
+    "label": "machinal-motion",
+    "description": "Design subject-specific animated scenes from short briefs; choose real assets, references, transformations, composition and shot handoffs before writing Svelte.",
+    "sourcePath": "skills/machinal-motion.md"
+  },
+  {
+    "id": "machinal-recipes",
+    "label": "machinal-recipes",
+    "description": "Author, edit, validate and compile machinal YAML video recipes using the live schema, capabilities and source metadata. Use for document/bindings/assets, clip timing, generation actions or recipe diagnostics; not for arbitrary YAML formats or directly replacing editor state with a recipe.",
+    "sourcePath": "skills/machinal-recipes.md"
+  },
+  {
+    "id": "machinal-review",
+    "label": "machinal-review",
+    "description": "Critique a machinal production contract before scene authoring and verify the resolved edit before rendering. Use for simplistic/generic scenes, missing promised transitions/effects, visual ambition, pacing and continuity. Current-client critique plus deterministic compile_recipe editorialReview; no server critic/model, engine replacement or unapproved paid previews.",
+    "sourcePath": "skills/machinal-review.md"
+  },
+  {
+    "id": "machinal-scenes",
+    "label": "machinal-scenes",
+    "description": "Integrate approved images into ambitious animated Svelte scenes, design signature reveals and use genuine Three.js for spatial storytelling. Use for image-led videos, diagrams, independently moving objects and scene edits via compile_scene/get_scene_source. Current-client source compilation avoids the server-model fee; server scene frames, final encoding and providers remain billed.",
+    "sourcePath": "skills/machinal-scenes.md"
+  },
+  {
+    "id": "machinal-sound",
+    "label": "machinal-sound",
+    "description": "Source licensed Openverse/Freesound sound effects, preserve attribution, import approved audio to projects and synchronize restrained effects to visible actions.",
+    "sourcePath": "skills/machinal-sound.md"
+  },
+  {
+    "id": "machinal-spatial",
+    "label": "machinal-spatial",
+    "description": "Stage genuine Three.js scene action with purposeful camera, lighting, materials, independent geometry and portrait-safe framing in machinal SceneThree.",
+    "sourcePath": "skills/machinal-spatial.md"
+  },
+  {
+    "id": "machinal-support",
+    "label": "machinal-support",
+    "description": "Discover and troubleshoot machinal MCP, missing tools, disconnected servers, authentication and saved keys on Windows/Linux. Use immediately when machinal tools are unavailable or a connection/key fails; recover the existing integration before asking for setup or a replacement key.",
+    "sourcePath": "skills/machinal-support.md"
+  },
+  {
+    "id": "machinal-visual-review",
+    "label": "machinal-visual-review",
+    "description": "Plan and critique sampled scene frames, track versioned evidence, distinguish source checks from visual review and make one bounded targeted repair before rendering.",
+    "sourcePath": "skills/machinal-visual-review.md"
+  }
+]

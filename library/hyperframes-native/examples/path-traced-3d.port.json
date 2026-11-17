@@ -1,0 +1,160 @@
+{
+ "id": "examples-path-traced-3d",
+ "nativePath": "examples/path-traced-3d.svelte",
+ "sourceVersion": "sha256:749924c9d2e97374e69f3a9453b9a99fe90395b9e7e983de7131ff40675f5aa2",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/examples/path-traced-3d/assets/render.js",
+  "registry/examples/path-traced-3d/assets/scene.js",
+  "registry/examples/path-traced-3d/assets/vendor/README.md",
+  "registry/examples/path-traced-3d/assets/vendor/three-gpu-pathtracer.LICENSE.txt",
+  "registry/examples/path-traced-3d/assets/vendor/three-mesh-bvh.LICENSE.txt",
+  "registry/examples/path-traced-3d/assets/vendor/three-path-tracer.min.js",
+  "registry/examples/path-traced-3d/assets/vendor/three.LICENSE.txt",
+  "registry/examples/path-traced-3d/index.html",
+  "registry/examples/path-traced-3d/registry-item.json",
+  "registry/examples/path-traced-3d/source/README.md",
+  "registry/examples/path-traced-3d/source/build.mjs",
+  "registry/examples/path-traced-3d/source/package-lock.json",
+  "registry/examples/path-traced-3d/source/package.json",
+  "registry/examples/path-traced-3d/source/path-traced-3d.test.mjs",
+  "registry/examples/path-traced-3d/source/vendor-entry.js",
+  "registry/examples/path-traced-3d/source/verify-render.mjs"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.bounces",
+  "design.renderer",
+  "design.samples"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:749924c9d2e97374e69f3a9453b9a99fe90395b9e7e983de7131ff40675f5aa2",
+   "runtimeVersion": "sha256:f5a396f72ea98b1c9bb22ecdd7707f57e6fffd89f31c84546a932f3828f6ce75",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 321904,
+       "sha256": "0b2eaf8243ca10274fe38dded57d303f0aeff721dc8fa380ed56e41774468e25"
+      },
+      {
+       "frame": 72,
+       "bytes": 339161,
+       "sha256": "c5b97031f34af04946b2418cf14520a5d2d44d851fd574103ae71e89a8a84cd2"
+      },
+      {
+       "frame": 144,
+       "bytes": 348086,
+       "sha256": "5a438d0d9e72faa096404ae137b963f0f43a7a63488f0a9dc0d5c60695f09fdc"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 223086,
+       "sha256": "50466bbf17cff9af3abd07136d1bac94d030a4050cb75ef4fe288df64c3fa4b4"
+      },
+      {
+       "frame": 72,
+       "bytes": 206943,
+       "sha256": "7f56c1f6fdcb79d0b1fc169bf566647aa2a9e0355f8b6da04e572d1146aeed45"
+      },
+      {
+       "frame": 144,
+       "bytes": 232894,
+       "sha256": "07fdff3cb1aa38dbf4e40277ad3ca843a2c8a0922d8c77066e734a239ec6a1af"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 321904,
+      "sha256": "0b2eaf8243ca10274fe38dded57d303f0aeff721dc8fa380ed56e41774468e25"
+     },
+     {
+      "frame": 72,
+      "bytes": 339161,
+      "sha256": "c5b97031f34af04946b2418cf14520a5d2d44d851fd574103ae71e89a8a84cd2"
+     },
+     {
+      "frame": 144,
+      "bytes": 348086,
+      "sha256": "5a438d0d9e72faa096404ae137b963f0f43a7a63488f0a9dc0d5c60695f09fdc"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 223086,
+      "sha256": "50466bbf17cff9af3abd07136d1bac94d030a4050cb75ef4fe288df64c3fa4b4"
+     },
+     {
+      "frame": 72,
+      "bytes": 206943,
+      "sha256": "7f56c1f6fdcb79d0b1fc169bf566647aa2a9e0355f8b6da04e572d1146aeed45"
+     },
+     {
+      "frame": 144,
+      "bytes": 232894,
+      "sha256": "07fdff3cb1aa38dbf4e40277ad3ca843a2c8a0922d8c77066e734a239ec6a1af"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "pathtracer",
+ "mediaReplacements": [],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 6,
+  "captionSafeArea": false
+ }
+}

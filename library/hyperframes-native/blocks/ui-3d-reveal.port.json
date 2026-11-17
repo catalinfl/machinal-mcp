@@ -1,0 +1,40 @@
+{
+ "id": "blocks-ui-3d-reveal",
+ "nativePath": "blocks/ui-3d-reveal.svelte",
+ "sourceVersion": "sha256:c5c0cdf867899f2f89271dc9c1cc76f74c4491e1faa84dc5210e6ddf17561168",
+ "status": "pending",
+ "sourcePaths": [
+  "registry/blocks/ui-3d-reveal/registry-item.json",
+  "registry/blocks/ui-3d-reveal/ui-3d-reveal.html"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "OFL font files are installed from pinned local Fontsource packages; no font CDN is required.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Explicitly deferred at the user’s request; excluded from published native ports.",
+  "Awaiting production runtime capture or source-vs-port equivalence review; not published as ported.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": false,
+  "visualInspection": false,
+  "motionVerified": false
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 13,
+  "captionSafeArea": false
+ }
+}

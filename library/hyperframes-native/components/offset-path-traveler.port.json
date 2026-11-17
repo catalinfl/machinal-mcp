@@ -1,0 +1,149 @@
+{
+ "id": "components-offset-path-traveler",
+ "nativePath": "components/offset-path-traveler.svelte",
+ "sourceVersion": "sha256:5e9785e4b1ed620c88892eca44ca4f6c9fbb1cda774dd7e0897b0263df986935",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/components/offset-path-traveler/demo.html",
+  "registry/components/offset-path-traveler/offset-path-traveler.html",
+  "registry/components/offset-path-traveler/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.accent",
+  "design.path",
+  "design.traveler_label"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:5e9785e4b1ed620c88892eca44ca4f6c9fbb1cda774dd7e0897b0263df986935",
+   "runtimeVersion": "sha256:ccd4ca341f49809121a0e8be06d4fde95c5fce744e823be9bbd87181c506eb97",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 25885,
+       "sha256": "205ee79e78b761ef08e1f8b3c28e25f8b48dc8a47ba708ef3ce9a2c5b16f419b"
+      },
+      {
+       "frame": 48,
+       "bytes": 68244,
+       "sha256": "b2bbbe43c2dbfefa17a7665fa938a57e33a873bb9a970078ff0f8940d3ef3dc8"
+      },
+      {
+       "frame": 96,
+       "bytes": 72121,
+       "sha256": "232cff8d3851defdefe992f1f5bdb31f01d3f03e80fc0b94f6d85ec1e0804bc1"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 20810,
+       "sha256": "95f63e4d518fbc827da6cdb042ce1f6d7bfbcb16f73a4d8268d067e15086b5c9"
+      },
+      {
+       "frame": 48,
+       "bytes": 20810,
+       "sha256": "95f63e4d518fbc827da6cdb042ce1f6d7bfbcb16f73a4d8268d067e15086b5c9"
+      },
+      {
+       "frame": 96,
+       "bytes": 20810,
+       "sha256": "95f63e4d518fbc827da6cdb042ce1f6d7bfbcb16f73a4d8268d067e15086b5c9"
+      }
+     ],
+     "animated": false
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 25885,
+      "sha256": "205ee79e78b761ef08e1f8b3c28e25f8b48dc8a47ba708ef3ce9a2c5b16f419b"
+     },
+     {
+      "frame": 48,
+      "bytes": 68244,
+      "sha256": "b2bbbe43c2dbfefa17a7665fa938a57e33a873bb9a970078ff0f8940d3ef3dc8"
+     },
+     {
+      "frame": 96,
+      "bytes": 72121,
+      "sha256": "232cff8d3851defdefe992f1f5bdb31f01d3f03e80fc0b94f6d85ec1e0804bc1"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 20810,
+      "sha256": "95f63e4d518fbc827da6cdb042ce1f6d7bfbcb16f73a4d8268d067e15086b5c9"
+     },
+     {
+      "frame": 48,
+      "bytes": 20810,
+      "sha256": "95f63e4d518fbc827da6cdb042ce1f6d7bfbcb16f73a4d8268d067e15086b5c9"
+     },
+     {
+      "frame": 96,
+      "bytes": 20810,
+      "sha256": "95f63e4d518fbc827da6cdb042ce1f6d7bfbcb16f73a4d8268d067e15086b5c9"
+     }
+    ],
+    "animated": false
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 4,
+  "captionSafeArea": false
+ }
+}

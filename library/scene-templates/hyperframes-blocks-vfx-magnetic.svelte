@@ -1,0 +1,533 @@
+<!-- Modified Svelte adaptation of registry/blocks/vfx-magnetic/vfx-magnetic.html; upstream 8ec98be29a64e88239a0c05f7e5d09f36e181493, Apache-2.0; original licence and CREDITS in hyperframes-library/.
+     Subject markup, stylesheet declarations and the source animation are retained; fonts, media and initialization are localized
+     as recorded in the sidecar. Host variables map to `design`, the timeline follows the scene clock, and document-level selectors
+     (html/body/:root/*) are retargeted to `.hf-port` so the port cannot restyle the host page. -->
+<svelte:options preserveWhitespace={true} />
+<script>
+  import { untrack } from 'svelte';
+  import { gsap } from 'gsap';
+  import { uploadHyperframeElement } from '@machinal/hyperframes/assets';
+  import { SceneCanvas, useScene } from '@machinal/scenes/svelte';
+
+  let { design = {} } = $props();
+  const __hfScene = useScene();
+  let root = $state();
+  let timeline = $state.raw();
+
+  // Host shim: the upstream page reads its editable variables from the
+  // HyperFrames host. In the port they come from the approved `design` prop.
+  const __hfHost = { getVariables: () => (design || {}), variables: design || {} };
+
+  // The upstream page publishes its timeline into the host registry,
+  // sometimes from a callback that runs after mount (once fonts are ready).
+  // Pause it at time zero so the scene controller is its only clock source.
+  let __hfTimelineSlot = { set() {}, get: () => undefined };
+
+  $effect(() => {
+    if (!root) return;
+    let live = true;
+    __hfTimelineSlot = {
+      set(value) {
+        if (live) {
+          timeline = value;
+          queueMicrotask(() => {
+            if (live && timeline === value) {
+              value?.pause(0);
+              value?.seek(0, false);
+            }
+          });
+        }
+      },
+      get() {
+        return untrack(() => timeline);
+      },
+    };
+    const context = gsap.context(() => {
+      untrack(() => __hfScene.resources.track(initialize(__hfTimelineSlot, root)));
+    }, root);
+    return () => {
+      live = false;
+      timeline?.kill?.();
+      context.revert();
+      timeline = undefined;
+    };
+  });
+
+  $effect(() => {
+    const active = timeline;
+    const time = __hfScene.frame.time;
+    if (active) untrack(() => {
+      active.seek(time, false);
+      const waits = [];
+      window.dispatchEvent(new CustomEvent('hf-seek', { detail: { time, waitUntil: promise => waits.push(promise) } }));
+      if (typeof window.__hf_page_composite_resolve === 'function') waits.push(window.__hf_page_composite_resolve());
+      if (waits.length) __hfScene.resources.track(Promise.all(waits));
+    });
+  });
+
+  async function initialize(__hfTimelineSlot, __hfRootElement) {
+    const __hfRegistry = new Proxy({}, { get: () => __hfTimelineSlot.get() });
+    const __hfListen = (type, listener, options = {}) => window.addEventListener(type, listener,
+      { ...options, signal: __hfScene.resources.signal });
+    var W = 1920,
+            H = 1080;
+          var canvas = document.getElementById("gl-canvas");
+          var content = document.getElementById("content");
+          var cursorDot = document.getElementById("cursor-dot");
+
+          function isSupported() {
+            var tc = document.createElement("canvas");
+            if (!("layoutSubtree" in tc)) return false;
+            tc.setAttribute("layoutsubtree", "");
+            var ctx = tc.getContext("2d");
+            return ctx && typeof ctx.drawElementImage === "function";
+          }
+
+          // ── WebGL2 Setup ─────────────────────────────────────────────────
+          var gl = canvas.getContext("webgl2", { alpha: false, preserveDrawingBuffer: true });
+
+          function compile(type, src) {
+            var s = gl.createShader(type);
+            gl.shaderSource(s, src);
+            gl.compileShader(s);
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+            return s;
+          }
+          function link(vsSrc, fsSrc) {
+            var p = gl.createProgram();
+            gl.attachShader(p, compile(gl.VERTEX_SHADER, vsSrc));
+            gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fsSrc));
+            gl.linkProgram(p);
+            return p;
+          }
+
+          var VS = [
+            "#version 300 es",
+            "in vec2 a_pos;",
+            "out vec2 v_uv;",
+            "void main() {",
+            "  v_uv = vec2(a_pos.x * 0.5 + 0.5, 0.5 - a_pos.y * 0.5);",
+            "  gl_Position = vec4(a_pos, 0.0, 1.0);",
+            "}",
+          ].join("\n");
+
+          var FS = [
+            "#version 300 es",
+            "precision highp float;",
+            "in vec2 v_uv;",
+            "out vec4 fragColor;",
+            "uniform sampler2D u_content;",
+            "uniform vec2 u_mouse;",
+            "uniform vec2 u_resolution;",
+            "uniform float u_repel;",
+            "uniform float u_strength;",
+            "",
+            "void main() {",
+            "  vec2 uv = v_uv;",
+            "  float aspect = u_resolution.x / u_resolution.y;",
+            "  vec2 delta = u_mouse - uv;",
+            "  vec2 aspectDelta = delta * vec2(aspect, 1.0);",
+            "  float dist = length(aspectDelta);",
+            "  float strength = exp(-dist * dist * 20.0) * 0.04 * u_strength;",
+            "  float direction = mix(1.0, -1.0, u_repel);",
+            "  vec2 displaced = uv + delta * strength * direction;",
+            "  displaced = clamp(displaced, vec2(0.0), vec2(1.0));",
+            "  float aberration = strength * 0.6;",
+            "  vec2 aberDir = normalize(delta + 0.0001) * aberration;",
+            "  float r = texture(u_content, displaced + aberDir * 0.3).r;",
+            "  float g = texture(u_content, displaced).g;",
+            "  float b = texture(u_content, displaced - aberDir * 0.3).b;",
+            "  fragColor = vec4(r, g, b, 1.0);",
+            "}",
+          ].join("\n");
+
+          var prog = link(VS, FS);
+
+          // Quad
+          var vao = gl.createVertexArray();
+          gl.bindVertexArray(vao);
+          var buf = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+          gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+            gl.STATIC_DRAW,
+          );
+          var aPos = gl.getAttribLocation(prog, "a_pos");
+          gl.enableVertexAttribArray(aPos);
+          gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+          // Texture
+          var tex = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_2D, tex);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+          // Uniforms
+          gl.useProgram(prog);
+          var U = {};
+          ["u_content", "u_mouse", "u_resolution", "u_repel", "u_strength"].forEach(function (n) {
+            U[n] = gl.getUniformLocation(prog, n);
+          });
+
+          // ── Capture + Render ─────────────────────────────────────────────
+          var captured = false;
+
+          function captureContent() {
+            if (!isSupported()) return;
+            gl.bindTexture(gl.TEXTURE_2D, tex);
+            uploadHyperframeElement(gl, gl.TEXTURE_2D, content, __hfScene.resources);
+            captured = true;
+          }
+
+          // Also support drawElementImage fallback via 2D context capture
+          function captureVia2D() {
+            var tc = document.createElement("canvas");
+            tc.setAttribute("layoutsubtree", "");
+            tc.width = W;
+            tc.height = H;
+            // Can't use drawElementImage from a different canvas — skip fallback
+          }
+
+          function render(mouseX, mouseY, repel, strength) {
+            gl.viewport(0, 0, W, H);
+            gl.useProgram(prog);
+            gl.bindVertexArray(vao);
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, tex);
+            gl.uniform1i(U.u_content, 0);
+            gl.uniform2f(U.u_mouse, mouseX, mouseY);
+            gl.uniform2f(U.u_resolution, W, H);
+            gl.uniform1f(U.u_repel, repel);
+            gl.uniform1f(U.u_strength, strength);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          }
+
+          // ── Animation State ──────────────────────────────────────────────
+          var S = {
+            mouseX: 0.5,
+            mouseY: 0.5,
+            repel: 0,
+            strength: 0,
+            progress: 0,
+          };
+
+          // ── GSAP Timeline ────────────────────────────────────────────────
+          
+          var tl = gsap.timeline({ paused: true });
+
+          // Driver tween
+          tl.to(
+            S,
+            {
+              progress: 1,
+              duration: 15,
+              ease: "none",
+              onUpdate: function () {
+                // Update cursor dot position
+                cursorDot.style.left = S.mouseX * W + "px";
+                cursorDot.style.top = S.mouseY * H + "px";
+                render(S.mouseX, S.mouseY, S.repel, S.strength);
+              },
+            },
+            0,
+          );
+
+          // Cursor appears
+          tl.to(cursorDot, { opacity: 1, duration: 0.3 }, 0.5);
+          tl.to(S, { strength: 1, duration: 0.5, ease: "power2.out" }, 0.5);
+
+          // Cursor path: smooth figure-8 across the page
+          // Phase 1: sweep across heading
+          tl.to(S, { mouseX: 0.35, mouseY: 0.3, duration: 2, ease: "power1.inOut" }, 1);
+          tl.to(S, { mouseX: 0.6, mouseY: 0.35, duration: 2, ease: "power1.inOut" }, 3);
+
+          // Phase 2: circle around text
+          tl.to(S, { mouseX: 0.4, mouseY: 0.5, duration: 1.5, ease: "sine.inOut" }, 5);
+          tl.to(S, { mouseX: 0.55, mouseY: 0.55, duration: 1.5, ease: "sine.inOut" }, 6.5);
+
+          // Phase 3: repel pulse
+          tl.to(S, { repel: 1, duration: 0.2, ease: "power4.out" }, 8);
+          tl.to(S, { repel: 0, duration: 0.5, ease: "power2.out" }, 8.5);
+
+          // Phase 4: sweep across cards
+          tl.to(S, { mouseX: 0.3, mouseY: 0.75, duration: 2, ease: "power1.inOut" }, 9);
+          tl.to(S, { mouseX: 0.65, mouseY: 0.72, duration: 2, ease: "power1.inOut" }, 11);
+
+          // Phase 5: exit
+          tl.to(S, { mouseX: 0.8, mouseY: 0.2, duration: 1.5, ease: "power2.inOut" }, 13);
+          tl.to(S, { strength: 0, duration: 0.5 }, 14);
+          tl.to(cursorDot, { opacity: 0, duration: 0.3 }, 14.2);
+
+          // Subtitles
+          tl.to("#sub1", { opacity: 1, duration: 0.3 }, 1);
+          tl.to("#sub1", { opacity: 0, duration: 0.3 }, 3.5);
+          tl.to("#sub2", { opacity: 1, duration: 0.3 }, 4);
+          tl.to("#sub2", { opacity: 0, duration: 0.3 }, 6.5);
+          tl.to("#sub3", { opacity: 1, duration: 0.3 }, 7.5);
+          tl.to("#sub3", { opacity: 0, duration: 0.3 }, 9.5);
+          tl.to("#sub4", { opacity: 1, duration: 0.3 }, 10.5);
+          tl.to("#sub4", { opacity: 0, duration: 0.3 }, 13);
+
+          __hfTimelineSlot.set(tl);
+
+          // Paint event for texture upload
+          canvas.onpaint = function () {
+            if (!captured) {
+              gl.bindTexture(gl.TEXTURE_2D, tex);
+              uploadHyperframeElement(gl, gl.TEXTURE_2D, content, __hfScene.resources);
+              captured = true;
+            }
+          };
+
+          queueMicrotask(function () {
+            if (isSupported()) {
+              canvas.requestPaint();
+            }
+            tl.seek(0);
+          });
+    if (window.__hf?.buildReady) await Promise.all(Object.values(window.__hf.buildReady));
+  }
+</script>
+
+<SceneCanvas background="#0c0c0c">
+  <div class="hf-port" data-hf-embedded-fonts bind:this={root}>
+    <div
+          id="root"
+          data-composition-id="magnetic-cursor"
+          data-width="1920"
+          data-height="1080"
+          data-start="0"
+          data-duration="15"
+          data-root="true"
+        >
+          <canvas
+            id="gl-canvas"
+            layoutsubtree
+            width="1920"
+            height="1080"
+            style="position: absolute; top: 0; left: 0; width: 1920px; height: 1080px"
+          >
+            <div class="page-content" id="content" style="width: 1920px; height: 1080px">
+              <div class="page-inner">
+                <h1 class="heading">Pixels bend toward<br />your <em>cursor</em></h1>
+                <p class="body-text">
+                  Move your mouse across this page. Every pixel is drawn through a WebGL shader that
+                  warps space toward your cursor position, like a magnet pulling iron filings beneath a
+                  thin rubber sheet.
+                </p>
+                <p class="body-text">
+                  The distortion follows a Gaussian falloff — strong at close range, tapering smoothly
+                  to nothing. The text remains readable even under deformation.
+                </p>
+                <p class="hint">HTML-in-Canvas API + WebGL2 shader distortion</p>
+                <div class="card-grid">
+                  <div class="card">
+                    <div class="card-icon">&#9889;</div>
+                    <div class="card-title">Real-time</div>
+                    <div class="card-desc">
+                      60fps distortion on live DOM content via texElementImage2D
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="card-icon">&#128268;</div>
+                    <div class="card-title">Native API</div>
+                    <div class="card-desc">
+                      No html2canvas. Browser's own rasterizer at full fidelity.
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="card-icon">&#127912;</div>
+                    <div class="card-title">GPU Shaders</div>
+                    <div class="card-desc">
+                      Gaussian warp + chromatic aberration in one fragment shader pass.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </canvas>
+    
+          
+          <div class="cursor-dot" id="cursor-dot"></div>
+    
+          
+          <div class="subtitle-bar">
+            <div class="subtitle" id="sub1">
+              The HTML-in-Canvas API renders live DOM as a WebGL texture
+            </div>
+            <div class="subtitle" id="sub2">A magnetic shader warps every pixel toward the cursor</div>
+            <div class="subtitle" id="sub3">
+              Chromatic aberration splits RGB channels at the distortion site
+            </div>
+            <div class="subtitle" id="sub4">
+              Impossible without native drawElementImage — no polyfill exists
+            </div>
+          </div>
+    
+          <div
+            id="driver"
+            class="clip"
+            data-start="0"
+            data-duration="15"
+            data-track-index="0"
+            style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+          ></div>
+        </div>
+  </div>
+</SceneCanvas>
+
+<style>
+:global {
+  .hf-port {
+    position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; overflow: hidden;
+  }
+  .hf-port, .hf-port *, .hf-port *::before, .hf-port *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .hf-port {
+    background: #0c0c0c;
+    overflow: hidden;
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
+    color: #e8e8e8;
+  }
+  #root {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: #0c0c0c;
+  }
+  canvas {
+    display: block;
+  }
+
+  .page-content {
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
+    color: #e8e8e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .page-inner {
+    max-width: 900px;
+    padding: 0 48px;
+  }
+  .heading {
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    color: #f0f0f0;
+    margin-bottom: 32px;
+  }
+  .heading em {
+    font-style: normal;
+    color: #70c7ed;
+  }
+  .body-text {
+    font-size: 22px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+  }
+  .body-text:last-of-type {
+    margin-bottom: 48px;
+  }
+  .hint {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.3);
+    font-family: ui-monospace, "SF Mono", monospace;
+    margin-bottom: 48px;
+    letter-spacing: 0.02em;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 24px;
+  }
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: rgba(112, 199, 237, 0.12);
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 8px;
+  }
+  .card-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Subtitles */
+  .subtitle-bar {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    pointer-events: none;
+  }
+  .subtitle {
+    font-size: 28px;
+    font-weight: 500;
+    color: white;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 12px 32px;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+    opacity: 0;
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
+  }
+
+  /* Cursor dot */
+  .cursor-dot {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(112, 199, 237, 0.8);
+    box-shadow:
+      0 0 20px rgba(112, 199, 237, 0.5),
+      0 0 40px rgba(112, 199, 237, 0.3);
+    z-index: 10;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+  }
+}
+</style>

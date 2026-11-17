@@ -1,0 +1,10 @@
+node_modules/
+*.tgz
+coverage/
+.agents/
+.codex/
+.opencode/
+/opencode.jsonc
+/bin/.opencode/
+/bin/opencode.jsonc
+/library/runtime/

@@ -1,0 +1,326 @@
+<!-- Modified Svelte adaptation of registry/components/scramble-reveal/scramble-reveal.html; upstream 8ec98be29a64e88239a0c05f7e5d09f36e181493, Apache-2.0; original licence and CREDITS in hyperframes-library/.
+     Subject markup, stylesheet declarations and the source animation are retained; fonts, media and initialization are localized
+     as recorded in the sidecar. Host variables map to `design`, the timeline follows the scene clock, and document-level selectors
+     (html/body/:root/*) are retargeted to `.hf-port` so the port cannot restyle the host page. -->
+<svelte:options preserveWhitespace={true} />
+<script>
+  import { untrack } from 'svelte';
+  import { gsap } from 'gsap';
+  
+  import { SceneCanvas, useScene } from '@machinal/scenes/svelte';
+
+  let { design = {} } = $props();
+  const __hfScene = useScene();
+  let root = $state();
+  let timeline = $state.raw();
+
+  // Host shim: the upstream page reads its editable variables from the
+  // HyperFrames host. In the port they come from the approved `design` prop.
+  const __hfHost = { getVariables: () => (design || {}), variables: design || {} };
+
+  // The upstream page publishes its timeline into the host registry,
+  // sometimes from a callback that runs after mount (once fonts are ready).
+  // Pause it at time zero so the scene controller is its only clock source.
+  let __hfTimelineSlot = { set() {}, get: () => undefined };
+
+  $effect(() => {
+    if (!root) return;
+    let live = true;
+    __hfTimelineSlot = {
+      set(value) {
+        if (live) {
+          timeline = value;
+          queueMicrotask(() => {
+            if (live && timeline === value) {
+              value?.pause(0);
+              value?.seek(0, false);
+            }
+          });
+        }
+      },
+      get() {
+        return untrack(() => timeline);
+      },
+    };
+    const context = gsap.context(() => {
+      untrack(() => __hfScene.resources.track(initialize(__hfTimelineSlot, root)));
+    }, root);
+    return () => {
+      live = false;
+      timeline?.kill?.();
+      context.revert();
+      timeline = undefined;
+    };
+  });
+
+  $effect(() => {
+    const active = timeline;
+    const time = __hfScene.frame.time;
+    if (active) untrack(() => {
+      active.seek(time, false);
+      const waits = [];
+      window.dispatchEvent(new CustomEvent('hf-seek', { detail: { time, waitUntil: promise => waits.push(promise) } }));
+      if (typeof window.__hf_page_composite_resolve === 'function') waits.push(window.__hf_page_composite_resolve());
+      if (waits.length) __hfScene.resources.track(Promise.all(waits));
+    });
+  });
+
+  async function initialize(__hfTimelineSlot, __hfRootElement) {
+    const __hfRegistry = new Proxy({}, { get: () => __hfTimelineSlot.get() });
+    const __hfListen = (type, listener, options = {}) => window.addEventListener(type, listener,
+      { ...options, signal: __hfScene.resources.signal });
+    (function () {
+                "use strict";
+
+                var root = document.getElementById("root");
+                var stage = root.querySelector(".sr-stage");
+                var textElement = root.querySelector(".sr-text");
+                var vars =
+                  __hfHost && __hfHost.getVariables
+                    ? __hfHost.getVariables()
+                    : {};
+
+                var text = vars.text == null ? "HYPERFRAMES" : String(vars.text);
+                // Each enum choice routes to a DIFFERENT contract token so the
+                // variable stays meaningful under a theme (green/blue/violet must
+                // not collapse into one themed accent).
+                var accentColors = {
+                  green: "var(--brand, #71f5a7)",
+                  blue: "var(--accent, #61a8ff)",
+                  violet: "var(--accent-2, #c5a3ff)",
+                };
+                var accent = Object.prototype.hasOwnProperty.call(accentColors, vars.accent)
+                  ? vars.accent
+                  : "green";
+                var style = vars.style === "clean" ? "clean" : "terminal";
+                var exit = vars.exit === "fade" || vars.exit === "up" ? vars.exit : "none";
+
+                root.style.setProperty("--sr-accent", accentColors[accent]);
+                stage.classList.toggle("sr-clean", style === "clean");
+                stage.setAttribute("aria-label", text);
+
+                var characters = Array.from(text);
+                var fittedCqw = Math.min(11, 118 / Math.max(1, characters.length));
+                root.style.setProperty("--sr-font-size", "min(" + fittedCqw.toFixed(3) + "cqw, 24cqh)");
+
+                var IN_BASE = 1.65;
+                var OUT_BASE = exit === "none" ? 0 : 0.45;
+                var ARRIVAL_BASE = 0.42;
+                var LOCK_TAIL_BASE = 0.15;
+                var STILLNESS = 0.3;
+                var FPS = 30;
+                var duration = Math.max(0.001, parseFloat(root.dataset.duration || "3"));
+                var totalBase = Math.max(0.001, IN_BASE + OUT_BASE);
+                var scale = duration < totalBase ? duration / totalBase : 1;
+                var IN = IN_BASE * scale;
+                var OUT = OUT_BASE * scale;
+                var ARRIVAL = ARRIVAL_BASE * scale;
+                var LOCK_TAIL = LOCK_TAIL_BASE * scale;
+                var HOLD = Math.max(0, duration - (IN + OUT));
+                var HOLD_START = IN;
+                var OUT_START = IN + HOLD;
+                var REVEAL_DURATION = Math.max(0, IN - LOCK_TAIL);
+                var lastFrame = Math.max(1, Math.round(REVEAL_DURATION * FPS));
+
+                // The LCG and all character-state decisions live here. This IIFE
+                // runs once before timeline construction, then only frameTable is
+                // read. Lock frames are monotonic by character index, so the final
+                // target resolves strictly from left to right.
+                var frameTable = (function () {
+                  var glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&*+?<>";
+                  var state = 0x27c0ffee;
+                  var firstLockFrame = Math.min(lastFrame, Math.max(1, Math.round(0.2 * FPS * scale)));
+                  var lockFrames = characters.map(function (character, index) {
+                    if (/\s/.test(character)) return 0;
+                    var position = characters.length <= 1 ? 1 : index / (characters.length - 1);
+                    return Math.round(firstLockFrame + position * (lastFrame - firstLockFrame));
+                  });
+                  var rows = [];
+
+                  for (var frame = 0; frame <= lastFrame; frame += 1) {
+                    var row = characters
+                      .map(function (character, index) {
+                        if (/\s/.test(character) || frame >= lockFrames[index]) return character;
+
+                        state = (Math.imul(1664525, state) + 1013904223) >>> 0;
+                        var glyphIndex = state % glyphs.length;
+                        var glyph = glyphs.charAt(glyphIndex);
+                        if (glyph === character)
+                          glyph = glyphs.charAt((glyphIndex + 1) % glyphs.length);
+                        return glyph;
+                      })
+                      .join("");
+                    rows.push(row);
+                  }
+
+                  return rows;
+                })();
+
+                gsap.set(stage, { opacity: 0, x: "-4cqw", y: "2.4cqh" });
+                textElement.textContent = frameTable[0];
+
+                var tl = gsap.timeline({ paused: true });
+
+                // IN: independently eased axes form the arrival arc. The authored
+                // frame rows then lock the target from left to right at 30 fps.
+                tl.to(stage, { opacity: 1, duration: ARRIVAL, ease: "power2.out" }, 0);
+                tl.to(stage, { x: "0cqw", duration: ARRIVAL, ease: "power3.out" }, 0);
+                tl.to(stage, { y: "0cqh", duration: ARRIVAL, ease: "sine.inOut" }, 0);
+                frameTable.forEach(function (row, frame) {
+                  tl.set(textElement, { textContent: row }, frame / FPS);
+                });
+
+                // HOLD: finite drift ends with authored stillness before departure.
+                var driftHalf = Math.max(0, HOLD - STILLNESS) / 2;
+                if (driftHalf > 0) {
+                  tl.to(
+                    stage,
+                    {
+                      y: "-0.55cqh",
+                      duration: driftHalf,
+                      ease: "sine.inOut",
+                      yoyo: true,
+                      repeat: 1,
+                    },
+                    HOLD_START,
+                  );
+                }
+
+                // OUT: optional departure; exit none holds until the frame cuts.
+                // The up exit keeps the original curved arc departure.
+                if (exit === "up") {
+                  tl.to(stage, { x: "5cqw", duration: OUT, ease: "power2.in" }, OUT_START);
+                  tl.to(stage, { y: "-3.5cqh", duration: OUT, ease: "sine.inOut" }, OUT_START);
+                  tl.to(stage, { opacity: 0, duration: OUT, ease: "power2.in" }, OUT_START);
+                } else if (exit === "fade") {
+                  tl.to(stage, { opacity: 0, duration: OUT, ease: "power2.in" }, OUT_START);
+                }
+
+                tl.seek(0);
+                
+                __hfTimelineSlot.set(tl);
+              })();
+    if (window.__hf?.buildReady) await Promise.all(Object.values(window.__hf.buildReady));
+  }
+</script>
+
+<SceneCanvas>
+  <div class="hf-port" data-hf-embedded-fonts bind:this={root}>
+    <div id="root" data-composition-variables='[
+        &#123; "id": "text", "type": "string", "role": "content", "label": "Text", "description": "Target string that resolves from deterministic wrong glyphs.", "default": "HYPERFRAMES" &#125;,
+        &#123; "id": "accent", "type": "enum", "role": "style", "label": "Accent", "description": "Color used by the text, prefix, and optional terminal frame.", "default": "green", "options": [&#123; "value": "green", "label": "Green" &#125;, &#123; "value": "blue", "label": "Blue" &#125;, &#123; "value": "violet", "label": "Violet" &#125;] &#125;,
+        &#123; "id": "style", "type": "enum", "role": "style", "label": "Style", "description": "Terminal frame or clean text-only presentation.", "default": "terminal", "options": [&#123; "value": "terminal", "label": "Terminal" &#125;, &#123; "value": "clean", "label": "Clean" &#125;] &#125;,
+        &#123; "id": "exit", "type": "enum", "role": "timing", "label": "Exit", "description": "Optional departure. Default none: the locked string holds until the frame cuts.", "default": "none", "options": [&#123; "value": "none", "label": "None" &#125;, &#123; "value": "fade", "label": "Fade" &#125;, &#123; "value": "up", "label": "Up" &#125;] &#125;
+      ]' data-composition-duration="3" data-composition-id="scramble-reveal" data-duration="3" data-fps="30">
+            
+    
+            <div
+              id="scramble-reveal-clip"
+              class="sr-clip clip"
+              data-start="0"
+              data-duration="3"
+              data-track-index="0"
+            >
+              <div class="sr-stage" role="img">
+                <div class="sr-shell">
+                  <span class="sr-prefix" aria-hidden="true">&gt;_</span>
+                  <span class="sr-text" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+    
+            
+            
+          </div>
+  </div>
+</SceneCanvas>
+
+<style>
+:global {
+  .hf-port {
+    position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; overflow: hidden;
+  }
+  .hf-port, .hf-port *, .hf-port *::before, .hf-port *::after {
+    box-sizing: border-box;
+  }
+
+  #root {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: size;
+    isolation: isolate;
+    color: var(--fg, #f8fafc);
+    font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace);
+    pointer-events: none;
+  }
+
+  .sr-clip {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: var(--bg, transparent);
+  }
+
+  .sr-stage {
+    display: block;
+    width: 88cqw;
+    max-width: 88cqw;
+    will-change: transform, opacity;
+  }
+
+  .sr-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 34cqh;
+    padding: var(--space-3, 5cqh) var(--space-3, 5cqw);
+    overflow: hidden;
+    border: 0.16cqmin solid color-mix(in srgb, var(--sr-accent) 58%, var(--border, #475569));
+    border-radius: var(--radius, 2.4cqmin);
+    background: color-mix(in srgb, var(--surface, #0b1016) 92%, var(--sr-accent));
+    box-shadow:
+      0 3.5cqh 10cqh color-mix(in srgb, var(--bg, #000000) 42%, transparent),
+      inset 0 0 4cqh color-mix(in srgb, var(--sr-accent) 7%, transparent);
+  }
+
+  .sr-prefix {
+    flex: 0 0 auto;
+    margin-right: var(--space-1, 1.8cqw);
+    color: color-mix(in srgb, var(--sr-accent) 78%, var(--fg, #ffffff));
+    font-size: calc(var(--sr-font-size) * 0.74);
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.78;
+  }
+
+  .sr-text {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--sr-accent);
+    font-size: var(--sr-font-size);
+    font-weight: 780;
+    line-height: 1;
+    letter-spacing: 0.055em;
+    text-align: center;
+    text-shadow: 0 0 2.8cqh color-mix(in srgb, var(--sr-accent) 34%, transparent);
+    white-space: pre;
+  }
+
+  .sr-stage.sr-clean .sr-shell {
+    min-height: 26cqh;
+    padding: var(--space-2, 3cqh) var(--space-2, 2cqw);
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .sr-stage.sr-clean .sr-prefix {
+    display: none;
+  }
+}
+</style>

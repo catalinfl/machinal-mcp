@@ -1,0 +1,155 @@
+{
+ "id": "blocks-vfx-iphone-device",
+ "nativePath": "blocks/vfx-iphone-device.svelte",
+ "sourceVersion": "sha256:b235aaf00762c9983fd15ff92b7f4c8df806e852aa0dcedc9a6b1edb8348bb19",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/vfx-iphone-device/registry-item.json",
+  "registry/blocks/vfx-iphone-device/vfx-iphone-device.html"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Markup built by the upstream script with innerHTML is reproduced by the same script, so the DOM is identical.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:b235aaf00762c9983fd15ff92b7f4c8df806e852aa0dcedc9a6b1edb8348bb19",
+   "runtimeVersion": "sha256:e1c0f90bc7850c504d6d450b511a7ad53b7d65147c3443c33bcd618b2ce23d37",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 8513,
+       "sha256": "34e2c25102cd1100ba15edb271a0e442b41d0ffac26f102fa3f97c438f9a5d99"
+      },
+      {
+       "frame": 180,
+       "bytes": 186258,
+       "sha256": "b0e20f5383d0b95d49a7407db58883d3699257c6f7c0d29a3f12346f4a02880f"
+      },
+      {
+       "frame": 360,
+       "bytes": 148664,
+       "sha256": "34c260e0926710d14fd72dc42701587282638f85e81da7bee09fd2f50ebff5db"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 10223,
+       "sha256": "835df3ec69538e7996f4a5f2be319f1287220d50f7e9ffa5e1c47eca9e22ed48"
+      },
+      {
+       "frame": 180,
+       "bytes": 139391,
+       "sha256": "ff8c47b41c826043ae63b6eaf69724b8e5aeb75a704879f7af7289e4c56e593d"
+      },
+      {
+       "frame": 360,
+       "bytes": 96400,
+       "sha256": "91c9fe49494368654cca3428c7bf3de3f7913af1fb77345d5c32b6848dfc8c72"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 8513,
+      "sha256": "34e2c25102cd1100ba15edb271a0e442b41d0ffac26f102fa3f97c438f9a5d99"
+     },
+     {
+      "frame": 180,
+      "bytes": 186258,
+      "sha256": "b0e20f5383d0b95d49a7407db58883d3699257c6f7c0d29a3f12346f4a02880f"
+     },
+     {
+      "frame": 360,
+      "bytes": 148664,
+      "sha256": "34c260e0926710d14fd72dc42701587282638f85e81da7bee09fd2f50ebff5db"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 10223,
+      "sha256": "835df3ec69538e7996f4a5f2be319f1287220d50f7e9ffa5e1c47eca9e22ed48"
+     },
+     {
+      "frame": 180,
+      "bytes": 139391,
+      "sha256": "ff8c47b41c826043ae63b6eaf69724b8e5aeb75a704879f7af7289e4c56e593d"
+     },
+     {
+      "frame": 360,
+      "bytes": 96400,
+      "sha256": "91c9fe49494368654cca3428c7bf3de3f7913af1fb77345d5c32b6848dfc8c72"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "models/iphone.glb",
+   "replacement": "locally authored generic iphone model"
+  },
+  {
+   "path": "models/macbook.glb",
+   "replacement": "locally authored generic macbook model"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 15,
+  "captionSafeArea": false
+ }
+}

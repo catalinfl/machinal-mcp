@@ -1,0 +1,150 @@
+{
+ "id": "blocks-vpn-youtube-spot",
+ "nativePath": "blocks/vpn-youtube-spot.svelte",
+ "sourceVersion": "sha256:e217b0deefe6892206932f348a0568dc74e0fc9f34477441441c68e71809dc65",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/vpn-youtube-spot/registry-item.json",
+  "registry/blocks/vpn-youtube-spot/vpn-youtube-spot.html"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:e217b0deefe6892206932f348a0568dc74e0fc9f34477441441c68e71809dc65",
+   "runtimeVersion": "sha256:d57e41b56f624cd8281e80cc6def3868d5e502b94fc263de1a78155a906cb343",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 291248,
+       "sha256": "d69d8e827751c395af0a92cf83d200ad7034d47409170b1fc3bac2f6c0dde4b5"
+      },
+      {
+       "frame": 84,
+       "bytes": 495396,
+       "sha256": "b9a387290b97aa6a185ec43175325e42dfc2bc51563e45463a2a97c87d627ad0"
+      },
+      {
+       "frame": 168,
+       "bytes": 566451,
+       "sha256": "ff7ef2fb07323fe1ff536a22986313c1022762a21be6d200b80a72a0dc43330e"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 118010,
+       "sha256": "6a371423ee277c93cfc2d76f93551708378b606c36f9859ea888c2e6bd46e596"
+      },
+      {
+       "frame": 84,
+       "bytes": 219523,
+       "sha256": "2e94820f6a43c3f6d7db3c2f756dccc67f01108e26616db78674ce3a08bd7252"
+      },
+      {
+       "frame": 168,
+       "bytes": 284556,
+       "sha256": "db57d9214594e9ccb033fa6eb142b47fee27df11fc15fd8229d668ec1d7947b1"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 291248,
+      "sha256": "d69d8e827751c395af0a92cf83d200ad7034d47409170b1fc3bac2f6c0dde4b5"
+     },
+     {
+      "frame": 84,
+      "bytes": 495396,
+      "sha256": "b9a387290b97aa6a185ec43175325e42dfc2bc51563e45463a2a97c87d627ad0"
+     },
+     {
+      "frame": 168,
+      "bytes": 566451,
+      "sha256": "ff7ef2fb07323fe1ff536a22986313c1022762a21be6d200b80a72a0dc43330e"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 118010,
+      "sha256": "6a371423ee277c93cfc2d76f93551708378b606c36f9859ea888c2e6bd46e596"
+     },
+     {
+      "frame": 84,
+      "bytes": 219523,
+      "sha256": "2e94820f6a43c3f6d7db3c2f756dccc67f01108e26616db78674ce3a08bd7252"
+     },
+     {
+      "frame": 168,
+      "bytes": 284556,
+      "sha256": "db57d9214594e9ccb033fa6eb142b47fee27df11fc15fd8229d668ec1d7947b1"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/vpn-sfx.wav",
+   "replacement": "silent audio sample (missing original audio)"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 7.75,
+  "captionSafeArea": false
+ }
+}

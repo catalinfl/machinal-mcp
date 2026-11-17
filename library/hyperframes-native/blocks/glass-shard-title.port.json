@@ -1,0 +1,182 @@
+{
+ "id": "blocks-glass-shard-title",
+ "nativePath": "blocks/glass-shard-title.svelte",
+ "sourceVersion": "sha256:cc78f485840d8584bd635bf7cebcb0b126d0a576325b04a02bbb68b970029c98",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/glass-shard-title/SKILL.upstream.md",
+  "registry/blocks/glass-shard-title/assets/Three-LICENSE.txt",
+  "registry/blocks/glass-shard-title/assets/fonts/CormorantGaramond-OFL.txt",
+  "registry/blocks/glass-shard-title/assets/fonts/Geist-OFL.txt",
+  "registry/blocks/glass-shard-title/assets/glass-main.js",
+  "registry/blocks/glass-shard-title/assets/glass-main.mjs",
+  "registry/blocks/glass-shard-title/build-bundle.mjs",
+  "registry/blocks/glass-shard-title/glass-shard-title.html",
+  "registry/blocks/glass-shard-title/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.bevel",
+  "design.chaos",
+  "design.easePow",
+  "design.flyInRotation",
+  "design.flyInTime",
+  "design.flyOutRotation",
+  "design.flyOutTime",
+  "design.fog",
+  "design.gap",
+  "design.headline",
+  "design.meshSmooth",
+  "design.padding",
+  "design.roundness",
+  "design.sideDist",
+  "design.sizeVariance",
+  "design.stagger",
+  "design.tileCount",
+  "design.zDist",
+  "design.zOut"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "OFL font files are installed from pinned local Fontsource packages; no font CDN is required.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:cc78f485840d8584bd635bf7cebcb0b126d0a576325b04a02bbb68b970029c98",
+   "runtimeVersion": "sha256:3dd427f5cbf67971aea82c90fe682939e9234d558d3b346287f26b8e15d21d15",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 9303,
+       "sha256": "062b99d2758f8aabc7754d28dd62c7cc0359be21514afd965d1c8b1585660bac"
+      },
+      {
+       "frame": 146,
+       "bytes": 141355,
+       "sha256": "82a3b463f1c78e7f5c1700f7e8c44bc3a2fe9e579ee512608a929e4439811593"
+      },
+      {
+       "frame": 292,
+       "bytes": 8512,
+       "sha256": "16ccede6ab5caacfba2d23f72e747ee443431c5d8bb275a84335ebef153d8b12"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 11098,
+       "sha256": "242686fa664cac3edf65b2c557e204ff941a0f8720236e5ddbb5efd18f6c0028"
+      },
+      {
+       "frame": 146,
+       "bytes": 90357,
+       "sha256": "f0f99c954994dc5ed667b7f0cd2a7c0b808874b928e3f04c5dc47e8cf98ff555"
+      },
+      {
+       "frame": 292,
+       "bytes": 10428,
+       "sha256": "105f5d312644666b40aa035cfb7c671bc188ffd9d3f9106bb21ce9ced665a334"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 9303,
+      "sha256": "062b99d2758f8aabc7754d28dd62c7cc0359be21514afd965d1c8b1585660bac"
+     },
+     {
+      "frame": 146,
+      "bytes": 141355,
+      "sha256": "82a3b463f1c78e7f5c1700f7e8c44bc3a2fe9e579ee512608a929e4439811593"
+     },
+     {
+      "frame": 292,
+      "bytes": 8512,
+      "sha256": "16ccede6ab5caacfba2d23f72e747ee443431c5d8bb275a84335ebef153d8b12"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 11098,
+      "sha256": "242686fa664cac3edf65b2c557e204ff941a0f8720236e5ddbb5efd18f6c0028"
+     },
+     {
+      "frame": 146,
+      "bytes": 90357,
+      "sha256": "f0f99c954994dc5ed667b7f0cd2a7c0b808874b928e3f04c5dc47e8cf98ff555"
+     },
+     {
+      "frame": 292,
+      "bytes": 10428,
+      "sha256": "105f5d312644666b40aa035cfb7c671bc188ffd9d3f9106bb21ce9ced665a334"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/ferndale_studio_01_1k.hdr",
+   "replacement": "locally authored studio HDR lighting environment"
+  },
+  {
+   "path": "assets/matcap-1.png",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 12.16,
+  "captionSafeArea": false
+ }
+}

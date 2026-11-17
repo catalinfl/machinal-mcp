@@ -1,0 +1,252 @@
+{
+ "id": "blocks-ios26-liquid-glass",
+ "nativePath": "blocks/ios26-liquid-glass.svelte",
+ "sourceVersion": "sha256:9c1c003e788a895cdacc6b7985fd4813b16316ed3e0d389747812596afe42081",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/ios26-liquid-glass/ios26-liquid-glass.html",
+  "registry/blocks/ios26-liquid-glass/lib/liquid-glass.iife.js",
+  "registry/blocks/ios26-liquid-glass/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Markup built by the upstream script with innerHTML is reproduced by the same script, so the DOM is identical.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:9c1c003e788a895cdacc6b7985fd4813b16316ed3e0d389747812596afe42081",
+   "runtimeVersion": "sha256:6325e2b24977c4b3a118bf37cd6b1375280e50f7b2a5ddef475eed529882b7b9",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 578910,
+       "sha256": "f510eec9d22160194fe543ee9f964c909090d287866d9d27cf795fb91b347f23"
+      },
+      {
+       "frame": 180,
+       "bytes": 578288,
+       "sha256": "e4930aaad34ae1f1d1c9ca6a3fe84e1eae34a8f8d5552ee84223b6c5a9177408"
+      },
+      {
+       "frame": 360,
+       "bytes": 589869,
+       "sha256": "ee28bf9eb070c7111a37e1dff52c37700da47daa0bf86b26df32ffa75b84149b"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 376495,
+       "sha256": "5bc2fb99d5b3c4df71c3719bff15befe0c71429e686528c7c9287443cb10d84d"
+      },
+      {
+       "frame": 180,
+       "bytes": 376108,
+       "sha256": "b606c72efa2298b249bdd22c71cd74bdbaa8f8dd6b31dded4eb79664da7c4fac"
+      },
+      {
+       "frame": 360,
+       "bytes": 412757,
+       "sha256": "21228b95ea3fd5a96abd66a63dfeb147c6e25a873937cf234149922958234b9a"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 578910,
+      "sha256": "f510eec9d22160194fe543ee9f964c909090d287866d9d27cf795fb91b347f23"
+     },
+     {
+      "frame": 180,
+      "bytes": 578288,
+      "sha256": "e4930aaad34ae1f1d1c9ca6a3fe84e1eae34a8f8d5552ee84223b6c5a9177408"
+     },
+     {
+      "frame": 360,
+      "bytes": 589869,
+      "sha256": "ee28bf9eb070c7111a37e1dff52c37700da47daa0bf86b26df32ffa75b84149b"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 376495,
+      "sha256": "5bc2fb99d5b3c4df71c3719bff15befe0c71429e686528c7c9287443cb10d84d"
+     },
+     {
+      "frame": 180,
+      "bytes": 376108,
+      "sha256": "b606c72efa2298b249bdd22c71cd74bdbaa8f8dd6b31dded4eb79664da7c4fac"
+     },
+     {
+      "frame": 360,
+      "bytes": 412757,
+      "sha256": "21228b95ea3fd5a96abd66a63dfeb147c6e25a873937cf234149922958234b9a"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/icons/notify-messages.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/weather.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/stocks.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/find-my.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/home.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/books.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/itunes-store.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/fitness.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/watch.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/contacts.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/files.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/translate.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/calendar.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/photos.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/chatgpt.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/slack.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/instagram.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/x.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/proton-mail.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/gmail.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/revolut.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/phone.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/brave.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/whatsapp.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/icons/music.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "models/iphone.glb",
+   "replacement": "locally authored generic iphone model"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 15,
+  "captionSafeArea": false
+ }
+}

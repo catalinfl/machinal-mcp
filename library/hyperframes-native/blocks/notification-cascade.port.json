@@ -1,0 +1,163 @@
+{
+ "id": "blocks-notification-cascade",
+ "nativePath": "blocks/notification-cascade.svelte",
+ "sourceVersion": "sha256:d8cdef952b4ec3c9f63a298ed8363a2ced04a22944b33f23da10f148ed19bd22",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/notification-cascade/TEMPLATE.md",
+  "registry/blocks/notification-cascade/assets/hyperframes-logo-white.svg",
+  "registry/blocks/notification-cascade/notification-cascade.html",
+  "registry/blocks/notification-cascade/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.appName",
+  "design.brandLogo",
+  "design.footerText",
+  "design.headlineAccent",
+  "design.headlineTop",
+  "design.message1",
+  "design.message2",
+  "design.message3",
+  "design.message4",
+  "design.notifTitle"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:d8cdef952b4ec3c9f63a298ed8363a2ced04a22944b33f23da10f148ed19bd22",
+   "runtimeVersion": "sha256:5b83392c62d862288799e517b80bd1b8b5e02c259bc4dd238f6c5e29cfca7785",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 8508,
+       "sha256": "82a2e41ba517809f5b58a7da95b52f22e165cd40afabe2fa4b082bc45388d894"
+      },
+      {
+       "frame": 168,
+       "bytes": 41492,
+       "sha256": "ed455be4482133143bfc89ce71dfde6305e6fd136d0780596b799a53d87cbc42"
+      },
+      {
+       "frame": 336,
+       "bytes": 67056,
+       "sha256": "20587fb455d375eba1f462c6c333ff30d7005b4ee5f1ec98045cdffa35638034"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 10218,
+       "sha256": "50cd045956c70205e900e0a21a06a154e5f522270df160e9f6234417a48bca1e"
+      },
+      {
+       "frame": 168,
+       "bytes": 137072,
+       "sha256": "c2e33a04ee7f3418a746018aea3536e6c0c8197bdad343a3670c09df2a49e216"
+      },
+      {
+       "frame": 336,
+       "bytes": 86130,
+       "sha256": "6eaa1dd9de81d305f9571e75bb2545a10fd81a0f47843f5f3630c8040814b265"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 8508,
+      "sha256": "82a2e41ba517809f5b58a7da95b52f22e165cd40afabe2fa4b082bc45388d894"
+     },
+     {
+      "frame": 168,
+      "bytes": 41492,
+      "sha256": "ed455be4482133143bfc89ce71dfde6305e6fd136d0780596b799a53d87cbc42"
+     },
+     {
+      "frame": 336,
+      "bytes": 67056,
+      "sha256": "20587fb455d375eba1f462c6c333ff30d7005b4ee5f1ec98045cdffa35638034"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 10218,
+      "sha256": "50cd045956c70205e900e0a21a06a154e5f522270df160e9f6234417a48bca1e"
+     },
+     {
+      "frame": 168,
+      "bytes": 137072,
+      "sha256": "c2e33a04ee7f3418a746018aea3536e6c0c8197bdad343a3670c09df2a49e216"
+     },
+     {
+      "frame": 336,
+      "bytes": 86130,
+      "sha256": "6eaa1dd9de81d305f9571e75bb2545a10fd81a0f47843f5f3630c8040814b265"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/desk-backdrop.jpg",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "duration": 14,
+  "captionSafeArea": false
+ }
+}

@@ -1,0 +1,203 @@
+{
+ "id": "components-cursor-marquee-select",
+ "nativePath": "components/cursor-marquee-select.svelte",
+ "sourceVersion": "sha256:3e39ee47ccb226260b37da4e1109b87190e3ee94a57c425a293bdeeaad5b5eb8",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/components/cursor-marquee-select/cursor-marquee-select.html",
+  "registry/components/cursor-marquee-select/demo.html",
+  "registry/components/cursor-marquee-select/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.accent",
+  "design.end_x",
+  "design.end_y",
+  "design.pill_label",
+  "design.start_x",
+  "design.start_y"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "Markup built by the upstream script with innerHTML is reproduced by the same script, so the DOM is identical.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:3e39ee47ccb226260b37da4e1109b87190e3ee94a57c425a293bdeeaad5b5eb8",
+   "runtimeVersion": "sha256:32beecba422901062c56b3ea68c43849ecf7f7f2d547342c5bbea1c7d7fad476",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 228218,
+       "sha256": "d19c6155d12c03fae67cd03483d8398fcbfcafc7f2908432731f4438b7d7bd1d"
+      },
+      {
+       "frame": 40,
+       "bytes": 235674,
+       "sha256": "dd59ec0e1f8583724ead12a64586773f88f613d0517f7380aa5a0d0835141fbe"
+      },
+      {
+       "frame": 81,
+       "bytes": 238392,
+       "sha256": "6b1d438193443072ce99709037e94cf5c461ad17580ebf0c93e366b84a20741f"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 157825,
+       "sha256": "5b6a41a08a1fadbb6a45ccb203198e86916984e3b82aecabdb8319b8560e8242"
+      },
+      {
+       "frame": 40,
+       "bytes": 163250,
+       "sha256": "d4d4c7cc910685ec4271c24e8eb007c24d96d1d8e23abcbf8903ea1f2869b9ec"
+      },
+      {
+       "frame": 81,
+       "bytes": 161799,
+       "sha256": "49a5d2cf36cc12417eedda70fbf8f8fc918ce1084655cb10711da9f2bdad34d8"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 228218,
+      "sha256": "d19c6155d12c03fae67cd03483d8398fcbfcafc7f2908432731f4438b7d7bd1d"
+     },
+     {
+      "frame": 40,
+      "bytes": 235674,
+      "sha256": "dd59ec0e1f8583724ead12a64586773f88f613d0517f7380aa5a0d0835141fbe"
+     },
+     {
+      "frame": 81,
+      "bytes": 238392,
+      "sha256": "6b1d438193443072ce99709037e94cf5c461ad17580ebf0c93e366b84a20741f"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 157825,
+      "sha256": "5b6a41a08a1fadbb6a45ccb203198e86916984e3b82aecabdb8319b8560e8242"
+     },
+     {
+      "frame": 40,
+      "bytes": 163250,
+      "sha256": "d4d4c7cc910685ec4271c24e8eb007c24d96d1d8e23abcbf8903ea1f2869b9ec"
+     },
+     {
+      "frame": 81,
+      "bytes": 161799,
+      "sha256": "49a5d2cf36cc12417eedda70fbf8f8fc918ce1084655cb10711da9f2bdad34d8"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "beach-sunset.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "mountain-lake.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "city-night.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "morning-coffee.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "forest-path.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "aurora.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "desert-dunes.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "window-portrait.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "harbor-boats.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "poppy-closeup.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "snow-peak.jpg",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "market-stall.jpg",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 3.4,
+  "captionSafeArea": false
+ }
+}

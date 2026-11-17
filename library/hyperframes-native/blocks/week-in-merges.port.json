@@ -1,0 +1,154 @@
+{
+ "id": "blocks-week-in-merges",
+ "nativePath": "blocks/week-in-merges.svelte",
+ "sourceVersion": "sha256:d19919d09fda7c84b935aa149ed3748b0c2ed18a5f5e6f8c53fb9149e34d99e2",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/week-in-merges/registry-item.json",
+  "registry/blocks/week-in-merges/week-in-merges.html"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.eyebrow",
+  "design.footer",
+  "design.overflow",
+  "design.period",
+  "design.rows",
+  "design.rows_max",
+  "design.source",
+  "design.title",
+  "design.total"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:d19919d09fda7c84b935aa149ed3748b0c2ed18a5f5e6f8c53fb9149e34d99e2",
+   "runtimeVersion": "sha256:ee741e11232643b9b471007a4918563a9aa04dae33bcbc539d89e5b18c9ebddd",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 48290,
+       "sha256": "a4119669b344ea1f7e7aac9eaaf0e08838fda143719264fd2e6de7bdb6eec7c8"
+      },
+      {
+       "frame": 192,
+       "bytes": 48324,
+       "sha256": "2a96455cb664d8c71d46f14443fc13a34024ff7da132775483c0a4b82dc1b5ae"
+      },
+      {
+       "frame": 384,
+       "bytes": 48304,
+       "sha256": "38fa0284b03488d779277f3b7a4487ace8b3176b782fc9827096f0d57c3f31be"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 55258,
+       "sha256": "955f5f941d3ce1d1848ff1d3c3c2623413933135d5e3e7a04d9d5d6b794ad998"
+      },
+      {
+       "frame": 192,
+       "bytes": 55320,
+       "sha256": "dd17ebebc07f1160da463ef60f3149b0f200602a6f8b91d63ce390bf9a2590a2"
+      },
+      {
+       "frame": 384,
+       "bytes": 55313,
+       "sha256": "0f2d2a673fb0ea87fa23795d5d3d4e30e1c8b54c3668922e0d1a4b1e5025c82d"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 48290,
+      "sha256": "a4119669b344ea1f7e7aac9eaaf0e08838fda143719264fd2e6de7bdb6eec7c8"
+     },
+     {
+      "frame": 192,
+      "bytes": 48324,
+      "sha256": "2a96455cb664d8c71d46f14443fc13a34024ff7da132775483c0a4b82dc1b5ae"
+     },
+     {
+      "frame": 384,
+      "bytes": 48304,
+      "sha256": "38fa0284b03488d779277f3b7a4487ace8b3176b782fc9827096f0d57c3f31be"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 55258,
+      "sha256": "955f5f941d3ce1d1848ff1d3c3c2623413933135d5e3e7a04d9d5d6b794ad998"
+     },
+     {
+      "frame": 192,
+      "bytes": 55320,
+      "sha256": "dd17ebebc07f1160da463ef60f3149b0f200602a6f8b91d63ce390bf9a2590a2"
+     },
+     {
+      "frame": 384,
+      "bytes": 55313,
+      "sha256": "0f2d2a673fb0ea87fa23795d5d3d4e30e1c8b54c3668922e0d1a4b1e5025c82d"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [],
+ "config": {
+  "width": 1080,
+  "height": 1350,
+  "fps": 30,
+  "duration": 16,
+  "captionSafeArea": false
+ }
+}

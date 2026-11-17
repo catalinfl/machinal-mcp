@@ -1,0 +1,154 @@
+{
+ "id": "blocks-blue-sweater-intro-video",
+ "nativePath": "blocks/blue-sweater-intro-video.svelte",
+ "sourceVersion": "sha256:6d78af83ab674c2a42602db051cd9bfe49d29973bf598c49f53df3e86b049ac5",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/blue-sweater-intro-video/blue-sweater-intro-video.html",
+  "registry/blocks/blue-sweater-intro-video/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page.",
+  "The upstream page declares no editable variables; this scene is a fixed composition."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:6d78af83ab674c2a42602db051cd9bfe49d29973bf598c49f53df3e86b049ac5",
+   "runtimeVersion": "sha256:4621ff3b09704c880df3a94586b2a38c4b00318bcc166a6d87e9775b85892efd",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 8516,
+       "sha256": "1e3041bcc2521ca9411077da40fe52ef6612523d552212b12953281649e6b153"
+      },
+      {
+       "frame": 144,
+       "bytes": 33298,
+       "sha256": "a42b5bdb76020dfde44fda331eaafaf879d36cb00fd96e541d46b35490d23470"
+      },
+      {
+       "frame": 288,
+       "bytes": 56185,
+       "sha256": "857ad5c07e9e878112f7765c69db754b91e2bf76db18c58d3eefc3cf47b61781"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 10430,
+       "sha256": "3a37f1f552e8b8c0aa74f586707c53a402891f1c8e50e02c7b8f8e8d647ff87e"
+      },
+      {
+       "frame": 144,
+       "bytes": 26289,
+       "sha256": "0a7a07e2561667a9c7350f48352f9ab795ed98a92837c0f77139030368c63c33"
+      },
+      {
+       "frame": 288,
+       "bytes": 40400,
+       "sha256": "8e79bb314a2537ddaa52ec14682d9f20a7e0ef3184cfe0f02892d5f56cf84a69"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 8516,
+      "sha256": "1e3041bcc2521ca9411077da40fe52ef6612523d552212b12953281649e6b153"
+     },
+     {
+      "frame": 144,
+      "bytes": 33298,
+      "sha256": "a42b5bdb76020dfde44fda331eaafaf879d36cb00fd96e541d46b35490d23470"
+     },
+     {
+      "frame": 288,
+      "bytes": 56185,
+      "sha256": "857ad5c07e9e878112f7765c69db754b91e2bf76db18c58d3eefc3cf47b61781"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 10430,
+      "sha256": "3a37f1f552e8b8c0aa74f586707c53a402891f1c8e50e02c7b8f8e8d647ff87e"
+     },
+     {
+      "frame": 144,
+      "bytes": 26289,
+      "sha256": "0a7a07e2561667a9c7350f48352f9ab795ed98a92837c0f77139030368c63c33"
+     },
+     {
+      "frame": 288,
+      "bytes": 40400,
+      "sha256": "8e79bb314a2537ddaa52ec14682d9f20a7e0ef3184cfe0f02892d5f56cf84a69"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/joe-sai-avatar.png",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/sfx/integrated-melodic-tech-mix.wav",
+   "replacement": "silent audio sample (missing original audio)"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 12,
+  "captionSafeArea": false
+ }
+}

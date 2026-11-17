@@ -1,0 +1,2345 @@
+[
+  {
+    "id": "internal-agents-captions-overlay",
+    "label": "captions-overlay",
+    "category": "internal-agents",
+    "description": "internal-agents Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-agents/skills/captions-overlay/SKILL.upstream.md",
+    "sha256": "95edff863c75088bb9f603790fb9991e5ef1a2b1887ecff04e499031c7e46655",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-9a1fff6bbb0af3dc2154d7a5",
+        "path": "internal-agents/skills/captions-overlay/SKILL.upstream.md",
+        "bytes": 5801,
+        "sha256": "95edff863c75088bb9f603790fb9991e5ef1a2b1887ecff04e499031c7e46655"
+      }
+    ]
+  },
+  {
+    "id": "internal-agents-changelog-video",
+    "label": "changelog-video",
+    "category": "internal-agents",
+    "description": "internal-agents Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-agents/skills/changelog-video/SKILL.upstream.md",
+    "sha256": "7224d4bbfdf8ab73c2be88b41a42e5573e4fc032d17c66abe9680ad6ee182852",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-7577de40691de7ac5ad7fddf",
+        "path": "internal-agents/skills/changelog-video/SKILL.upstream.md",
+        "bytes": 13476,
+        "sha256": "7224d4bbfdf8ab73c2be88b41a42e5573e4fc032d17c66abe9680ad6ee182852"
+      },
+      {
+        "id": "file-e86a8d6ebc1cb26a299155b5",
+        "path": "internal-agents/skills/changelog-video/examples/master-skeleton.html",
+        "bytes": 8230,
+        "sha256": "8e0b9f966090d7088c0c3f572ad80ae11558ca82edf1cec14b16fcf366882e33"
+      },
+      {
+        "id": "file-1466c7e46eaac861faae3435",
+        "path": "internal-agents/skills/changelog-video/examples/script-tokens.json",
+        "bytes": 1201,
+        "sha256": "248e3b713585dd14a17afaa3d52dfd0dcfe505644c354cd179ad544c046efae5"
+      },
+      {
+        "id": "file-cf0740953bf2c9463d837baa",
+        "path": "internal-agents/skills/changelog-video/references/build-spec.md",
+        "bytes": 6132,
+        "sha256": "51e4184ea06618196b786f0cb4564565bf1020157b84219ed903cceca554092f"
+      },
+      {
+        "id": "file-2429d0b91d7c81160b6d7a2b",
+        "path": "internal-agents/skills/changelog-video/references/lexicon.json",
+        "bytes": 1671,
+        "sha256": "52cbdd05b01c6ff49352cc68957f294515dcd462fb5149a235ff6cf8e419804c"
+      },
+      {
+        "id": "file-7f6be092c65579adf9ebfe6f",
+        "path": "internal-agents/skills/changelog-video/references/script-voice.md",
+        "bytes": 4877,
+        "sha256": "3779239fbadc19afa13772b698dd022a2d65cacd6a79b931c027988ec9f8977d"
+      },
+      {
+        "id": "file-5054874668f1865d3d9d2a08",
+        "path": "internal-agents/skills/changelog-video/references/visualization-registry.md",
+        "bytes": 7348,
+        "sha256": "cbfb33fdd162d43c626e06108c212391472cf4b1c17fb7ddd0b8e621769793ed"
+      },
+      {
+        "id": "file-426ab0fa3d1595a6f3c044db",
+        "path": "internal-agents/skills/changelog-video/scripts/align-captions.mjs",
+        "bytes": 4581,
+        "sha256": "871e58b43daf9e8e52d6838df70a4b5d49982a1c3fdacc973a42362fcd82a7ab"
+      }
+    ]
+  },
+  {
+    "id": "internal-agents-cut-the-curve",
+    "label": "cut-the-curve",
+    "category": "internal-agents",
+    "description": "internal-agents Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-agents/skills/cut-the-curve/SKILL.upstream.md",
+    "sha256": "c97df202caea16949a54afdcbc7007c60063028f73bb56ffeaec630ccb0d5145",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-d540c045e0b3f3af2f48bd5c",
+        "path": "internal-agents/skills/cut-the-curve/SKILL.upstream.md",
+        "bytes": 18859,
+        "sha256": "c97df202caea16949a54afdcbc7007c60063028f73bb56ffeaec630ccb0d5145"
+      },
+      {
+        "id": "file-0b831c5710bd97b1ec6cc480",
+        "path": "internal-agents/skills/cut-the-curve/examples/gsap-implementation.md",
+        "bytes": 10070,
+        "sha256": "c5e523bf1404eff2ffe903bc756006fd21894e1f6c10e630485afc570a2ad72b"
+      }
+    ]
+  },
+  {
+    "id": "internal-agents-motion-doctrine",
+    "label": "motion-doctrine",
+    "category": "internal-agents",
+    "description": "internal-agents Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-agents/skills/motion-doctrine/SKILL.upstream.md",
+    "sha256": "d4d20aa33a57784154ffe55b83424037842269e59cc1e821c1b18bd541877142",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-5bffdeba06bd1b5af96da451",
+        "path": "internal-agents/skills/motion-doctrine/SKILL.upstream.md",
+        "bytes": 11936,
+        "sha256": "d4d20aa33a57784154ffe55b83424037842269e59cc1e821c1b18bd541877142"
+      },
+      {
+        "id": "file-43186a341baa3306ce6531a5",
+        "path": "internal-agents/skills/motion-doctrine/references/seam-gate.md",
+        "bytes": 4778,
+        "sha256": "f69614fddd916e07150c0862e3c49937e076259790586b80bd3dcf240ea46782"
+      },
+      {
+        "id": "file-a54a81ddf1168b25c75371c1",
+        "path": "internal-agents/skills/motion-doctrine/scripts/seam-gate.mjs",
+        "bytes": 22737,
+        "sha256": "580e29c1eff176d52fc62b1a4d92443242712e974c9cc0b4e0bbf57907919605"
+      },
+      {
+        "id": "file-67a80bbdb5cc32c0e726edfc",
+        "path": "internal-agents/skills/motion-doctrine/scripts/seam-stamp.mjs",
+        "bytes": 5755,
+        "sha256": "38040de56d700efd51512714405eda30cfe0bdf1ec4ebb221ec42a50c9f96c4d"
+      }
+    ]
+  },
+  {
+    "id": "internal-agents-oversized-cursor",
+    "label": "oversized-cursor",
+    "category": "internal-agents",
+    "description": "internal-agents Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-agents/skills/oversized-cursor/SKILL.upstream.md",
+    "sha256": "a176b1f251c37908a3a4dc88c76fb389b100a33447b7d2743e4c9acc08a252fe",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-819fee51df75d4f5fcacd58d",
+        "path": "internal-agents/skills/oversized-cursor/SKILL.upstream.md",
+        "bytes": 6625,
+        "sha256": "a176b1f251c37908a3a4dc88c76fb389b100a33447b7d2743e4c9acc08a252fe"
+      }
+    ]
+  },
+  {
+    "id": "internal-agents-seam-craft",
+    "label": "seam-craft",
+    "category": "internal-agents",
+    "description": "internal-agents Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-agents/skills/seam-craft/SKILL.upstream.md",
+    "sha256": "c5aa27c6d6c088fa0bec2941692927975dcd382bc568f6f0ba8518e049e092fe",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-299eedc45e4e4c31b4e89817",
+        "path": "internal-agents/skills/seam-craft/SKILL.upstream.md",
+        "bytes": 4865,
+        "sha256": "c5aa27c6d6c088fa0bec2941692927975dcd382bc568f6f0ba8518e049e092fe"
+      }
+    ]
+  },
+  {
+    "id": "internal-claude-captions-overlay",
+    "label": "captions-overlay",
+    "category": "internal-claude",
+    "description": "internal-claude Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-claude/skills/captions-overlay/SKILL.upstream.md",
+    "sha256": "95edff863c75088bb9f603790fb9991e5ef1a2b1887ecff04e499031c7e46655",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-e0b33e55d59069a7198e5f6d",
+        "path": "internal-claude/skills/captions-overlay/SKILL.upstream.md",
+        "bytes": 5801,
+        "sha256": "95edff863c75088bb9f603790fb9991e5ef1a2b1887ecff04e499031c7e46655"
+      }
+    ]
+  },
+  {
+    "id": "internal-claude-changelog-video",
+    "label": "changelog-video",
+    "category": "internal-claude",
+    "description": "internal-claude Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-claude/skills/changelog-video/SKILL.upstream.md",
+    "sha256": "7224d4bbfdf8ab73c2be88b41a42e5573e4fc032d17c66abe9680ad6ee182852",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-3644bf55143e33d549331dea",
+        "path": "internal-claude/skills/changelog-video/SKILL.upstream.md",
+        "bytes": 13476,
+        "sha256": "7224d4bbfdf8ab73c2be88b41a42e5573e4fc032d17c66abe9680ad6ee182852"
+      },
+      {
+        "id": "file-228d352af5a9811f83630824",
+        "path": "internal-claude/skills/changelog-video/examples/master-skeleton.html",
+        "bytes": 8230,
+        "sha256": "8e0b9f966090d7088c0c3f572ad80ae11558ca82edf1cec14b16fcf366882e33"
+      },
+      {
+        "id": "file-68481ccfe2625f7feaf52bcf",
+        "path": "internal-claude/skills/changelog-video/examples/script-tokens.json",
+        "bytes": 1201,
+        "sha256": "248e3b713585dd14a17afaa3d52dfd0dcfe505644c354cd179ad544c046efae5"
+      },
+      {
+        "id": "file-8c94aa659ceaaa13706990af",
+        "path": "internal-claude/skills/changelog-video/references/build-spec.md",
+        "bytes": 6132,
+        "sha256": "51e4184ea06618196b786f0cb4564565bf1020157b84219ed903cceca554092f"
+      },
+      {
+        "id": "file-346705add193c6695f2e1314",
+        "path": "internal-claude/skills/changelog-video/references/lexicon.json",
+        "bytes": 1671,
+        "sha256": "52cbdd05b01c6ff49352cc68957f294515dcd462fb5149a235ff6cf8e419804c"
+      },
+      {
+        "id": "file-23a20a0ef42d9d1a9d9e0ae9",
+        "path": "internal-claude/skills/changelog-video/references/script-voice.md",
+        "bytes": 4877,
+        "sha256": "3779239fbadc19afa13772b698dd022a2d65cacd6a79b931c027988ec9f8977d"
+      },
+      {
+        "id": "file-bd889deccc2a7ae927b515c1",
+        "path": "internal-claude/skills/changelog-video/references/visualization-registry.md",
+        "bytes": 7348,
+        "sha256": "cbfb33fdd162d43c626e06108c212391472cf4b1c17fb7ddd0b8e621769793ed"
+      },
+      {
+        "id": "file-6b06137d72edca97a1c7f970",
+        "path": "internal-claude/skills/changelog-video/scripts/align-captions.mjs",
+        "bytes": 4581,
+        "sha256": "871e58b43daf9e8e52d6838df70a4b5d49982a1c3fdacc973a42362fcd82a7ab"
+      }
+    ]
+  },
+  {
+    "id": "internal-claude-cut-the-curve",
+    "label": "cut-the-curve",
+    "category": "internal-claude",
+    "description": "internal-claude Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-claude/skills/cut-the-curve/SKILL.upstream.md",
+    "sha256": "c97df202caea16949a54afdcbc7007c60063028f73bb56ffeaec630ccb0d5145",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-e67bb8fc04363b1dcba3bcee",
+        "path": "internal-claude/skills/cut-the-curve/SKILL.upstream.md",
+        "bytes": 18859,
+        "sha256": "c97df202caea16949a54afdcbc7007c60063028f73bb56ffeaec630ccb0d5145"
+      },
+      {
+        "id": "file-c2f359d96845535f8c1e46f4",
+        "path": "internal-claude/skills/cut-the-curve/examples/gsap-implementation.md",
+        "bytes": 10070,
+        "sha256": "c5e523bf1404eff2ffe903bc756006fd21894e1f6c10e630485afc570a2ad72b"
+      }
+    ]
+  },
+  {
+    "id": "internal-claude-motion-doctrine",
+    "label": "motion-doctrine",
+    "category": "internal-claude",
+    "description": "internal-claude Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-claude/skills/motion-doctrine/SKILL.upstream.md",
+    "sha256": "d4d20aa33a57784154ffe55b83424037842269e59cc1e821c1b18bd541877142",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-2bd6bc933013cb02f0da5c12",
+        "path": "internal-claude/skills/motion-doctrine/SKILL.upstream.md",
+        "bytes": 11936,
+        "sha256": "d4d20aa33a57784154ffe55b83424037842269e59cc1e821c1b18bd541877142"
+      },
+      {
+        "id": "file-97489382d5ebfd05f8220bab",
+        "path": "internal-claude/skills/motion-doctrine/references/seam-gate.md",
+        "bytes": 4778,
+        "sha256": "f69614fddd916e07150c0862e3c49937e076259790586b80bd3dcf240ea46782"
+      },
+      {
+        "id": "file-c5032fc2e3e8b6cf506662af",
+        "path": "internal-claude/skills/motion-doctrine/scripts/seam-gate.mjs",
+        "bytes": 22737,
+        "sha256": "580e29c1eff176d52fc62b1a4d92443242712e974c9cc0b4e0bbf57907919605"
+      },
+      {
+        "id": "file-33e60f7688a3b1922bcf8eb3",
+        "path": "internal-claude/skills/motion-doctrine/scripts/seam-stamp.mjs",
+        "bytes": 5755,
+        "sha256": "38040de56d700efd51512714405eda30cfe0bdf1ec4ebb221ec42a50c9f96c4d"
+      }
+    ]
+  },
+  {
+    "id": "internal-claude-oversized-cursor",
+    "label": "oversized-cursor",
+    "category": "internal-claude",
+    "description": "internal-claude Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-claude/skills/oversized-cursor/SKILL.upstream.md",
+    "sha256": "a176b1f251c37908a3a4dc88c76fb389b100a33447b7d2743e4c9acc08a252fe",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-91ef767da5357c90e47b11b9",
+        "path": "internal-claude/skills/oversized-cursor/SKILL.upstream.md",
+        "bytes": 6625,
+        "sha256": "a176b1f251c37908a3a4dc88c76fb389b100a33447b7d2743e4c9acc08a252fe"
+      }
+    ]
+  },
+  {
+    "id": "internal-claude-seam-craft",
+    "label": "seam-craft",
+    "category": "internal-claude",
+    "description": "internal-claude Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "internal-claude/skills/seam-craft/SKILL.upstream.md",
+    "sha256": "c5aa27c6d6c088fa0bec2941692927975dcd382bc568f6f0ba8518e049e092fe",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-3eceae02a035d9973eb5caba",
+        "path": "internal-claude/skills/seam-craft/SKILL.upstream.md",
+        "bytes": 4865,
+        "sha256": "c5aa27c6d6c088fa0bec2941692927975dcd382bc568f6f0ba8518e049e092fe"
+      }
+    ]
+  },
+  {
+    "id": "published-figma",
+    "label": "figma",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/figma/SKILL.upstream.md",
+    "sha256": "11d3bc878c932464eebd55227113055933903b6ac1d179b1578231e0a358b295",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-e7ab64f637d75a98a2435d93",
+        "path": "skills/figma/SKILL.upstream.md",
+        "bytes": 6456,
+        "sha256": "11d3bc878c932464eebd55227113055933903b6ac1d179b1578231e0a358b295"
+      },
+      {
+        "id": "file-34495df3fb6bbf5865bb8479",
+        "path": "skills/figma/scripts/lib/windows-exe-search.mjs",
+        "bytes": 640,
+        "sha256": "6a301aa13e97d3e2e3ba7520c350ebec1b09ecafba24afd6a6866d5c3eb3b10f"
+      },
+      {
+        "id": "file-e9cafc753f7c9d0af83dec09",
+        "path": "skills/figma/scripts/verify-motion.mjs",
+        "bytes": 5089,
+        "sha256": "b3e535cf4f713bf3be8a63fd4beac6b57aea14676cb33fee2bb2bed4f92052de"
+      }
+    ]
+  },
+  {
+    "id": "published-hyperframes-cli",
+    "label": "hyperframes-cli",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/hyperframes-cli/SKILL.upstream.md",
+    "sha256": "15b47980da048017e715effb6300577454e934cc9a88b091018a98863209ce89",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-f3138e6c387b9c5e3c877b70",
+        "path": "skills/hyperframes-cli/SKILL.upstream.md",
+        "bytes": 7744,
+        "sha256": "15b47980da048017e715effb6300577454e934cc9a88b091018a98863209ce89"
+      },
+      {
+        "id": "file-95bb6ad6f65a5cd5ab88653f",
+        "path": "skills/hyperframes-cli/references/beats.md",
+        "bytes": 992,
+        "sha256": "795f67b5c3fa680968a43e6482685fd55a0adb555d179643bfcb7989d251e69a"
+      },
+      {
+        "id": "file-1585d8e0a841778ce15db5af",
+        "path": "skills/hyperframes-cli/references/cloud.md",
+        "bytes": 13272,
+        "sha256": "31f23ab377e9dcfb137940ee69be0cb579c970a4a2a4401653ffe65a7ded513c"
+      },
+      {
+        "id": "file-d60d6c21023a97c96cb9fd7d",
+        "path": "skills/hyperframes-cli/references/cloudrun.md",
+        "bytes": 3553,
+        "sha256": "16f46a18ee3d165dba3b7ee50362bb32cb0a927643a90821e7b63494fe0bde83"
+      },
+      {
+        "id": "file-7c450d2cf738b693d1b73bef",
+        "path": "skills/hyperframes-cli/references/compare-and-batch.md",
+        "bytes": 4378,
+        "sha256": "d17fa5a16707d981fa6473b99a28aa45abf41bca0fd96c5157c632abd0bfc222"
+      },
+      {
+        "id": "file-f7f16d15ed602dfd7b1cf1fb",
+        "path": "skills/hyperframes-cli/references/conventions.md",
+        "bytes": 2092,
+        "sha256": "5012403aa194bc350bdfd89d7c9f00e85c0ecc0356a1417ae4146b7bb8bb7b07"
+      },
+      {
+        "id": "file-0f3280356bd56f2e7e845a29",
+        "path": "skills/hyperframes-cli/references/doctor-browser.md",
+        "bytes": 4411,
+        "sha256": "b794615b597ed85b1aec9575d1aea3e01eab561e743c80f31ecfc6a99e528c14"
+      },
+      {
+        "id": "file-ba5d1e71d29e4b258d968ae1",
+        "path": "skills/hyperframes-cli/references/feedback.md",
+        "bytes": 2539,
+        "sha256": "ae188d5c3e90f0e011b1e322bbfbe10575667b2a5073cffdac05026ac59925a7"
+      },
+      {
+        "id": "file-70e61287b63c25f4c496006e",
+        "path": "skills/hyperframes-cli/references/init-and-scaffold.md",
+        "bytes": 6792,
+        "sha256": "3932ea29b3604dd76f9e6f93642e4e180999ecb7b3fdf4499443bfc38db82c9f"
+      },
+      {
+        "id": "file-8fe81b483703d91f3e8a7c2e",
+        "path": "skills/hyperframes-cli/references/lambda.md",
+        "bytes": 17907,
+        "sha256": "80b8ce187a1dec26bf8bed682cdd1415a79a5d72ba6ef07650c58f5d3795845b"
+      },
+      {
+        "id": "file-912ae9e60df1ed048f9076bd",
+        "path": "skills/hyperframes-cli/references/lint-validate-inspect.md",
+        "bytes": 20082,
+        "sha256": "5a0198691f1a5fdcbf31286a2e7838eda3640f131a292f737a90bc78cfda60eb"
+      },
+      {
+        "id": "file-a66cd7e106dc687ad019a22a",
+        "path": "skills/hyperframes-cli/references/preview-render.md",
+        "bytes": 36764,
+        "sha256": "6408e1975436fc78da1c00cfd962df88e47b72765560cf0b93924a44bf2755e5"
+      },
+      {
+        "id": "file-31db30cc3d1ad98cc84960f5",
+        "path": "skills/hyperframes-cli/references/upgrade-info-misc.md",
+        "bytes": 11866,
+        "sha256": "66b470b78ada7a676b5416859202705fa6450df8b194543fb2762ae949f76336"
+      }
+    ]
+  },
+  {
+    "id": "published-hyperframes-registry",
+    "label": "hyperframes-registry",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/hyperframes-registry/SKILL.upstream.md",
+    "sha256": "70289ff0cfda09de2f58f30e9ba1ffbcc54308a5357bef6a7345100c8ab26842",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-42d7b839f229d30d4020e9cc",
+        "path": "skills/hyperframes-registry/SKILL.upstream.md",
+        "bytes": 4640,
+        "sha256": "70289ff0cfda09de2f58f30e9ba1ffbcc54308a5357bef6a7345100c8ab26842"
+      },
+      {
+        "id": "file-73c69a0891f70ecdbe4b9a8b",
+        "path": "skills/hyperframes-registry/examples/add-block.md",
+        "bytes": 1232,
+        "sha256": "0e3353755c4ef55e53570d1266a4a43b2c5aef9bbe41276430e38cfa6580b83a"
+      },
+      {
+        "id": "file-da416c70e451a474e2e70f8b",
+        "path": "skills/hyperframes-registry/examples/add-component.md",
+        "bytes": 1473,
+        "sha256": "d06992d31eec617a91f5c34630c9274c52dd07898bd24f10a869d0d1cab5af29"
+      },
+      {
+        "id": "file-d70bb26e0c69d411a1a64005",
+        "path": "skills/hyperframes-registry/references/component-quality-bar.md",
+        "bytes": 16390,
+        "sha256": "f0d4c3c44131bc0791f8a8cc3d2d7478d38045451775af7d20b2dd47cf5f91ac"
+      },
+      {
+        "id": "file-4de11939f0fbf36353384d59",
+        "path": "skills/hyperframes-registry/references/contributing.md",
+        "bytes": 7270,
+        "sha256": "3724d1dd269768da26b731f6592ac749f47f62443e909f881ac12ceba36db0fa"
+      },
+      {
+        "id": "file-1d7e68c18960ccf4343e4d78",
+        "path": "skills/hyperframes-registry/references/demo-html-pattern.md",
+        "bytes": 1884,
+        "sha256": "dfc50cd33eff2c2be75437786fc3e851ab0085f7d453fb35b3380ecf9a6e9f04"
+      },
+      {
+        "id": "file-baead02c3640f2a0a04412a3",
+        "path": "skills/hyperframes-registry/references/discovery.md",
+        "bytes": 16593,
+        "sha256": "ca82fcc1e0b2d824b72a8bda99b60d257b23d493fa1d28adbb0548a762cacd04"
+      },
+      {
+        "id": "file-b1197b69301c59ff032533f7",
+        "path": "skills/hyperframes-registry/references/install-locations.md",
+        "bytes": 1519,
+        "sha256": "83793e7d6aeea9a751755e4bd23ea48182ff9af082287b98a1192343d2571dd1"
+      },
+      {
+        "id": "file-76a4173b0b04875a4e18cc92",
+        "path": "skills/hyperframes-registry/references/placeholder-material.md",
+        "bytes": 9006,
+        "sha256": "15adf4a40b26166f64df784aed065adb58051d9ccd5c0c52ad9b71e3b8367a09"
+      },
+      {
+        "id": "file-8da7e233be62e880afefd0a7",
+        "path": "skills/hyperframes-registry/references/search.md",
+        "bytes": 9416,
+        "sha256": "3da7b42d2a0d8d9e2cbcdd8591da5a83203c424de9f46a995950d374a74531ee"
+      },
+      {
+        "id": "file-5bd24cddba8d0c9e77172a55",
+        "path": "skills/hyperframes-registry/references/templates.md",
+        "bytes": 11451,
+        "sha256": "98e1ef62d3c1264b28139d85a1c9b5a8b7438209914aebef6d9890e3f4275805"
+      },
+      {
+        "id": "file-9ca1315ea97b5cd6472b00d6",
+        "path": "skills/hyperframes-registry/references/wiring-blocks.md",
+        "bytes": 2656,
+        "sha256": "34bf92a4d98c2535f699c141f3df4de4697353e95067d5e6b14a4a6cbb1b651a"
+      },
+      {
+        "id": "file-26c22017936caab747a52599",
+        "path": "skills/hyperframes-registry/references/wiring-components.md",
+        "bytes": 1723,
+        "sha256": "6c8341c29fdae6de4f9fd1560a668d11cf34731b81fe5a06c9aeb4a000047b2a"
+      }
+    ]
+  },
+  {
+    "id": "published-hyperframes",
+    "label": "hyperframes",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/hyperframes/SKILL.upstream.md",
+    "sha256": "b0f406b01c09d60cf8f50dfd6adf994f45b47f4f709de66f5e52b2d09b9b3153",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-1083df1267ae02fcebfa3a52",
+        "path": "skills/hyperframes/SKILL.upstream.md",
+        "bytes": 7682,
+        "sha256": "b0f406b01c09d60cf8f50dfd6adf994f45b47f4f709de66f5e52b2d09b9b3153"
+      },
+      {
+        "id": "file-dcf514d03b5582323abd778c",
+        "path": "skills/hyperframes/assets/frame-presets/biennale-yellow/FRAME.md",
+        "bytes": 17789,
+        "sha256": "76d22cced9c152b0edb520543cf34c4ce772a312caa7211c40d4315b53c053cf"
+      },
+      {
+        "id": "file-c4de8b039e9fe8206cc27359",
+        "path": "skills/hyperframes/assets/frame-presets/biennale-yellow/caption-skin.html",
+        "bytes": 8131,
+        "sha256": "b0e4812d9cb5852969be276f8a98ffa2b293ba8cc902fababae3f3f6340088c3"
+      },
+      {
+        "id": "file-febf0f9391c9ff62f385fb17",
+        "path": "skills/hyperframes/assets/frame-presets/biennale-yellow/frame-showcase.html",
+        "bytes": 34908,
+        "sha256": "5ba04e47cf9897e023dcfa49e1ec26fe26bac0c5061097dc6e7cb1d9ed46d7d0"
+      },
+      {
+        "id": "file-6439832bd65aa90ba5cbb9df",
+        "path": "skills/hyperframes/assets/frame-presets/blockframe/FRAME.md",
+        "bytes": 16292,
+        "sha256": "ef8d9d47a209bed4ccc2d928c14a81cdaecb5129f5dc0cdc0dc40afc7ef92931"
+      },
+      {
+        "id": "file-2a5947bd12c4f6864912318c",
+        "path": "skills/hyperframes/assets/frame-presets/blockframe/caption-skin.html",
+        "bytes": 8345,
+        "sha256": "a1073a9910efb0bd146d9ee4513ef95bd72c4993db399ccb4decf2d10002faab"
+      },
+      {
+        "id": "file-ca182637a70ad1aa42e6a65f",
+        "path": "skills/hyperframes/assets/frame-presets/blockframe/frame-showcase.html",
+        "bytes": 38856,
+        "sha256": "8d2e4963713928b353d0aa28c2c83fce415df81b66a500c192b602c0aaf4ddf2"
+      },
+      {
+        "id": "file-977f51968b84ad4d4825bc3a",
+        "path": "skills/hyperframes/assets/frame-presets/blue-professional/FRAME.md",
+        "bytes": 17202,
+        "sha256": "62e9a445885f6057084493de385a8ce20c3b4a299ae36a553ef54884f06bad68"
+      },
+      {
+        "id": "file-4cd2c3188e418734d8f2a7d2",
+        "path": "skills/hyperframes/assets/frame-presets/blue-professional/caption-skin.html",
+        "bytes": 8257,
+        "sha256": "e2524d610d0c833f6b71355357c13b26e670ec581c28ce37d12ead15ce4297b4"
+      },
+      {
+        "id": "file-f1051665feaf04b20854affc",
+        "path": "skills/hyperframes/assets/frame-presets/blue-professional/frame-showcase.html",
+        "bytes": 39108,
+        "sha256": "715b130d086977a48925a3c79bb079fbc7270274c9c9a7761bf275df3020b0ba"
+      },
+      {
+        "id": "file-b071ee5be2e146614eca1ff0",
+        "path": "skills/hyperframes/assets/frame-presets/bold-poster/FRAME.md",
+        "bytes": 15984,
+        "sha256": "af756ef993099f9ac78328f676eb79a6572ff0e9c2aacf12787471cd4525b171"
+      },
+      {
+        "id": "file-e9823c1367be19024459f900",
+        "path": "skills/hyperframes/assets/frame-presets/bold-poster/caption-skin.html",
+        "bytes": 8720,
+        "sha256": "a19c81d30377687605e2345601efabba5315d0d4db13c3ab4748d7004778c24a"
+      },
+      {
+        "id": "file-fd9f46a53aeb3a133461e6e1",
+        "path": "skills/hyperframes/assets/frame-presets/bold-poster/frame-showcase.html",
+        "bytes": 32385,
+        "sha256": "57bbc3374b6a8b37ce59e36ed784c22bbb88fd44d039955221913b3e1bacf159"
+      },
+      {
+        "id": "file-601e89c53ac5c50f62c13c5c",
+        "path": "skills/hyperframes/assets/frame-presets/broadside/FRAME.md",
+        "bytes": 16303,
+        "sha256": "3af0a1e5e61bece19841671672d7732082f03d5699b713475e90323a21dbcc89"
+      },
+      {
+        "id": "file-f08d0f96d313382cb64dc73e",
+        "path": "skills/hyperframes/assets/frame-presets/broadside/caption-skin.html",
+        "bytes": 8431,
+        "sha256": "f074e1a9662d48ec0008aff7fffa1bdeeda40c5c5e05db9bd0fa6dd2ecdc7a6b"
+      },
+      {
+        "id": "file-dbc50221af15fab1d6daa06e",
+        "path": "skills/hyperframes/assets/frame-presets/broadside/frame-showcase.html",
+        "bytes": 33899,
+        "sha256": "8d23a2cbeb898568a5626b38ffc864236fb4a09930d59b17c34c45f34c8e4161"
+      },
+      {
+        "id": "file-a3f4dd8492538b7bce9ac4f8",
+        "path": "skills/hyperframes/assets/frame-presets/capsule/FRAME.md",
+        "bytes": 17214,
+        "sha256": "f06dba67a3859f7c732b5177f7bcc58c94592caa5d6bbbcc6730a7876f5baa7a"
+      },
+      {
+        "id": "file-3c6c283d5474bd16ed86c84a",
+        "path": "skills/hyperframes/assets/frame-presets/capsule/caption-skin.html",
+        "bytes": 8374,
+        "sha256": "0e62f725051213512566b6f615c438b893a3b39507a5a2666a52938c8dd74e46"
+      },
+      {
+        "id": "file-f3d425043932d68ccaf6070f",
+        "path": "skills/hyperframes/assets/frame-presets/capsule/frame-showcase.html",
+        "bytes": 43052,
+        "sha256": "b3a642b5df3bbfb1ff227f1b82ee3ea02b51f20a0d7c5c46c97d72b180cddb4f"
+      },
+      {
+        "id": "file-066a188d990e54489c0503da",
+        "path": "skills/hyperframes/assets/frame-presets/cartesian/FRAME.md",
+        "bytes": 17294,
+        "sha256": "3dc6a31813a333b2a7a1509ddbd3b4dabbbd7e12e6479b6cff10d69c185fec95"
+      },
+      {
+        "id": "file-4f5ebf72c995edfaf2223344",
+        "path": "skills/hyperframes/assets/frame-presets/cartesian/caption-skin.html",
+        "bytes": 8315,
+        "sha256": "e3e08147d1725d40576f4f97687ce0c6a4c32ee1b74dac2720f0ba652b9dfcfd"
+      },
+      {
+        "id": "file-ed11c2dc9de9f4e32bcecf3b",
+        "path": "skills/hyperframes/assets/frame-presets/cartesian/frame-showcase.html",
+        "bytes": 35340,
+        "sha256": "d7867cee5e07c4f22345c566071f2ce0261b3fccca111a94dfbec5fde64f3e55"
+      },
+      {
+        "id": "file-18faa928d81beb381935eaf2",
+        "path": "skills/hyperframes/assets/frame-presets/cobalt-grid/FRAME.md",
+        "bytes": 17286,
+        "sha256": "62a6c9e6e5188cc29b9c0098e9bb8e72c23f152d9a99dd92c58139d26b69b19f"
+      },
+      {
+        "id": "file-46a3c31e58d6208fd08b4e15",
+        "path": "skills/hyperframes/assets/frame-presets/cobalt-grid/caption-skin.html",
+        "bytes": 8825,
+        "sha256": "5cc71d8f0669e80d12ccb6bb83722870eecfeccade0bf64f8fb165e23fbadf3f"
+      },
+      {
+        "id": "file-ee30f25780394fb4d560389a",
+        "path": "skills/hyperframes/assets/frame-presets/cobalt-grid/frame-showcase.html",
+        "bytes": 47020,
+        "sha256": "b135214cd2e310273a01e3f72b2828149f022803954a22a13cbf27aa1c2f518a"
+      },
+      {
+        "id": "file-e711d297288be7d8ca2b9615",
+        "path": "skills/hyperframes/assets/frame-presets/code-editorial/FRAME.md",
+        "bytes": 20610,
+        "sha256": "c24f6925cf938b88a93368443091440648e715c75ac38bd90abdaab6130bb4ad"
+      },
+      {
+        "id": "file-019d37482d6b48988a92ff8e",
+        "path": "skills/hyperframes/assets/frame-presets/code-editorial/caption-skin.html",
+        "bytes": 8322,
+        "sha256": "724a20adff3824e4d31d5d51cc094337209a896a5ef3ae1e4e28aa502ee980e4"
+      },
+      {
+        "id": "file-376b69a24767b662a0d1a766",
+        "path": "skills/hyperframes/assets/frame-presets/code-editorial/fonts/OFL-eb-garamond.txt",
+        "bytes": 4519,
+        "sha256": "f03c8eda63076cd52317dcd40aa04db8472d4cb592dfaafa385129dfdafc7f9c"
+      },
+      {
+        "id": "file-5e1b05c561e1cb29dc663596",
+        "path": "skills/hyperframes/assets/frame-presets/code-editorial/fonts/OFL-inter.txt",
+        "bytes": 4477,
+        "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345"
+      },
+      {
+        "id": "file-9a82ba5a02464367e4b19926",
+        "path": "skills/hyperframes/assets/frame-presets/code-editorial/fonts/OFL-jetbrains-mono.txt",
+        "bytes": 4524,
+        "sha256": "403581b69dac5cff4079205e01c6b467e56af449ecbd7247693ddb1baafa005b"
+      },
+      {
+        "id": "file-7af150b6418d9c1ce053e781",
+        "path": "skills/hyperframes/assets/frame-presets/code-editorial/frame-showcase.html",
+        "bytes": 43711,
+        "sha256": "08d711f5409a6af3fb6de05febe47fee77e4c8e85517bf2d087e2277b524e4ab"
+      },
+      {
+        "id": "file-33fabc78ab1095c5db2820a4",
+        "path": "skills/hyperframes/assets/frame-presets/coral/FRAME.md",
+        "bytes": 18950,
+        "sha256": "8530ecb36d1bb2d53392d88d972df35beeba19a5bcb3260fc9b18a58de7cdfe8"
+      },
+      {
+        "id": "file-ca98a89422ce38c742b24dbe",
+        "path": "skills/hyperframes/assets/frame-presets/coral/caption-skin.html",
+        "bytes": 8330,
+        "sha256": "44904b0567292521391fb576f07de7d2f5d8bce81d0369460f1054d093a06877"
+      },
+      {
+        "id": "file-abffd4441d474685ea5f06cd",
+        "path": "skills/hyperframes/assets/frame-presets/coral/frame-showcase.html",
+        "bytes": 36472,
+        "sha256": "8ddf31ae13a4e57fe9730892fbbcb171cae67a204b5cb00b00374984f49b8f76"
+      },
+      {
+        "id": "file-df970fbee65e6f9f8827b37f",
+        "path": "skills/hyperframes/assets/frame-presets/creative-mode/FRAME.md",
+        "bytes": 19605,
+        "sha256": "c1a1359502d9fc79ef267305291fe0f651219c72d88088cee32327dd933dead8"
+      },
+      {
+        "id": "file-2a15e2b02c5ce47dac210c50",
+        "path": "skills/hyperframes/assets/frame-presets/creative-mode/caption-skin.html",
+        "bytes": 8389,
+        "sha256": "2a45f759d64f5f6713ad2d529468df5bb345afe7d441d46c6316072348c1061b"
+      },
+      {
+        "id": "file-907c38edd368633e8205d12f",
+        "path": "skills/hyperframes/assets/frame-presets/creative-mode/frame-showcase.html",
+        "bytes": 38750,
+        "sha256": "32c1371fcd526c56edb515e5b255ad736a3e330ba3ff2631c61576064b384ef0"
+      },
+      {
+        "id": "file-756ed0ffa32bc2749de26a53",
+        "path": "skills/hyperframes/assets/frame-presets/daisy-days/FRAME.md",
+        "bytes": 17445,
+        "sha256": "42d827dbd279990052e171d04380b5e6bbc111ae391dc283deb7a452e70b9b97"
+      },
+      {
+        "id": "file-37a9bfa6cd6893db422d7fc7",
+        "path": "skills/hyperframes/assets/frame-presets/daisy-days/caption-skin.html",
+        "bytes": 8516,
+        "sha256": "5af839f607efb817d96956f3b016fd6fd065851f69ac1ac223a8634737bd497e"
+      },
+      {
+        "id": "file-97fd81cb5f9bad28b3c11c36",
+        "path": "skills/hyperframes/assets/frame-presets/daisy-days/frame-showcase.html",
+        "bytes": 42293,
+        "sha256": "4fb93e5fa3ba12367f303996b6ca8b62f8e18c721d02e8032274df12d49d96f3"
+      },
+      {
+        "id": "file-c30bd07e3c7b6d6e9aca314a",
+        "path": "skills/hyperframes/assets/frame-presets/editorial-forest/FRAME.md",
+        "bytes": 17019,
+        "sha256": "ceeb2ab768367da1e1f3e1eca36ab9feeb3de3e4d15493319b0044c3d869329c"
+      },
+      {
+        "id": "file-3e809562b259ffe0ff49ec17",
+        "path": "skills/hyperframes/assets/frame-presets/editorial-forest/caption-skin.html",
+        "bytes": 8356,
+        "sha256": "50427bf7fcec9c8ac22f195a0e7fc442ad85e733198837ee0b9b8050296a0fa5"
+      },
+      {
+        "id": "file-4d3f1f424fa8adcf53aa6871",
+        "path": "skills/hyperframes/assets/frame-presets/editorial-forest/frame-showcase.html",
+        "bytes": 36847,
+        "sha256": "bb87b88b91184f4fee7f02eea63ed35d9d378fa89fad8988326e31e82a43dbb1"
+      },
+      {
+        "id": "file-d1595eab09db0533c52f656f",
+        "path": "skills/hyperframes/references/captions.md",
+        "bytes": 4985,
+        "sha256": "e7e2af7eace992487baa455bfa703fb3d770fb29f36732541554e60a46896d54"
+      },
+      {
+        "id": "file-54086d131e698b9301c53049",
+        "path": "skills/hyperframes/references/film.md",
+        "bytes": 7236,
+        "sha256": "b684403f725cf720b9f192bafd420ca55f24060114004234a4e46a715de7a183"
+      },
+      {
+        "id": "file-ce717808f257aa0a153a7fb5",
+        "path": "skills/hyperframes/references/format.md",
+        "bytes": 13729,
+        "sha256": "f61ac9f8dced54ccaf17e9e6f3b027bedd4d9ece2ec6dcba39823b06f53a332d"
+      },
+      {
+        "id": "file-3367f756749dfe7892163502",
+        "path": "skills/hyperframes/references/look.md",
+        "bytes": 6031,
+        "sha256": "5128a54cdb75bca2f627170e4a3a9667f4f11cf1579301fc16c53862c29c3ad3"
+      },
+      {
+        "id": "file-1f55f5020d66372a3dc8781e",
+        "path": "skills/hyperframes/references/motion.md",
+        "bytes": 12496,
+        "sha256": "bd55ea56343346060cd612a30874996e82f48ac5051ecb2bd1ab01efe4e2fc71"
+      },
+      {
+        "id": "file-d71e8655ae467bc875b6b9aa",
+        "path": "skills/hyperframes/references/overlays.md",
+        "bytes": 2613,
+        "sha256": "dc055a8f60d1ed61ef6760a7dea651f08b7f4e54e6ef80e65d09b170e3af1d72"
+      },
+      {
+        "id": "file-74678cad48cbfdb31da63bd3",
+        "path": "skills/hyperframes/references/path-tracing.md",
+        "bytes": 5762,
+        "sha256": "c45284156bfb77b5151cf6e5b34d47cad8e7da871147e842b4ebe358b187c6b7"
+      },
+      {
+        "id": "file-d60851fc286ca33fba3ad63c",
+        "path": "skills/hyperframes/references/plugin-installation.md",
+        "bytes": 4166,
+        "sha256": "2e31b2880a1d297a7b37eeb195aa070ca9fc297ba8524d420f3d8892ea2609b8"
+      },
+      {
+        "id": "file-055802261083745ea90badd5",
+        "path": "skills/hyperframes/references/review.md",
+        "bytes": 5327,
+        "sha256": "90886b58db02aaa53e6b91c433748629eda061b18465804b56ebbbab92508e56"
+      },
+      {
+        "id": "file-6671f9e24465c208baab724b",
+        "path": "skills/hyperframes/references/runtimes.md",
+        "bytes": 4188,
+        "sha256": "438b527d08c6aaef96f9750d4be68e8b558aebeb6ce96cf39c5338bd170032e5"
+      },
+      {
+        "id": "file-923823925fb86df4f531979d",
+        "path": "skills/hyperframes/references/skill-lifecycle.md",
+        "bytes": 4926,
+        "sha256": "094f8bc2d2ec3db9f306d9ab2a2d9a60a65e00bbeeb2f1aa4760d92b1f438b6d"
+      },
+      {
+        "id": "file-f95a9730211164bc8dfc3eb5",
+        "path": "skills/hyperframes/references/sound.md",
+        "bytes": 3651,
+        "sha256": "0e7cf882b5aef638ca66dc2989a1fba1b7ea61772d2307a3acb502090cb72e7c"
+      },
+      {
+        "id": "file-f95d1e6df839279a241fe27f",
+        "path": "skills/hyperframes/references/spec.md",
+        "bytes": 6055,
+        "sha256": "6fa0658c5cf5c23058f70a6549cc952d683979052a0934760ba748bbec88fbc0"
+      },
+      {
+        "id": "file-d17b80b50477afcfbf056a33",
+        "path": "skills/hyperframes/references/story.md",
+        "bytes": 11486,
+        "sha256": "3c2b96bb7f262652f4bf5efdef1ae806b47fd259c6704cb131938c5254965f22"
+      },
+      {
+        "id": "file-60122c2246610714fca4b735",
+        "path": "skills/hyperframes/references/storyboard-format.md",
+        "bytes": 6696,
+        "sha256": "f79e3be44cf2e506cdd2d1c46926319a0067f11889fe8aaf3a55759a9c61fb86"
+      },
+      {
+        "id": "file-f5e0b7306666f36b6ec4239d",
+        "path": "skills/hyperframes/references/storyboard.md",
+        "bytes": 4456,
+        "sha256": "b71197f1234c435e7c91ad22e6ce348542a9e4cddede41dba09c8986edc6598b"
+      },
+      {
+        "id": "file-9506b50147f72dbbe13bfe0c",
+        "path": "skills/hyperframes/references/types/3d.md",
+        "bytes": 1805,
+        "sha256": "1194492ec496e2146ae1e772fd5de6e23d850d25523f80ea61540331d748291e"
+      },
+      {
+        "id": "file-ac05f23d6f3fc8d9f5105c1a",
+        "path": "skills/hyperframes/references/types/character.md",
+        "bytes": 1635,
+        "sha256": "e8b4f6fd622acff593e2d7e478aa4e18ace1f9f785d16e42db5faf57ed525498"
+      },
+      {
+        "id": "file-d14d1dc381f77948c41620a7",
+        "path": "skills/hyperframes/references/types/data.md",
+        "bytes": 1322,
+        "sha256": "c5fda22433aca573b871eeff956cd57e3773d6b16ffd9b3cc5726937912c1b7a"
+      },
+      {
+        "id": "file-f4085161876d9b8feb9266aa",
+        "path": "skills/hyperframes/references/types/explainer.md",
+        "bytes": 3045,
+        "sha256": "ef2bd945bd347e760fd483515189c58e8000bd2cbc5f4b1c2d3e5d34e4d81f4e"
+      },
+      {
+        "id": "file-15e12660862ef17c18c5af75",
+        "path": "skills/hyperframes/references/types/launch.md",
+        "bytes": 4738,
+        "sha256": "1405b663227018d3dd7bfef895bcea3d3dd6c596078316bec30e8686d014f661"
+      },
+      {
+        "id": "file-317874f1f0cb58b5900a4230",
+        "path": "skills/hyperframes/references/types/music.md",
+        "bytes": 1606,
+        "sha256": "868df2814d2a8e8f2bc884372d674320aee43c995fc67d25a109ebfdecb58b4a"
+      },
+      {
+        "id": "file-7cd45d5ddbb6edc3b334788a",
+        "path": "skills/hyperframes/references/types/vertical.md",
+        "bytes": 1646,
+        "sha256": "fed9f5a1a3ceb204bb54e0dda0fd50befe611d0ab388a5036fc80cbc117a691b"
+      },
+      {
+        "id": "file-8ec89f65664ee8e3f75313aa",
+        "path": "skills/hyperframes/scripts/bake-basemap.mjs",
+        "bytes": 18197,
+        "sha256": "fea86ab2e2aab59fa81e4b26d77c0edcaadaf4c41b4455cf359c06047088c40c"
+      },
+      {
+        "id": "file-6fb9526f171d55b5da34fb94",
+        "path": "skills/hyperframes/scripts/lib/main-module.mjs",
+        "bytes": 479,
+        "sha256": "61811e09110856e1439c29875e4a4ad7701ae45d4045f9d1dcb6a7929698e4c0"
+      },
+      {
+        "id": "file-0cac98dd191843ce171deb42",
+        "path": "skills/hyperframes/scripts/lib/main-module.test.mjs",
+        "bytes": 1943,
+        "sha256": "3d0ee22dd8b7acbdf8997c11449f29f13bafe6b20668a478ba504f66ec1ef151"
+      },
+      {
+        "id": "file-16b8261d19a2aea96add8a6f",
+        "path": "skills/hyperframes/scripts/lib/windows-exe-search.mjs",
+        "bytes": 640,
+        "sha256": "6a301aa13e97d3e2e3ba7520c350ebec1b09ecafba24afd6a6866d5c3eb3b10f"
+      },
+      {
+        "id": "file-55d03672a2a7415be3164f50",
+        "path": "skills/hyperframes/scripts/lib/windows-exe-search.test.mjs",
+        "bytes": 5699,
+        "sha256": "11b83c0772e2021fe775ed616ec15418dd155d9c2d377624d0dbc36d0a1db681"
+      },
+      {
+        "id": "file-49db8ff97202006d8d001c5a",
+        "path": "skills/hyperframes/scripts/locate.mjs",
+        "bytes": 8273,
+        "sha256": "c6583d7867b32a2f6f0c144f79b9abd27b9792c4bffa1256547d58cbcf5c0248"
+      },
+      {
+        "id": "file-2ee936969db51a697eeb3a47",
+        "path": "skills/hyperframes/scripts/plugin-cli.mjs",
+        "bytes": 5644,
+        "sha256": "2f93e37115183b3c4d13f84f7207a44c17411b2107a7515e0c59076d7da5a3bc"
+      },
+      {
+        "id": "file-265951df25f5cc15cd50a750",
+        "path": "skills/hyperframes/scripts/plugin-cli.test.mjs",
+        "bytes": 12618,
+        "sha256": "d3c84b1f82ce5ad7bc9de3fbb27e5c0416f996613105db77f486e4904549cc26"
+      }
+    ]
+  },
+  {
+    "id": "published-media-use",
+    "label": "media-use",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/media-use/SKILL.upstream.md",
+    "sha256": "2eef0b69ab75e54481ff73b6617b70cb0b7ac620a993e7996248c3a80fee558e",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-592409531c87addd5b709de0",
+        "path": "skills/media-use/.gitignore",
+        "bytes": 17,
+        "sha256": "a299ec0fcdb6bc6670cf9fb22eefe3fcc37730e2e554b7f54e25de88be1ede02"
+      },
+      {
+        "id": "file-6a46238e98b137db0cccd8d8",
+        "path": "skills/media-use/SKILL.upstream.md",
+        "bytes": 5451,
+        "sha256": "2eef0b69ab75e54481ff73b6617b70cb0b7ac620a993e7996248c3a80fee558e"
+      },
+      {
+        "id": "file-63a5b05aefc971827946cc25",
+        "path": "skills/media-use/audio/assets/sfx/CREDITS.md",
+        "bytes": 1183,
+        "sha256": "79590c7738b0427b10f362f76b02cfd2643158a40e1d5fd787f9ac6b33bcf4ce"
+      },
+      {
+        "id": "file-76a04ec2961619d19775f19f",
+        "path": "skills/media-use/audio/assets/sfx/manifest.json",
+        "bytes": 3721,
+        "sha256": "1b1aae06c6e25412e1d217ebf1e646a0ed36410c0fcad11acdb8f5d5e5b7dc10"
+      },
+      {
+        "id": "file-4694585537b8d6ec0ccfa5b1",
+        "path": "skills/media-use/audio/references/bgm.md",
+        "bytes": 8128,
+        "sha256": "49c9d4d8b733e9c0d80e084be35c99432e2accc1c57266b3f01c3155e0acc47e"
+      },
+      {
+        "id": "file-5897754c450b11f80852aef6",
+        "path": "skills/media-use/audio/references/captions/authoring.md",
+        "bytes": 9422,
+        "sha256": "c1f159e6a99b5ed65812fbc777fabdbf8cb82dec7fcb2e970b9524653d96bb59"
+      },
+      {
+        "id": "file-1aab90d4af9c4acb1cd91cc0",
+        "path": "skills/media-use/audio/references/captions/motion.md",
+        "bytes": 5480,
+        "sha256": "ee1b89fc53e7433e1c1192c24e09365a3894bae653d8061c2bbc4202c097250f"
+      },
+      {
+        "id": "file-4d9ff2abd3c1b45b3915d4b6",
+        "path": "skills/media-use/audio/references/captions/transcript-handling.md",
+        "bytes": 5439,
+        "sha256": "84c4d5181749022c00b6de62ffe95fe257598fb5f9111d9e8541d25a13836287"
+      },
+      {
+        "id": "file-35feafff1d793700f75ab497",
+        "path": "skills/media-use/audio/references/remove-background.md",
+        "bytes": 8472,
+        "sha256": "fb6b38a25c6535c57a461bbe2ca681b38f18e5f09b1e904e4a0b5f6eca7a5b98"
+      },
+      {
+        "id": "file-123f8071be476832c1160494",
+        "path": "skills/media-use/audio/references/requirements.md",
+        "bytes": 4799,
+        "sha256": "d0891f4a4c24cd47c4bcb57cad28418e496403a377c51eafed709bc094133eea"
+      },
+      {
+        "id": "file-f8ea52a86a6a0ee8a83e4952",
+        "path": "skills/media-use/audio/references/sfx.md",
+        "bytes": 4137,
+        "sha256": "b89b14e4d819594d07cf2899e3ca59ceafe743e77e7df46dafdbebe4effebe75"
+      },
+      {
+        "id": "file-649c28e659d9692410c653ad",
+        "path": "skills/media-use/audio/references/transcribe.md",
+        "bytes": 2847,
+        "sha256": "5525a555f5356766a5e3333a945b5f90af51f63b2b98210d23e3a605a5de8703"
+      },
+      {
+        "id": "file-bf6310d43e97ba270c8eef3e",
+        "path": "skills/media-use/audio/references/tts-to-captions.md",
+        "bytes": 1755,
+        "sha256": "bc74fa83c096d64997dde33c9873c01b23c3b575b80689793440cd91466c8bd1"
+      },
+      {
+        "id": "file-f3b081a939dae9410f8371b9",
+        "path": "skills/media-use/audio/references/tts.md",
+        "bytes": 14205,
+        "sha256": "22e7100f01b3363d42ca667d7302d4d8405cf82df265704c078d9e606f2e3115"
+      },
+      {
+        "id": "file-d710270c601e634b1e6cba45",
+        "path": "skills/media-use/audio/scripts/audio.mjs",
+        "bytes": 15534,
+        "sha256": "1331b0802a9e6d3415493a45468b1acb65e1b192afe40ea94e10d8b693205485"
+      },
+      {
+        "id": "file-e29c36e1c148f0e9e378be6e",
+        "path": "skills/media-use/audio/scripts/audio.test.mjs",
+        "bytes": 8621,
+        "sha256": "5b5c4aec6bc656ed9112c911b4617ee0f13dca2a3f6832d2bebba7cea92e95e1"
+      },
+      {
+        "id": "file-7b35899fdcb01d45088954d0",
+        "path": "skills/media-use/audio/scripts/carve.mjs",
+        "bytes": 20609,
+        "sha256": "1ae83aeac13226b94bc3e7e97e9d1c7e4109dfc6f1ae961714c223fb896d3488"
+      },
+      {
+        "id": "file-4c1493252e51695b03722108",
+        "path": "skills/media-use/audio/scripts/carve.test.mjs",
+        "bytes": 12511,
+        "sha256": "9d45276eb50f709042db34d7fe50b6f91c929489adf5bf6d73d40ddabf141cd9"
+      },
+      {
+        "id": "file-5010e9d5ad0effdc09830203",
+        "path": "skills/media-use/audio/scripts/extract-audio-data.py",
+        "bytes": 7270,
+        "sha256": "5ef8c22de6477f6c847c2069955046b4334fb4de4ebdec5ef7e8ce90d2fadc14"
+      },
+      {
+        "id": "file-cdc11d15e6db7970dde0263b",
+        "path": "skills/media-use/audio/scripts/gemini-pipeline.test.mjs",
+        "bytes": 4942,
+        "sha256": "994d02861e3822ee9ec389778351eb681f21a662b920cb6e787e035df6fbff09"
+      },
+      {
+        "id": "file-0c485933170ec55ff145ca90",
+        "path": "skills/media-use/audio/scripts/heygen-tts.mjs",
+        "bytes": 4393,
+        "sha256": "0105b07581bde333ae84c1128f12a13ca29a4ce6d0f2f5268878e97c37182ed2"
+      },
+      {
+        "id": "file-bb71e3b59893bf79ee6c5b9b",
+        "path": "skills/media-use/audio/scripts/heygen-tts.test.mjs",
+        "bytes": 1408,
+        "sha256": "55f54468f0ba01f24c7a587f1b58d7d128a9c03919dfadd92dc2929aa1e8ed69"
+      },
+      {
+        "id": "file-eff877b82e7d22c24fb95a75",
+        "path": "skills/media-use/audio/scripts/heygen-voice.mjs",
+        "bytes": 3859,
+        "sha256": "1ab6d29860c106b49ca0c3dec408d99a8d3297a5bbc953d21f1148c3d8568064"
+      },
+      {
+        "id": "file-6196b204ccb83c410007a317",
+        "path": "skills/media-use/audio/scripts/heygen-voice.test.mjs",
+        "bytes": 8536,
+        "sha256": "d0920895246ee7679a424ffa36ed13d3f1bb7c03b8641c8bbb4a4efd4ede320b"
+      },
+      {
+        "id": "file-e6901ffdc2c5abef40ce336d",
+        "path": "skills/media-use/audio/scripts/lib/audio-carve.mjs",
+        "bytes": 16991,
+        "sha256": "f4438df74a93c1620488f7a8c8121eebccfb71b34ff1ead06f1e6f307b1ed5b8"
+      },
+      {
+        "id": "file-13992469ee773f6306592c25",
+        "path": "skills/media-use/audio/scripts/lib/audio-meta.mjs",
+        "bytes": 1166,
+        "sha256": "94e1b4cf242362eeb52bb8a5665b5b50fe4ffdc7854f4366b82e290c33d03890"
+      },
+      {
+        "id": "file-2bbd60b732ece95ef53983ba",
+        "path": "skills/media-use/audio/scripts/lib/audio-meta.test.mjs",
+        "bytes": 4591,
+        "sha256": "e6627824e12aec0c19c7d6f28cd8445ed6a341c846b873f467337e1af96e0e7a"
+      },
+      {
+        "id": "file-81aadb416d22880298beab77",
+        "path": "skills/media-use/audio/scripts/lib/bgm-volume.mjs",
+        "bytes": 236,
+        "sha256": "bb9debebdbd09724f6d07cd10b3982a076639664420ff8caf5f5a36ae7429a8c"
+      },
+      {
+        "id": "file-82a04979a4c8e09e38ee3712",
+        "path": "skills/media-use/audio/scripts/lib/bgm.mjs",
+        "bytes": 11824,
+        "sha256": "d4f784121f15d1a75847de8efe73d1ae6518635249c0c9f0e16f5e1c67477ccf"
+      },
+      {
+        "id": "file-4aa847de224134d64cc91582",
+        "path": "skills/media-use/audio/scripts/lib/bgm.test.mjs",
+        "bytes": 4767,
+        "sha256": "f35295ab14262c6ee139e68cb5ca3d0f5c7bb991030cfcadca4819e825feb438"
+      },
+      {
+        "id": "file-9d9d8965a0f465cd8a9b5fdf",
+        "path": "skills/media-use/audio/scripts/lib/concurrency.mjs",
+        "bytes": 527,
+        "sha256": "36a28dc1a0528b5605cba29a593dd54a786ad6283611b09a634946b12a5ed32e"
+      },
+      {
+        "id": "file-cf12f3b61fefbf9b60d301b3",
+        "path": "skills/media-use/audio/scripts/lib/concurrency.test.mjs",
+        "bytes": 1654,
+        "sha256": "daf0b162a9c3fc1a20cc22dff19566530e198459a10afcdf42ad39bec2426f55"
+      },
+      {
+        "id": "file-5a30f2d109511f08ea03bcc1",
+        "path": "skills/media-use/audio/scripts/lib/gemini-auth.mjs",
+        "bytes": 1664,
+        "sha256": "eee9dea0385ae4e27cbb3fb0c5681b035e993a1391311e4cdc2282b38514261c"
+      },
+      {
+        "id": "file-0fff7783c825f4451f00201a",
+        "path": "skills/media-use/audio/scripts/lib/gemini-auth.py",
+        "bytes": 1981,
+        "sha256": "5ba85af3b5b46bfa04013f5d24b2c5b72dc7677b6cc5ef5ef926de82be4f8542"
+      },
+      {
+        "id": "file-5eedf977e7a544e9cce201cc",
+        "path": "skills/media-use/audio/scripts/lib/gemini-auth.test.mjs",
+        "bytes": 3097,
+        "sha256": "4a74c9e910914d57c715b0ed487e6e8ce2af265e32edfe04e8432780a6ffe0b0"
+      },
+      {
+        "id": "file-a42e58a6878cb63c7c5e5e69",
+        "path": "skills/media-use/audio/scripts/lib/gemini-auth_test.py",
+        "bytes": 4430,
+        "sha256": "5f524492aa5d4fa77c45bfed0002a33045677bd1c28027ff80554c9911f32b66"
+      },
+      {
+        "id": "file-4dc931ca5b0b5118856e7979",
+        "path": "skills/media-use/audio/scripts/lib/gemini-tts.mjs",
+        "bytes": 5142,
+        "sha256": "bf003704ac37e81a9e1b500103691c37670f9ff556e1dde3062e2e87873ef914"
+      },
+      {
+        "id": "file-db482cd5e183f308647222ed",
+        "path": "skills/media-use/audio/scripts/lib/gemini-tts.test.mjs",
+        "bytes": 9426,
+        "sha256": "68b3fae36ec470a7c1dc67fc340239af76495c5d3ae5ae26db14bbd7cfc7f5fc"
+      },
+      {
+        "id": "file-8446bb30085fd1377eaf2cb2",
+        "path": "skills/media-use/audio/scripts/lib/heygen.mjs",
+        "bytes": 14618,
+        "sha256": "8e60c37a953207897590e339655f13ca66fc2042d20925a09ba8bd742e6ebc9f"
+      },
+      {
+        "id": "file-a2e871bb5f4e4798dff4b329",
+        "path": "skills/media-use/audio/scripts/lib/heygen.test.mjs",
+        "bytes": 23411,
+        "sha256": "3c10d3cf6fb5f219cb05a39a82f03540a7b754bef7e5a433b1b0791531ce178d"
+      },
+      {
+        "id": "file-814ad1cfeffdd02c12cc8fc7",
+        "path": "skills/media-use/audio/scripts/lib/main-module.mjs",
+        "bytes": 479,
+        "sha256": "61811e09110856e1439c29875e4a4ad7701ae45d4045f9d1dcb6a7929698e4c0"
+      },
+      {
+        "id": "file-b9b2f4cfe57e44c8a6596d95",
+        "path": "skills/media-use/audio/scripts/lib/media-record.mjs",
+        "bytes": 5182,
+        "sha256": "70dc13952b6edd363a27866a9275174bd4aca4b1ce2281e1ba09edbb02c6158f"
+      },
+      {
+        "id": "file-a75f596b21e5e7d7ee554a34",
+        "path": "skills/media-use/audio/scripts/lib/media-record.test.mjs",
+        "bytes": 12937,
+        "sha256": "c73d535f2a10f56e982155fd6d357d047818998d7553860772e17180c1d8fc6d"
+      },
+      {
+        "id": "file-e85aa01e89976b8bf02ff632",
+        "path": "skills/media-use/audio/scripts/lib/openverse.mjs",
+        "bytes": 4999,
+        "sha256": "e2b176ed6e0b91231debab84ef6633a1a4885e400b9511a39f11e97acef261bd"
+      },
+      {
+        "id": "file-eb5c3f0ac79ee4d055d25125",
+        "path": "skills/media-use/audio/scripts/lib/project-path.mjs",
+        "bytes": 2285,
+        "sha256": "ce4962e06ee34c9588d4067ddabcfd640a9bea35bf155e1b25ee635cbb22f81a"
+      },
+      {
+        "id": "file-17f9820fb476f7350dd6814c",
+        "path": "skills/media-use/audio/scripts/lib/project-path.test.mjs",
+        "bytes": 3096,
+        "sha256": "61aeae52e51d95fe4a9caf646534b3670c54043bd3d8eb67a6b968ca1accc388"
+      },
+      {
+        "id": "file-0c61a879f63b1d86b84e3996",
+        "path": "skills/media-use/audio/scripts/lib/python.mjs",
+        "bytes": 4663,
+        "sha256": "576765c574f5cd94b4b6be515ae9bef871e558d166bbefdf34bfb29a92c2a1df"
+      },
+      {
+        "id": "file-a631acd71def7b35fe0b60a2",
+        "path": "skills/media-use/audio/scripts/lib/python.test.mjs",
+        "bytes": 8030,
+        "sha256": "089ccfc875f7df34f7ee109147b0d1c3b39152029b0ae5a798ff3aad661de398"
+      },
+      {
+        "id": "file-27dd717b1179f024b38923f1",
+        "path": "skills/media-use/audio/scripts/lib/recording.mjs",
+        "bytes": 4539,
+        "sha256": "74bdb99826b8e962da53f2379173dc1aacb197145a2757f8ad1be03ca8927f31"
+      },
+      {
+        "id": "file-7399604b12206338c4131ab2",
+        "path": "skills/media-use/audio/scripts/lib/sfx.mjs",
+        "bytes": 7372,
+        "sha256": "5c443cdf72bf14552f23a468e311b273e1448b49aeca385f2484995217f75d3f"
+      },
+      {
+        "id": "file-84a3eaaa9471c74647a30e9a",
+        "path": "skills/media-use/audio/scripts/lib/sfx.test.mjs",
+        "bytes": 11893,
+        "sha256": "87bc81631a1dae1e251e13bb219521815f1cc14f7ec30b8d29b38885138f360d"
+      },
+      {
+        "id": "file-2348f2b039602173c0696d01",
+        "path": "skills/media-use/audio/scripts/lib/tts.cleanup.test.mjs",
+        "bytes": 7141,
+        "sha256": "6264e7c39ae5e4c2f27d2727f31de2b957e36339ed257dc4f4b984eedf3c7f85"
+      },
+      {
+        "id": "file-4ddc55c655536cc92174d0be",
+        "path": "skills/media-use/audio/scripts/lib/tts.mjs",
+        "bytes": 19052,
+        "sha256": "6d468159f98b515585ab42c0fd9104d8669d3369c762bb4f4b434c0af6d4a251"
+      },
+      {
+        "id": "file-f95c18bec936a17348f2c5f3",
+        "path": "skills/media-use/audio/scripts/lib/tts.spawn.test.mjs",
+        "bytes": 6147,
+        "sha256": "40299540bdc679bae3c616418a156c64664fbf737d3e3e2198071e56c3cd1a57"
+      },
+      {
+        "id": "file-45894833c646a9649d680c63",
+        "path": "skills/media-use/audio/scripts/lib/tts.test.mjs",
+        "bytes": 10483,
+        "sha256": "91713e4eea55f1cb595039bae29a483614f88f9a87d266ea278c590a76188525"
+      },
+      {
+        "id": "file-991f021ca845811c100d5a66",
+        "path": "skills/media-use/audio/scripts/lib/voice-credit.mjs",
+        "bytes": 686,
+        "sha256": "16a45db14f36ba557654f8104df09481e9d34234aebcb4cdc1ff5213bed3d4e5"
+      },
+      {
+        "id": "file-ac14d7d3cc963b41e1263195",
+        "path": "skills/media-use/audio/scripts/lib/voice-credit.test.mjs",
+        "bytes": 946,
+        "sha256": "c7f3fccb3767b702ee3e99643fe8a44fa255c5a95999aef1535be6455cd2bd5a"
+      },
+      {
+        "id": "file-6abcc35beb63572d441b8811",
+        "path": "skills/media-use/audio/scripts/lyria-recipe.py",
+        "bytes": 5023,
+        "sha256": "07bcba4a128430545a03e7ced49b9a6750a77d72a3659d67e4e9886fe9731436"
+      },
+      {
+        "id": "file-4609d67e33b91e5e4c82b3b1",
+        "path": "skills/media-use/audio/scripts/recording.test.mjs",
+        "bytes": 9397,
+        "sha256": "5cdd3402fcab5a722bf331b71b198064fd1a5cb769d4871de7f6e7ada25b0f68"
+      },
+      {
+        "id": "file-2e467d9b0c277bb9adb2d0d0",
+        "path": "skills/media-use/audio/scripts/trusted-program.test.mjs",
+        "bytes": 3436,
+        "sha256": "00187804c173b1325ac1a7c30e3834bb9fe73d0f75f9516d3de4abb5f201baea"
+      },
+      {
+        "id": "file-5535666180d8337c2cc3b8dd",
+        "path": "skills/media-use/audio/scripts/trusted_program.py",
+        "bytes": 2829,
+        "sha256": "9f73bb01cb9a85ec9968d7b4868338725d19592d347401e65d595bbce4e38f33"
+      },
+      {
+        "id": "file-df8c4e3ccdc8bcdc14983778",
+        "path": "skills/media-use/audio/scripts/wait-bgm.mjs",
+        "bytes": 6295,
+        "sha256": "ea897ebcd925a5c2b0f098a34bc5644abfda9ae5ba82ad08fb4085029a333849"
+      },
+      {
+        "id": "file-8fb07027e548d6f0503095d2",
+        "path": "skills/media-use/audio/scripts/wait-bgm.test.mjs",
+        "bytes": 8227,
+        "sha256": "f27eb808e5fb763ac220bb7b68f878b387b78b9a1cc39725e386c43f9dc56b87"
+      },
+      {
+        "id": "file-58465303c3c6aaa75b266901",
+        "path": "skills/media-use/luts/README.md",
+        "bytes": 1087,
+        "sha256": "c06cbbf2aab80cbf8aa25c83497202a63107a61e083b6c199a89d513e8096a3b"
+      },
+      {
+        "id": "file-cfd0f6e1c83898d78dfb484a",
+        "path": "skills/media-use/luts/index.json",
+        "bytes": 1997,
+        "sha256": "988ac83c14bc3a9ef09aa6ab64459a0aa9e766e96361738136970ec89df1675a"
+      },
+      {
+        "id": "file-3490befad2b1182fb02b5c7b",
+        "path": "skills/media-use/references/audio.md",
+        "bytes": 3554,
+        "sha256": "b41de88dfb543530c708911110af777cd579a1bec92584bb779d627ea5b86a12"
+      },
+      {
+        "id": "file-c08eefbaa14ac3e10bcb8cf9",
+        "path": "skills/media-use/references/grading.md",
+        "bytes": 7150,
+        "sha256": "430e2b57dfb64c3acfbdd02317ba967ebb580d42b348686ccffbc175d3de8392"
+      },
+      {
+        "id": "file-005d606affbed15855e5d4d6",
+        "path": "skills/media-use/references/heygen.md",
+        "bytes": 12093,
+        "sha256": "9cf82c08f1a114a788c358c79c61c09293089b9314f7f1023fc7388ffbcc6f98"
+      },
+      {
+        "id": "file-c6db66de4d7bb60358b53f46",
+        "path": "skills/media-use/references/local.md",
+        "bytes": 2626,
+        "sha256": "659271d787fe3bdd39f0bc32b1eeb03860b9c76c2672cb71b6bb8d4a88fe4385"
+      },
+      {
+        "id": "file-dd4d48697185f6e7105d30d5",
+        "path": "skills/media-use/references/media-treatment-recipes.md",
+        "bytes": 35868,
+        "sha256": "852e7e978af56c9e99ba14f19009da974cd78f99b399ca194dc416c31c49bda5"
+      },
+      {
+        "id": "file-0a18898017c3609fb087a988",
+        "path": "skills/media-use/references/media-treatments.md",
+        "bytes": 14151,
+        "sha256": "32b9b3bb6fb3838829ff08dc5650b2eb065086b4bd5db9c431e9629a38e93385"
+      },
+      {
+        "id": "file-89ddd75d11119010eb5457db",
+        "path": "skills/media-use/references/memory.md",
+        "bytes": 3828,
+        "sha256": "55477edafb7f9c8294cafd3f1633b7a1820d538695c0868f9c3ddb6b418dadbc"
+      },
+      {
+        "id": "file-e6b54ee97313c346c4b76817",
+        "path": "skills/media-use/references/meta.md",
+        "bytes": 6545,
+        "sha256": "3651b66e86874b21e9636de65be5a4581f4f394f3c8fc02ddc9128f4dcfa107c"
+      },
+      {
+        "id": "file-275930205a391bffc9edca91",
+        "path": "skills/media-use/references/mixing.md",
+        "bytes": 4597,
+        "sha256": "b9a96f6a35b06c613f7a731e0b9db9e334acbb8c026ba44f9ce1ca70dec7a3de"
+      },
+      {
+        "id": "file-2b78cd93c8bb0216fcff24cd",
+        "path": "skills/media-use/references/operations.md",
+        "bytes": 16153,
+        "sha256": "e5a52fe98376a1215680dec8c6393f6d5b55055ecdcfb7d07db356904c518603"
+      },
+      {
+        "id": "file-91e138c0dd788f3546ca50a2",
+        "path": "skills/media-use/references/resolve.md",
+        "bytes": 10100,
+        "sha256": "676115ab007793b127ab535c7b26ea1bd3a0a10c21806ceaf595b92eb15b3c2c"
+      },
+      {
+        "id": "file-47a35bfca968634cd31dd2d0",
+        "path": "skills/media-use/references/setup-providers.md",
+        "bytes": 9331,
+        "sha256": "5cc3c135398435afa6a06e3ba533da871c07d7c5aa2a4dd4d4d5520c119f284b"
+      },
+      {
+        "id": "file-8a0115cb9cc819224874c6e9",
+        "path": "skills/media-use/references/telemetry-dashboard.md",
+        "bytes": 4200,
+        "sha256": "bdc30ad1ff84ebe7f5ca835acb9f47b33717e041ea79b41c6f0db489b86094a7"
+      },
+      {
+        "id": "file-5d475cbec24ab41bd31e80a7",
+        "path": "skills/media-use/scripts/audio-duck.mjs",
+        "bytes": 4069,
+        "sha256": "6beac3c1c6c0e0375e67a04c184406ced3740cc832bb3ba9a09c796bbe16d40e"
+      },
+      {
+        "id": "file-986dccf6a03646eeb54bee2f",
+        "path": "skills/media-use/scripts/compatibility.test.mjs",
+        "bytes": 1610,
+        "sha256": "3263a2e82b06560d2c0ea9f7e41b3fe46bec624b70c539ccb121b880dae2250e"
+      },
+      {
+        "id": "file-a493b3a318b0ccdd2fb048c6",
+        "path": "skills/media-use/scripts/dither.mjs",
+        "bytes": 10008,
+        "sha256": "200bbce49edfe2577408c9cbe4816bc59aa807470676d9c25697834e6a3ae6a9"
+      },
+      {
+        "id": "file-b7c167d9da365635efcbd110",
+        "path": "skills/media-use/scripts/dither.test.mjs",
+        "bytes": 4723,
+        "sha256": "c22c3a0ae41647ac3f733b489a6bc6043fd294155d00954be5d901b3cff7d216"
+      },
+      {
+        "id": "file-b56dbfe9e4552cbe5d911ddd",
+        "path": "skills/media-use/scripts/eval.mjs",
+        "bytes": 14930,
+        "sha256": "7627a734cad20cbe2c66af1c7530feac3f7152e7eb70b41aef0aee1ac7e4eb7f"
+      },
+      {
+        "id": "file-4b4e4812bdf7e3bdce90c648",
+        "path": "skills/media-use/scripts/lib/config-lock.mjs",
+        "bytes": 1520,
+        "sha256": "a9d1679e2039be38cd1756a1011f813ae4be0577c2ff77b9ed411b99b1c94275"
+      },
+      {
+        "id": "file-9799c564d8b87f1784ed6c8b",
+        "path": "skills/media-use/scripts/lib/credit-limit.mjs",
+        "bytes": 2044,
+        "sha256": "1699e9136a4f5fbe8e019d5c57932c3d41b880c72f0ebb88c2ad6a50eb9a1e9b"
+      },
+      {
+        "id": "file-9fc001e58e1d0731cb2802ce",
+        "path": "skills/media-use/scripts/lib/cutlist.mjs",
+        "bytes": 6381,
+        "sha256": "c395f49bdb602b29dfc1ea98b7f6d0d5d8781f00eca1c16d009d10e7ef0205be"
+      },
+      {
+        "id": "file-9903afe103fc909627e7ede1",
+        "path": "skills/media-use/scripts/lib/duck.mjs",
+        "bytes": 3849,
+        "sha256": "0930aea672a8cb204d344902cb90442491a8979f9f554f9c7c61cd13666a6846"
+      },
+      {
+        "id": "file-2fa6fb6bb61bb805c733c8c5",
+        "path": "skills/media-use/scripts/lib/error-diffusion.mjs",
+        "bytes": 6631,
+        "sha256": "aa718fe95f98087979bab5ea31d68b8e45fbde0c5b874c6888ad21923fb45936"
+      },
+      {
+        "id": "file-8f17f1fcce5116a4d85d9bcc",
+        "path": "skills/media-use/scripts/lib/index-gen.mjs",
+        "bytes": 2000,
+        "sha256": "a8a0e47ddc9a9a50580004c931b766420bc8e1691ca7a11025fffbc3ac1e6202"
+      },
+      {
+        "id": "file-347595f5d08e69c40087725f",
+        "path": "skills/media-use/scripts/lib/manifest.mjs",
+        "bytes": 10859,
+        "sha256": "f80d1014fa9597edce87620f91bfd9df03789c4a73b0cdcfe023659bff9cb2ce"
+      },
+      {
+        "id": "file-d6fd8018f8347a1a10366d8f",
+        "path": "skills/media-use/scripts/lib/media-fetch.mjs",
+        "bytes": 2838,
+        "sha256": "6a90740eee3e4765b83b4c9726676b2935a7fbc9990f61ad5b166f9263188366"
+      },
+      {
+        "id": "file-1cd8058f89bea1d6e5ee99b6",
+        "path": "skills/media-use/scripts/lib/media-home.mjs",
+        "bytes": 730,
+        "sha256": "7f69890d7b822f202b44ddec0d8176c767cd8b1da4dfc4d918599c6a05cfecb1"
+      },
+      {
+        "id": "file-873943b3d4b71114b94a6ce3",
+        "path": "skills/media-use/scripts/lib/npx-sync.mjs",
+        "bytes": 3318,
+        "sha256": "03346ebeb0e70153050dc5f36f5bafa63807d8e9d823ebf95a4250e9858de6d4"
+      },
+      {
+        "id": "file-3450f28b35dae87dc1ce770d",
+        "path": "skills/media-use/scripts/lib/parakeet-words.mjs",
+        "bytes": 1149,
+        "sha256": "d5b66efe6cb8975beab2f523503113c3be3117e687ebc20695e7ab08c2ba1b4d"
+      },
+      {
+        "id": "file-e231a2dcb56162979f19f43f",
+        "path": "skills/media-use/scripts/lib/prefs-store.mjs",
+        "bytes": 7012,
+        "sha256": "960429595e5c5dda3f88f2899852d2ac2322a7d26b27ed8139612d0161fff749"
+      },
+      {
+        "id": "file-0d9cd3c095bb4eacb8e9a779",
+        "path": "skills/media-use/scripts/lib/recipe-store.mjs",
+        "bytes": 13287,
+        "sha256": "6d2786c2ba4959178351047c3b6d1d2b29a701685c9b256fcc4793c50717ce83"
+      },
+      {
+        "id": "file-7cddae7b5f335be43cc354a7",
+        "path": "skills/media-use/scripts/lib/telemetry.mjs",
+        "bytes": 8976,
+        "sha256": "b817e192cb6a676db4de3a47058edd858815a0e7fb8d9fb80c150085e9284330"
+      },
+      {
+        "id": "file-7b157e773921dbf5d2634d9c",
+        "path": "skills/media-use/scripts/lib/telemetry.test.mjs",
+        "bytes": 3078,
+        "sha256": "2733285623440cef340ec50e55a6f2d50e330b8122ceef853cf5e670eab6c76e"
+      },
+      {
+        "id": "file-ff1e5e69ae9451c442500ff7",
+        "path": "skills/media-use/scripts/lib/transcriptCutFade.mjs",
+        "bytes": 911,
+        "sha256": "ee9c7ec28650cf0f6a0f1f21f1c6a1faa5e152337163cccc0cc9a109b3c99805"
+      },
+      {
+        "id": "file-239dde64a0b71a5f6be6102c",
+        "path": "skills/media-use/scripts/lib/windows-exe-search.mjs",
+        "bytes": 640,
+        "sha256": "6a301aa13e97d3e2e3ba7520c350ebec1b09ecafba24afd6a6866d5c3eb3b10f"
+      },
+      {
+        "id": "file-cdec47dfe1fda0367eccd398",
+        "path": "skills/media-use/scripts/lib/words.mjs",
+        "bytes": 728,
+        "sha256": "bfc1f93523d2fc8ce55580b262efcca537c7feabaf029c1c6f33433591377adb"
+      },
+      {
+        "id": "file-72e866692b701427b770d405",
+        "path": "skills/media-use/scripts/prefs.mjs",
+        "bytes": 2350,
+        "sha256": "f551d5efe51dea7b59d37595c052b950111c6734d913567630181959e7497a04"
+      },
+      {
+        "id": "file-5ef681f81f116e334a4111c2",
+        "path": "skills/media-use/scripts/recipe.mjs",
+        "bytes": 3892,
+        "sha256": "97d2a12604084668599c44f235d6300b77593f86a9a58a6034cf5aa92c98fcba"
+      },
+      {
+        "id": "file-0c6f4d94c1f58b56b3335697",
+        "path": "skills/media-use/scripts/resolve-plugin.test.mjs",
+        "bytes": 3299,
+        "sha256": "544098bb4cf0018a4388db365f57ccbb62f9e6e859d23f9d67bb5ee8a71b0748"
+      },
+      {
+        "id": "file-1f808674d649f1815f9c40ae",
+        "path": "skills/media-use/scripts/resolve.mjs",
+        "bytes": 1400,
+        "sha256": "e4e78ab49d6006c7deae9030d520a7a4238dfbef1976ce219e219b64f8e4247b"
+      },
+      {
+        "id": "file-6ae521390d758887fc928bc4",
+        "path": "skills/media-use/scripts/transcribe.mjs",
+        "bytes": 8144,
+        "sha256": "38da68a01db46af398ffbeba2cfc51e7932e71c1509ad4bdb886a6220f5d5d74"
+      },
+      {
+        "id": "file-e5ccc32703a374ef1d4c1db7",
+        "path": "skills/media-use/scripts/transcribe.test.mjs",
+        "bytes": 7912,
+        "sha256": "3cc6c20225f6f2d38abc7e0eb6d14fefc6e2fc5bb7ff827bb6019b6fccf42ca1"
+      },
+      {
+        "id": "file-b9a62065b7e3f98e0137ecaf",
+        "path": "skills/media-use/scripts/transcript-cut.mjs",
+        "bytes": 10305,
+        "sha256": "59fb02511af4ec0ba8cc2031fcdd1f2cfc0369f01c11109c0aa0e9edbb173b27"
+      },
+      {
+        "id": "file-c753bceab5cd646ebd804db4",
+        "path": "skills/media-use/scripts/transcript-cut.test.mjs",
+        "bytes": 9849,
+        "sha256": "af546cd7d473eb5f4258148a8dd8ec637a67a242cd50948abe1e0dcd6f64c527"
+      }
+    ]
+  },
+  {
+    "id": "published-remotion-to-hyperframes",
+    "label": "remotion-to-hyperframes",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/remotion-to-hyperframes/SKILL.upstream.md",
+    "sha256": "349dccf0fbabf5ecabee929f01f3d5eaa2f0b0fbee3960daefcac23ffe906ee7",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-4e3ae6db6f58732e7b38af08",
+        "path": "skills/remotion-to-hyperframes/SKILL.upstream.md",
+        "bytes": 5328,
+        "sha256": "349dccf0fbabf5ecabee929f01f3d5eaa2f0b0fbee3960daefcac23ffe906ee7"
+      },
+      {
+        "id": "file-af50991459c1ffb3bdf7c258",
+        "path": "skills/remotion-to-hyperframes/assets/.gitkeep",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "file-cb9f13d6d941505fbddc5e53",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/.gitignore",
+        "bytes": 16,
+        "sha256": "975bd96543101813e4923824631bbca68bfba96107a4c872a74def48d8b001e6"
+      },
+      {
+        "id": "file-d4a8238d78597da9f749d2e3",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/run.sh",
+        "bytes": 8598,
+        "sha256": "ca2f56842f286b27348e40bc04bd0c10cee2d1f7b884c09a03cd3520ce9d55fb"
+      },
+      {
+        "id": "file-806579d26403d6b4e634aa7a",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/.gitignore",
+        "bytes": 128,
+        "sha256": "dfeca00985d7133f301ce322e69359f20b7df359c9724067fcee6079b605ab8e"
+      },
+      {
+        "id": "file-72d36f4479a40f95578c2121",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/README.md",
+        "bytes": 2191,
+        "sha256": "6d11a1012e3e0b48caed58350f86c1a3ee8a3031b1390472e78ca303e4a35f15"
+      },
+      {
+        "id": "file-8e79b47b265ec8e1c71813f4",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/expected.json",
+        "bytes": 1791,
+        "sha256": "7bae1fbcd11d3bc18d3b83fc2604da2d84845578dc6fb2f181c9f927550b6cd3"
+      },
+      {
+        "id": "file-677364d57c8929bc4d5735eb",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/hf-src/compositions/title.html",
+        "bytes": 1099,
+        "sha256": "94012cda014dc1007badb8c9cf02850410e3d080e74a07ab214fb9b9fc0893d7"
+      },
+      {
+        "id": "file-4d7f14e2a39a34d54388171d",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/hf-src/index.html",
+        "bytes": 1147,
+        "sha256": "ea04e4d0c59b5792ce729521c82290c44c058255aa30718de104c2e4882d3268"
+      },
+      {
+        "id": "file-0752ac55627598af182bb406",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/remotion-src/package.json",
+        "bytes": 296,
+        "sha256": "f9037f73cfc4bc7ad28fcd4bb140d7e6fa6cccf282e52bc27164ccc56a40cf9c"
+      },
+      {
+        "id": "file-d200f5b19fceca70654ceee5",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/remotion-src/remotion.config.ts",
+        "bytes": 497,
+        "sha256": "105f9af576e76af26840b1ba6ccfd0f98415a26ecf00c2895490ae77fc1d9a06"
+      },
+      {
+        "id": "file-9c342670082f9b7e0e3279b7",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/remotion-src/src/Root.tsx",
+        "bytes": 259,
+        "sha256": "e3e158828c415ba90c158755d997eff6d5034e4ccd5c16dec7c5f271bcb3cc06"
+      },
+      {
+        "id": "file-cc8d404aa8e65ecd64009e30",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/remotion-src/src/TitleCard.tsx",
+        "bytes": 773,
+        "sha256": "6ffcc488718b52a5206332881186331a9424e9c14d06c64ecc8219bff7718f8f"
+      },
+      {
+        "id": "file-e08ce6a15d699be88abb78ff",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/remotion-src/src/index.ts",
+        "bytes": 109,
+        "sha256": "957e481dd33a29b4a55ae0e95dbf763b7e48c37c427ca4bd1275faf34bc07a74"
+      },
+      {
+        "id": "file-a66d43bc6bd509a1a08d35df",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-1-title-card/remotion-src/tsconfig.json",
+        "bytes": 337,
+        "sha256": "cc24d56b89415ebbfdff594c246957974a16c8603803fedeff515edbee5f5c58"
+      },
+      {
+        "id": "file-c3a8c1166adc724ef2a9ab85",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/.gitignore",
+        "bytes": 215,
+        "sha256": "cbb4f717d6250eaee0f2c345417c80ef82b7db570d37f1128ad2c02f7788727e"
+      },
+      {
+        "id": "file-325ee42c063d5b2123b86665",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/README.md",
+        "bytes": 3272,
+        "sha256": "53fe6c23d8ab34c5bbbc2ccde1a50f7e65214b235b75a0419ea973e7cb625d24"
+      },
+      {
+        "id": "file-e2b75e943e5fb18e1bd11736",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/expected.json",
+        "bytes": 2117,
+        "sha256": "aefb204abb7faa5b33da4d1f686164438b92e50f4b6daa9c0da3f8cb193e632f"
+      },
+      {
+        "id": "file-19976fb2bd98206a29d7a0f0",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/hf-src/compositions/scene-1.html",
+        "bytes": 1152,
+        "sha256": "ee628f2c828c8f321be8e0b31c821a19e7971ec77fab5be457bc1b2960114bb3"
+      },
+      {
+        "id": "file-fa0edbb8a068013dcaa9be14",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/hf-src/compositions/scene-2.html",
+        "bytes": 1158,
+        "sha256": "a315bd07762052858eabf1570c42398f9417c5c30c1b94fc6c44a10063c48b9d"
+      },
+      {
+        "id": "file-8aa550bb7b4f45be4c4d82d0",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/hf-src/compositions/scene-3.html",
+        "bytes": 1004,
+        "sha256": "2e5eb665cacc575e9c8dc45d004db9dfab2407fc140e9200117c947aa1cbe521"
+      },
+      {
+        "id": "file-734c863c35f34c2b187eec3d",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/hf-src/index.html",
+        "bytes": 1819,
+        "sha256": "1aa68e478eb8d4ad01564806bd245d840a9ea33d2c4b0cc4cd6a49ff28d58a70"
+      },
+      {
+        "id": "file-11d65de8e6d4875c13a8ec95",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/remotion-src/package.json",
+        "bytes": 298,
+        "sha256": "54130e2f8e546c5a0d22e8f90cb08e13d3c0e4efa0bf258796f0503c47e87a58"
+      },
+      {
+        "id": "file-5b092dc2b0d2e7cdb3c53a24",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/remotion-src/remotion.config.ts",
+        "bytes": 497,
+        "sha256": "105f9af576e76af26840b1ba6ccfd0f98415a26ecf00c2895490ae77fc1d9a06"
+      },
+      {
+        "id": "file-be4c2639ed684864d12d89fc",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/remotion-src/src/MultiScene.tsx",
+        "bytes": 2367,
+        "sha256": "a6c10fcbe7668cd0b8aca25d1423e53be4acb6cf37e51fa03bd73b8152a60fc8"
+      },
+      {
+        "id": "file-032531af8ba7ebf3f44e6118",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/remotion-src/src/Root.tsx",
+        "bytes": 264,
+        "sha256": "0d17fc76061ebcddfeabeea2caeb721b0f0fe7d2c6cd1e2fea116d5832dc49c1"
+      },
+      {
+        "id": "file-6c50598a940b645c64df9854",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/remotion-src/src/index.ts",
+        "bytes": 109,
+        "sha256": "957e481dd33a29b4a55ae0e95dbf763b7e48c37c427ca4bd1275faf34bc07a74"
+      },
+      {
+        "id": "file-04d06939fe2b00bba63cff0d",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/remotion-src/tsconfig.json",
+        "bytes": 337,
+        "sha256": "cc24d56b89415ebbfdff594c246957974a16c8603803fedeff515edbee5f5c58"
+      },
+      {
+        "id": "file-08eeab608eed1db28a86ed89",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-2-multi-scene/setup.sh",
+        "bytes": 1244,
+        "sha256": "312bf8f2958afd8ebc21dc73479eef4b92c30623584b99293614b984965a553c"
+      },
+      {
+        "id": "file-6acccea56f23d7dfc3757e98",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/.gitignore",
+        "bytes": 128,
+        "sha256": "dfeca00985d7133f301ce322e69359f20b7df359c9724067fcee6079b605ab8e"
+      },
+      {
+        "id": "file-cf46b166ee15f6f37f6a89cb",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/README.md",
+        "bytes": 5089,
+        "sha256": "2a03db3d8f40250810e645c90cdb5202ee4751f205c68260de3f2cffbf6539be"
+      },
+      {
+        "id": "file-60f9ec0c7cc184f3aa1b2ec3",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/expected.json",
+        "bytes": 3343,
+        "sha256": "4ec6f9818a55252ddb82072c4ff8cdd8b0e6abc593cfc3042072aee39b205cc1"
+      },
+      {
+        "id": "file-8a465cbfb10ee08e7e4db0c1",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/hf-src/compositions/scene-1.html",
+        "bytes": 1648,
+        "sha256": "dd79cb58bb73be0a10d168cd1a157889180e8627e9487d23d82db0c6298bac25"
+      },
+      {
+        "id": "file-7724f146d44753217ab3c836",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/hf-src/compositions/scene-2.html",
+        "bytes": 3043,
+        "sha256": "8f79201c4ad2cca45c3a9c4079c91f250d46c1e4765371c503e233d2d48b3dcc"
+      },
+      {
+        "id": "file-5c9586986096083c15332585",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/hf-src/compositions/scene-3.html",
+        "bytes": 1654,
+        "sha256": "93996c065ac3ea39cde3e89cd96c798901f01ff106c0598172a21e5fb94ee8e8"
+      },
+      {
+        "id": "file-c37228d43d8ae338c5717932",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/hf-src/index.html",
+        "bytes": 1757,
+        "sha256": "340d555c8ea9637fa5b30f55e42edba4264e92cdb3b22a5cd1c083a54711f038"
+      },
+      {
+        "id": "file-47418a8a9343643f04892f2c",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/package.json",
+        "bytes": 318,
+        "sha256": "c3e3079555d56273b78860129cd2540752232356f12bcdc4af6ae52d848beb8e"
+      },
+      {
+        "id": "file-de0298a896057c68895aa054",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/remotion.config.ts",
+        "bytes": 497,
+        "sha256": "105f9af576e76af26840b1ba6ccfd0f98415a26ecf00c2895490ae77fc1d9a06"
+      },
+      {
+        "id": "file-9270f0cebf38bd7d4577de44",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/Root.tsx",
+        "bytes": 681,
+        "sha256": "113fdac2ac92f90f135abbcc1e24ace0fd2ff50f861c93db94599f82771f1985"
+      },
+      {
+        "id": "file-e92b8c3b894e365a19e2af4b",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/Stargazed.tsx",
+        "bytes": 970,
+        "sha256": "151be9c45dbb626de4ad148f6a099b94b8cf1e717b79e98f9409a398cf4d8bb6"
+      },
+      {
+        "id": "file-ea65659746bc0360d54de32b",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/components/AnimatedNumber.tsx",
+        "bytes": 740,
+        "sha256": "0f10007f91bc101fc4ad583b2456b6283cdf08b15a64f0028e43d45f1e3fd4b0"
+      },
+      {
+        "id": "file-a5b1236471f9e0b1cfa0ac16",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/components/StatCard.tsx",
+        "bytes": 1474,
+        "sha256": "e22d82bcdac1848059667ad9dc78f748337743cefa13fbb2514d0df20054b5d7"
+      },
+      {
+        "id": "file-817785e065641e6f62c5c797",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/components/UnderlinedText.tsx",
+        "bytes": 1154,
+        "sha256": "356978f113c97f9ca3fb7dd81b830d1abf91bad67b36a7fb10641816e2df9b34"
+      },
+      {
+        "id": "file-98d36554b9f9f34f47ddb1ff",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/index.ts",
+        "bytes": 109,
+        "sha256": "957e481dd33a29b4a55ae0e95dbf763b7e48c37c427ca4bd1275faf34bc07a74"
+      },
+      {
+        "id": "file-51016c51ad3663645237a8e4",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/scenes/OutroScene.tsx",
+        "bytes": 423,
+        "sha256": "356071b5cb883c9c637ccb97a17732839d885e4a3cdac31d2734a474050036e0"
+      },
+      {
+        "id": "file-6cce1d8ad8ae95907b271db0",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/scenes/StatsScene.tsx",
+        "bytes": 676,
+        "sha256": "6a7b3f777ce4762f54fe86961f2050b696a4810d06616cf3bd0db6d9addcad38"
+      },
+      {
+        "id": "file-f8c734a506dd66c07da72e23",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/src/scenes/TitleScene.tsx",
+        "bytes": 1230,
+        "sha256": "24cabaabcd364c3e434aa8ac46929830c54eca3edaf355c143f0bac8b1d851c3"
+      },
+      {
+        "id": "file-05bd6fa8201e4888f7970c51",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/tsconfig.json",
+        "bytes": 337,
+        "sha256": "cc24d56b89415ebbfdff594c246957974a16c8603803fedeff515edbee5f5c58"
+      },
+      {
+        "id": "file-7c5d9d63f5afe77560b9a07e",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/README.md",
+        "bytes": 2825,
+        "sha256": "1ecada7bc9e9313d188cc3e1d2c731ab5e41f4ab7b9ee157dfec91a63afe4b9d"
+      },
+      {
+        "id": "file-b365985eadfa40b72165b592",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/cases/01-use-state.tsx",
+        "bytes": 1000,
+        "sha256": "9e22cd1f74df87f34a0c3682e4aa7e948c582b4031b6226a054e384d609cc816"
+      },
+      {
+        "id": "file-579f06e1c0fd551cf75af8dc",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/cases/02-use-effect-deps.tsx",
+        "bytes": 954,
+        "sha256": "5fb0307fd81f712a2e8109940201af26f925acab1d840b0f9539e1a8b615d077"
+      },
+      {
+        "id": "file-a98f139a47ec3beb38097a81",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/cases/03-async-metadata.tsx",
+        "bytes": 1128,
+        "sha256": "62cf1868ef9bbef0bc2173118a0e90e894cb94f5dfa54ab8ad632c0a3da7fa0f"
+      },
+      {
+        "id": "file-c72a570a91ce55349844ed84",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/cases/04-third-party-react.tsx",
+        "bytes": 1183,
+        "sha256": "74b145ed7e3c0568dda453f01b9ec6cdaec37478791a5edd3941447f1490f5e3"
+      },
+      {
+        "id": "file-38cadd7c96c87f1faf9f1465",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/cases/05-lambda-config.tsx",
+        "bytes": 1425,
+        "sha256": "961b9d599dab03e167775a14ee23cbee2d0c80ff8da4da34818d9433603c7ad8"
+      },
+      {
+        "id": "file-236daa5f3ab4a55f9a465aa8",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/cases/06-warnings-only.tsx",
+        "bytes": 1387,
+        "sha256": "38a93a2eeb5a4935afc56fba76eef263885e357901331e96a001f68417c269d4"
+      },
+      {
+        "id": "file-fea35d0212a56f4f3e9ed723",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/cases/07-custom-hook.tsx",
+        "bytes": 1094,
+        "sha256": "eafc07dfb99f2e78246663219ea251a2b98f1a6daff94d8689aa4f8a34fab41c"
+      },
+      {
+        "id": "file-1666678033827f1a034763ff",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/cases/08-mixed.tsx",
+        "bytes": 1166,
+        "sha256": "4a3c2c65c563ff4af123dee0a90082a1e408f7fbfd6c14795940821956d2baa1"
+      },
+      {
+        "id": "file-f86eac96f98460cf51f09a77",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/expected.json",
+        "bytes": 2784,
+        "sha256": "fff7f57d87ec185c3f4b95debabcb1c8dd3ea8012af7b6b3a83486900fc095c5"
+      },
+      {
+        "id": "file-fa3f7faeb966f5c8d53633d2",
+        "path": "skills/remotion-to-hyperframes/assets/test-corpus/tier-4-escape-hatch/validate.sh",
+        "bytes": 3534,
+        "sha256": "75abb2f5a9d39591e75712113fd2a9ebe6bcae911b7bda33a1209aff101446b7"
+      },
+      {
+        "id": "file-02bc56acd80cfbbfdf1417ee",
+        "path": "skills/remotion-to-hyperframes/references/api-map.md",
+        "bytes": 16476,
+        "sha256": "9f92de58615a32e45032e6d06edd1027bec3bc098a5f9f7cf67e76b24a4950f5"
+      },
+      {
+        "id": "file-2aac9cebd32a44162e53b7d4",
+        "path": "skills/remotion-to-hyperframes/references/escape-hatch.md",
+        "bytes": 5403,
+        "sha256": "047472599b5f38502f8419839740e3fcb2198ddba96211d70331c4ad3b6774c7"
+      },
+      {
+        "id": "file-12cc07f321f1e8f0cac1760c",
+        "path": "skills/remotion-to-hyperframes/references/eval.md",
+        "bytes": 4409,
+        "sha256": "036b11e1b959381e7d21753c89669f53253c03924d58a531f885739c771b3bd7"
+      },
+      {
+        "id": "file-8b56dd3c87b8769bd758f8f5",
+        "path": "skills/remotion-to-hyperframes/references/fonts.md",
+        "bytes": 3246,
+        "sha256": "c7f59567c1f6d560c8c6f95577a86fabfafdc7517a5d7eaebb73d564ad955ad6"
+      },
+      {
+        "id": "file-73cd17f6cf25aa772e5fc22d",
+        "path": "skills/remotion-to-hyperframes/references/limitations.md",
+        "bytes": 5042,
+        "sha256": "fe5f721523952b454ca5a7bc7bc0579d81f1cd4a1dfb3d010b327f3d1963f4bc"
+      },
+      {
+        "id": "file-4315a2bfac7e8dafd1b082eb",
+        "path": "skills/remotion-to-hyperframes/references/lottie.md",
+        "bytes": 5044,
+        "sha256": "1f6b46fb926e07e2a2e629f902da0ec9385a4fdf956660013805f470f5bfafde"
+      },
+      {
+        "id": "file-04523312ee3bbadd05c39011",
+        "path": "skills/remotion-to-hyperframes/references/media.md",
+        "bytes": 4528,
+        "sha256": "0e9861f959298f7171ec709399a236b4575e9530d095a87224bca3365bfb0947"
+      },
+      {
+        "id": "file-c0e4566f778dac0bfd4d97b5",
+        "path": "skills/remotion-to-hyperframes/references/parameters.md",
+        "bytes": 4916,
+        "sha256": "eabfa937f1613fb5d14e6e1d160d48864682c04edd5ff843d179fa9e786f362a"
+      },
+      {
+        "id": "file-a1aecc32054f3ff4e599633b",
+        "path": "skills/remotion-to-hyperframes/references/sequencing.md",
+        "bytes": 6992,
+        "sha256": "67899c16e5970bc675e8dbcc523d41ed0cbd9d9644974a8af3353ef231aad30e"
+      },
+      {
+        "id": "file-23bdda2998cfd3172f66bae3",
+        "path": "skills/remotion-to-hyperframes/references/timing.md",
+        "bytes": 7021,
+        "sha256": "597bad21c9229ef790c2e122879cdbf6e7fc11aa1e3694d5ede0014a1e734192"
+      },
+      {
+        "id": "file-d57bfeacb281a5a7b84d9d68",
+        "path": "skills/remotion-to-hyperframes/references/transitions.md",
+        "bytes": 4500,
+        "sha256": "4d32d654ba5872fc8e55f0559415f61feafcdf20f1918ae724e4d14b76486873"
+      },
+      {
+        "id": "file-beb1aa4c7b4c6037b0ec2783",
+        "path": "skills/remotion-to-hyperframes/scripts/.gitkeep",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "file-28642404f7b058faeed775b3",
+        "path": "skills/remotion-to-hyperframes/scripts/lint_source.py",
+        "bytes": 12978,
+        "sha256": "6043611ad04ce16d2ef5596822eb2887e865ed9759c8e528471b994dff7d88b1"
+      },
+      {
+        "id": "file-45192df6cdeaa184ec78578b",
+        "path": "skills/remotion-to-hyperframes/scripts/tests/boxSizing.test.mjs",
+        "bytes": 939,
+        "sha256": "f860a1b0d1cb67f6ca64e0bf2d980e1dbbb8cf620603e04ec58d20172acf536f"
+      },
+      {
+        "id": "file-38fb6b4be157d58d11991493",
+        "path": "skills/remotion-to-hyperframes/scripts/tests/fixtures/blocker.tsx",
+        "bytes": 1853,
+        "sha256": "e12bc7d06340b71cebbdbc8aae9f948a21f7487dbccafcdea6be9f1936f7e4c0"
+      },
+      {
+        "id": "file-9e3644fd73c4795fc5d66acf",
+        "path": "skills/remotion-to-hyperframes/scripts/tests/fixtures/clean.tsx",
+        "bytes": 1379,
+        "sha256": "912f5a176e8b4eee7acbdf9a9334e1edcb14f6859cab397846ed8a63f13d080d"
+      },
+      {
+        "id": "file-d3d5d877391a5b9e3fa6bc62",
+        "path": "skills/remotion-to-hyperframes/scripts/tests/smoke.sh",
+        "bytes": 1495,
+        "sha256": "2ba20a80cf6082004ee6dc043b90cde7361eff4affd2d66460bdfe9fbdf20fa0"
+      }
+    ]
+  },
+  {
+    "id": "published-reverse-any-video",
+    "label": "reverse-any-video",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/reverse-any-video/SKILL.upstream.md",
+    "sha256": "53acfe741225c6a708bc88825691991b9f1348e68ecdb341410836fe7bca5777",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-64983882dcaae80f4151f7b2",
+        "path": "skills/reverse-any-video/SKILL.upstream.md",
+        "bytes": 5429,
+        "sha256": "53acfe741225c6a708bc88825691991b9f1348e68ecdb341410836fe7bca5777"
+      },
+      {
+        "id": "file-27b1c8b01b7bd7eaa48ec1c2",
+        "path": "skills/reverse-any-video/references/animated.md",
+        "bytes": 2599,
+        "sha256": "98fac6e20f30a0c8b0f5ab22475e7305808e64839876273142f8d1d860f296f2"
+      },
+      {
+        "id": "file-419fcc3fe7c57fd17828ca9a",
+        "path": "skills/reverse-any-video/references/match.md",
+        "bytes": 4292,
+        "sha256": "be8b2100b0a50c0f4a770d58b43b7e46538d472f9e87e0847b2d2f1f6700e5df"
+      },
+      {
+        "id": "file-69e88c233b5a32f229816013",
+        "path": "skills/reverse-any-video/references/people.md",
+        "bytes": 4057,
+        "sha256": "8a6468815e339dca6a9a24b72d95e2ac478f4598ceb226080dbae5e9e7c57870"
+      },
+      {
+        "id": "file-1600e43e762ac67a145ff7aa",
+        "path": "skills/reverse-any-video/references/start.md",
+        "bytes": 6988,
+        "sha256": "86e0f55fe09d6a0e360284b30088fe2aa997494b03c7e2574c3925e52c38f862"
+      }
+    ]
+  },
+  {
+    "id": "published-slideshow",
+    "label": "slideshow",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/slideshow/SKILL.upstream.md",
+    "sha256": "90dd52ca1757a98527ef96fbed4e42bf4dd504a103004988d718df0c154feea4",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-bc031981e603d15d4fb5b56f",
+        "path": "skills/slideshow/SKILL.upstream.md",
+        "bytes": 5217,
+        "sha256": "90dd52ca1757a98527ef96fbed4e42bf4dd504a103004988d718df0c154feea4"
+      },
+      {
+        "id": "file-b44f99cc0138ae296bbf4bca",
+        "path": "skills/slideshow/references/standalone-harness.md",
+        "bytes": 44277,
+        "sha256": "0f12d69a9c05a801291d923c7b1dbe666b29f3b68f6bb73d7c80681ae09df7e9"
+      }
+    ]
+  },
+  {
+    "id": "published-style-sampling",
+    "label": "style-sampling",
+    "category": "published",
+    "description": "published Hyperframes skill; adapt to Machinal, do not execute upstream tooling.",
+    "sourcePath": "skills/style-sampling/SKILL.upstream.md",
+    "sha256": "89a215855645b3f9e6e4aa714b90ee96bec25f52d03f79efe4d59a60b5a5d137",
+    "origin": {
+      "repository": "https://github.com/heygen-com/hyperframes",
+      "revision": "8ec98be29a64e88239a0c05f7e5d09f36e181493",
+      "license": "Apache-2.0"
+    },
+    "referenceOnly": true,
+    "adaptationGuideUri": "machinal://reference/hyperframes",
+    "files": [
+      {
+        "id": "file-a30ab338a30a5665c77d4918",
+        "path": "skills/style-sampling/SKILL.upstream.md",
+        "bytes": 5412,
+        "sha256": "89a215855645b3f9e6e4aa714b90ee96bec25f52d03f79efe4d59a60b5a5d137"
+      },
+      {
+        "id": "file-0b0d57618e01c75be4fa82f5",
+        "path": "skills/style-sampling/references/remix.md",
+        "bytes": 11074,
+        "sha256": "36573cfa9455e6850af147fa58c7bf3de5d8da00e5003983253f9cc7bcb1d2cc"
+      }
+    ]
+  }
+]

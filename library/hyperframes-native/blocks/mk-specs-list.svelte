@@ -1,0 +1,294 @@
+<!-- Modified Svelte adaptation of registry/blocks/mk-specs-list/mk-specs-list.html; upstream 8ec98be29a64e88239a0c05f7e5d09f36e181493, Apache-2.0; original licence and CREDITS in hyperframes-library/.
+     Subject markup, stylesheet declarations and the source animation are retained; fonts, media and initialization are localized
+     as recorded in the sidecar. Host variables map to `design`, the timeline follows the scene clock, and document-level selectors
+     (html/body/:root/*) are retargeted to `.hf-port` so the port cannot restyle the host page. -->
+<svelte:options preserveWhitespace={true} />
+<script>
+  import { untrack } from 'svelte';
+  import { gsap } from 'gsap';
+  
+  import { SceneCanvas, useScene } from '@machinal/scenes/svelte';
+
+  let { design = {} } = $props();
+  const __hfScene = useScene();
+  let root = $state();
+  let timeline = $state.raw();
+
+  // Host shim: the upstream page reads its editable variables from the
+  // HyperFrames host. In the port they come from the approved `design` prop.
+  const __hfHost = { getVariables: () => (design || {}), variables: design || {} };
+
+  // The upstream page publishes its timeline into the host registry,
+  // sometimes from a callback that runs after mount (once fonts are ready).
+  // Pause it at time zero so the scene controller is its only clock source.
+  let __hfTimelineSlot = { set() {}, get: () => undefined };
+
+  $effect(() => {
+    if (!root) return;
+    let live = true;
+    __hfTimelineSlot = {
+      set(value) {
+        if (live) {
+          timeline = value;
+          queueMicrotask(() => {
+            if (live && timeline === value) {
+              value?.pause(0);
+              value?.seek(0, false);
+            }
+          });
+        }
+      },
+      get() {
+        return untrack(() => timeline);
+      },
+    };
+    const context = gsap.context(() => {
+      untrack(() => __hfScene.resources.track(initialize(__hfTimelineSlot, root)));
+    }, root);
+    return () => {
+      live = false;
+      timeline?.kill?.();
+      context.revert();
+      timeline = undefined;
+    };
+  });
+
+  $effect(() => {
+    const active = timeline;
+    const time = __hfScene.frame.time;
+    if (active) untrack(() => {
+      active.seek(time, false);
+      const waits = [];
+      window.dispatchEvent(new CustomEvent('hf-seek', { detail: { time, waitUntil: promise => waits.push(promise) } }));
+      if (typeof window.__hf_page_composite_resolve === 'function') waits.push(window.__hf_page_composite_resolve());
+      if (waits.length) __hfScene.resources.track(Promise.all(waits));
+    });
+  });
+
+  async function initialize(__hfTimelineSlot, __hfRootElement) {
+    const __hfRegistry = new Proxy({}, { get: () => __hfTimelineSlot.get() });
+    const __hfListen = (type, listener, options = {}) => window.addEventListener(type, listener,
+      { ...options, signal: __hfScene.resources.signal });
+    (function () {
+            
+
+            /* ---- published parameters (inspector-style CONFIG) ---- */
+            var CONFIG = {
+              scheme: "light", // "light" (ink rows) | "dark" (white rows, for footage)
+              rows: [
+                { label: "Design", value: "Minimal, clean lines" },
+                { label: "Typography", value: "Inter SemiBold" },
+                { label: "Motion", value: "Restrained, no bounce" },
+                { label: "Color", value: "Stage + one accent" },
+                { label: "Shapes", value: "Capsules & rounded cards" },
+              ],
+              underline: true, // accent sweep under each row
+              lineWidth: 660, // px
+              scrim: 0, // 0–1 left-edge dark scrim for readability over footage
+              x: 160, // column left edge
+              rowGap: 44, // px between rows
+              stagger: 0.18, // s between row entrances
+              animationIn: true,
+              animationOut: true,
+            };
+
+            var DUR = 8;
+            var root = document.getElementById("mk-sl-root");
+            var col = document.getElementById("mk-sl-col");
+            var scrim = document.getElementById("mk-sl-scrim");
+
+            if (CONFIG.scheme === "dark") root.classList.add("mk-dark");
+            scrim.style.opacity = String(CONFIG.scrim);
+
+            /* build rows */
+            CONFIG.rows.forEach(function (r, i) {
+              var row = document.createElement("div");
+              row.id = "mk-sl-row-" + i;
+              row.className = "mk-sl-row";
+              if (i > 0) row.style.marginTop = CONFIG.rowGap + "px";
+
+              var text = document.createElement("div");
+              text.className = "mk-sl-text";
+              var label = document.createElement("span");
+              label.className = "mk-sl-label";
+              label.textContent = r.label;
+              text.appendChild(label);
+              if (r.value) {
+                var value = document.createElement("span");
+                value.className = "mk-sl-value";
+                value.textContent = r.value;
+                text.appendChild(value);
+              }
+              row.appendChild(text);
+
+              if (CONFIG.underline) {
+                var line = document.createElement("div");
+                line.className = "mk-sl-line";
+                line.style.width = CONFIG.lineWidth + "px";
+                var fill = document.createElement("div");
+                fill.id = "mk-sl-fill-" + i;
+                fill.className = "mk-sl-line-fill";
+                line.appendChild(fill);
+                row.appendChild(line);
+              }
+              col.appendChild(row);
+            });
+
+            /* center the column vertically */
+            var colH =
+              CONFIG.rows.length * (46 + 22 + (CONFIG.underline ? 2 : 0)) +
+              (CONFIG.rows.length - 1) * CONFIG.rowGap;
+            col.style.left = CONFIG.x + "px";
+            col.style.top = Math.round((1080 - colH) / 2) + "px";
+
+            var tl = gsap.timeline({ paused: true });
+
+            CONFIG.rows.forEach(function (r, i) {
+              var row = document.getElementById("mk-sl-row-" + i);
+              var t0 = (CONFIG.animationIn ? 0.3 : 0) + i * CONFIG.stagger;
+
+              if (CONFIG.animationIn) {
+                gsap.set(row, { opacity: 0, x: -36 });
+                tl.to(row, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, t0);
+              } else {
+                gsap.set(row, { opacity: 1 });
+              }
+
+              if (CONFIG.underline) {
+                var fill = document.getElementById("mk-sl-fill-" + i);
+                gsap.set(fill, { scaleX: 0 });
+                tl.to(fill, { scaleX: 1, duration: 0.8, ease: "power2.inOut" }, t0 + 0.15);
+              }
+            });
+
+            /* exit + hard kill */
+            if (CONFIG.animationOut) {
+              tl.to(col, { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, DUR - 0.5);
+              tl.to(scrim, { opacity: 0, duration: 0.4, ease: "power2.in" }, DUR - 0.5);
+            }
+            tl.set(root, { visibility: "hidden" }, DUR - 0.02);
+
+            __hfTimelineSlot.set(tl);
+          })();
+    if (window.__hf?.buildReady) await Promise.all(Object.values(window.__hf.buildReady));
+  }
+</script>
+
+<SceneCanvas background="transparent">
+  <div class="hf-port" data-hf-embedded-fonts bind:this={root}>
+    <div
+          id="mk-sl-root"
+          data-composition-id="mk-specs-list"
+          data-start="0"
+          data-duration="8"
+          data-width="1920"
+          data-height="1080"
+        >
+          <div id="mk-sl-scrim"></div>
+          <div id="mk-sl-col"></div>
+          <div
+            id="mk-sl-drv"
+            class="clip"
+            data-start="0"
+            data-duration="8"
+            data-track-index="0"
+            style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+          ></div>
+        </div>
+  </div>
+</SceneCanvas>
+
+<style>
+:global {
+  .hf-port {
+    position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; overflow: hidden;
+  }
+  .hf-port, .hf-port *, .hf-port *::before, .hf-port *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .hf-port {
+    background: transparent;
+    overflow: hidden;
+  }
+  #mk-sl-root {
+    /* ---- mk tokens: override in the host to re-skin the family ---- */
+    --mk-font: "Inter", -apple-system, sans-serif;
+    --mk-ink: #1d1d1f;
+    --mk-ink-dim: #6e6e73;
+    --mk-ink-dark: #f5f5f7;
+    --mk-ink-dim-dark: #a1a1a6;
+    --mk-accent: #0071e3;
+    --mk-accent-dark: #7d5cff;
+    --mk-hairline: 2px;
+
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: transparent; /* overlays footage or mk-background */
+  }
+  #mk-sl-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 62%);
+    opacity: 0;
+  }
+  #mk-sl-col {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+  }
+  .mk-sl-row {
+    font-family: var(--mk-font);
+    line-height: 1;
+    opacity: 0;
+  }
+  .mk-sl-text {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    white-space: nowrap;
+  }
+  .mk-sl-label {
+    font-weight: 600;
+    font-size: 46px;
+    letter-spacing: -0.015em;
+    color: var(--mk-ink);
+  }
+  .mk-sl-value {
+    font-weight: 400;
+    font-size: 40px;
+    letter-spacing: -0.01em;
+    color: var(--mk-ink-dim);
+  }
+  .mk-sl-line {
+    position: relative;
+    margin-top: 22px;
+    height: var(--mk-hairline);
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .mk-sl-line-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--mk-accent);
+    transform-origin: left center;
+  }
+  /* dark scheme: white rows for use over footage (overlay look) */
+  .mk-dark .mk-sl-label {
+    color: var(--mk-ink-dark);
+  }
+  .mk-dark .mk-sl-value {
+    color: var(--mk-ink-dim-dark);
+  }
+  .mk-dark .mk-sl-line {
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .mk-dark .mk-sl-line-fill {
+    background: var(--mk-accent-dark);
+  }
+}
+</style>

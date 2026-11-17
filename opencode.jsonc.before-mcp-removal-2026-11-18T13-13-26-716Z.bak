@@ -1,0 +1,25 @@
+{
+  "mcp": {
+    "servers": {
+      "machinal": {
+        "type": "remote",
+        "url": "http://127.0.0.1:8080/mcp",
+        "oauth": false,
+        "headers": {
+          "Authorization": "Bearer {env:MACHINAL_API_KEY}"
+        }
+      }
+    }
+  },
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": [
+    {
+      "package": "file:///D:/test-web/packages/mcp-installer/src/opencode-plugin",
+      "options": {
+        "servers": {
+          "machinal": "http://127.0.0.1:8080/mcp"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+ "id": "blocks-canopy-part-title",
+ "nativePath": "blocks/canopy-part-title.svelte",
+ "sourceVersion": "sha256:b1608d0ba8f60092132f5cd2618155f4c2add8bbc71d46baa875aa1355011c8a",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/canopy-part-title/SKILL.upstream.md",
+  "registry/blocks/canopy-part-title/canopy-part-title.html",
+  "registry/blocks/canopy-part-title/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.background",
+  "design.font",
+  "design.fontSize",
+  "design.fontWeight",
+  "design.headline1",
+  "design.headline2",
+  "design.leafCount",
+  "design.letterSpacing",
+  "design.retainedBreeze",
+  "design.stayCount",
+  "design.sweepSpeed"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "OFL font files are installed from pinned local Fontsource packages; no font CDN is required.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:b1608d0ba8f60092132f5cd2618155f4c2add8bbc71d46baa875aa1355011c8a",
+   "runtimeVersion": "sha256:cbf6c5935ee9e308a30899aed3d6fd73ee44b88a70964f5128df23b698f9b6e1",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 8513,
+       "sha256": "79eb06ff024c893b558121972928881455b0b93d2294a5b7856e93667e31bef4"
+      },
+      {
+       "frame": 144,
+       "bytes": 258075,
+       "sha256": "0803780ccf5507b8bfa2f875d276cf2637ed5f38f49e9e6b39409e6fe17fcbda"
+      },
+      {
+       "frame": 288,
+       "bytes": 201960,
+       "sha256": "ec5307ada38b920b914b88bf43a2fab127e99b8c861b1e911f9e0de9749e198a"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 10223,
+       "sha256": "b78c4643bb850bc673f69aaa8d81c2d18f01d2aa9507739550343257558e2b3c"
+      },
+      {
+       "frame": 144,
+       "bytes": 145997,
+       "sha256": "86c9912ddd19f67303f92d7a9166f1ac46ce5fcc8aaef6d4adc98d37dc0cb9b9"
+      },
+      {
+       "frame": 288,
+       "bytes": 113615,
+       "sha256": "57ba13c997cef82e1f13615d8fb71a723bc8ad4f85d2ffb5371ab8fbce6e7f22"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 8513,
+      "sha256": "79eb06ff024c893b558121972928881455b0b93d2294a5b7856e93667e31bef4"
+     },
+     {
+      "frame": 144,
+      "bytes": 258075,
+      "sha256": "0803780ccf5507b8bfa2f875d276cf2637ed5f38f49e9e6b39409e6fe17fcbda"
+     },
+     {
+      "frame": 288,
+      "bytes": 201960,
+      "sha256": "ec5307ada38b920b914b88bf43a2fab127e99b8c861b1e911f9e0de9749e198a"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 10223,
+      "sha256": "b78c4643bb850bc673f69aaa8d81c2d18f01d2aa9507739550343257558e2b3c"
+     },
+     {
+      "frame": 144,
+      "bytes": 145997,
+      "sha256": "86c9912ddd19f67303f92d7a9166f1ac46ce5fcc8aaef6d4adc98d37dc0cb9b9"
+     },
+     {
+      "frame": 288,
+      "bytes": 113615,
+      "sha256": "57ba13c997cef82e1f13615d8fb71a723bc8ad4f85d2ffb5371ab8fbce6e7f22"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/leaf-surface-color.webp",
+   "replacement": "locally authored abstract illustration"
+  },
+  {
+   "path": "assets/leaf-surface-normal.webp",
+   "replacement": "locally authored abstract illustration"
+  }
+ ],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 12,
+  "captionSafeArea": false
+ }
+}

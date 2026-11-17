@@ -1,0 +1,193 @@
+{
+ "id": "blocks-heygen-avatar-promo-card",
+ "nativePath": "blocks/heygen-avatar-promo-card.svelte",
+ "sourceVersion": "sha256:fccee11ee865ff4472fd46fc79da3da7980133f90ab3f846b8211867be8a6753",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/heygen-avatar-promo-card/TEMPLATE.md",
+  "registry/blocks/heygen-avatar-promo-card/assets/fonts/eb-garamond-LICENSE.txt",
+  "registry/blocks/heygen-avatar-promo-card/assets/fonts/inter-LICENSE.txt",
+  "registry/blocks/heygen-avatar-promo-card/assets/heygen-logo.svg",
+  "registry/blocks/heygen-avatar-promo-card/heygen-avatar-promo-card.html",
+  "registry/blocks/heygen-avatar-promo-card/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.accentColor",
+  "design.brandLogo",
+  "design.canvasColor",
+  "design.codeLabel",
+  "design.darkTileColor",
+  "design.inkColor",
+  "design.lightTileColor",
+  "design.mutedInkColor",
+  "design.offerSuffix",
+  "design.offerValue",
+  "design.pill1",
+  "design.pill2",
+  "design.promoPrefix",
+  "design.promoSuffix",
+  "design.subhead",
+  "design.titleLine1",
+  "design.titleLine2"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "OFL font files are installed from pinned local Fontsource packages; no font CDN is required.",
+  "Missing media is replaced by explicitly authorized, locally authored sample artwork/video; it is not the original subject imagery.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:fccee11ee865ff4472fd46fc79da3da7980133f90ab3f846b8211867be8a6753",
+   "runtimeVersion": "sha256:c11422cbcdadd405fd821e4766a27bde1c54e00a34162313726375d47df279a9",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 181077,
+       "sha256": "896243ed84bac718ff399eb71a7f00f7596c3458bb01a146f243bc6f82fedb1d"
+      },
+      {
+       "frame": 120,
+       "bytes": 266290,
+       "sha256": "45c7a23838788680e6e1283ae4ed61cb72f1ac94afdee19fb5ef8d25dfcd778f"
+      },
+      {
+       "frame": 240,
+       "bytes": 267791,
+       "sha256": "0e0d5eb6d62ae005c9a13adde638489597fac00b46daa699388987d4644e5c7e"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 39868,
+       "sha256": "c5c500e7258c602d83a4b5a7a79a45874007fa7e56a8be45ebbfd47a75610950"
+      },
+      {
+       "frame": 120,
+       "bytes": 454439,
+       "sha256": "0ab8ef45cbc943cd7b4f819e460b488dcc52bf41b0e4871e246c240880efe240"
+      },
+      {
+       "frame": 240,
+       "bytes": 452149,
+       "sha256": "4c3034806f8e70af4058b6f99ae9213f6b3254eeb249fb0a26d2b66479852ae9"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 181077,
+      "sha256": "896243ed84bac718ff399eb71a7f00f7596c3458bb01a146f243bc6f82fedb1d"
+     },
+     {
+      "frame": 120,
+      "bytes": 266290,
+      "sha256": "45c7a23838788680e6e1283ae4ed61cb72f1ac94afdee19fb5ef8d25dfcd778f"
+     },
+     {
+      "frame": 240,
+      "bytes": 267791,
+      "sha256": "0e0d5eb6d62ae005c9a13adde638489597fac00b46daa699388987d4644e5c7e"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 39868,
+      "sha256": "c5c500e7258c602d83a4b5a7a79a45874007fa7e56a8be45ebbfd47a75610950"
+     },
+     {
+      "frame": 120,
+      "bytes": 454439,
+      "sha256": "0ab8ef45cbc943cd7b4f819e460b488dcc52bf41b0e4871e246c240880efe240"
+     },
+     {
+      "frame": 240,
+      "bytes": 452149,
+      "sha256": "4c3034806f8e70af4058b6f99ae9213f6b3254eeb249fb0a26d2b66479852ae9"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [
+  {
+   "path": "assets/av_r1k1.mp4",
+   "replacement": "locally authored silent motion sample"
+  },
+  {
+   "path": "assets/av_r1k3.mp4",
+   "replacement": "locally authored silent motion sample"
+  },
+  {
+   "path": "assets/av_r1k4.mp4",
+   "replacement": "locally authored silent motion sample"
+  },
+  {
+   "path": "assets/av_r2k0.mp4",
+   "replacement": "locally authored silent motion sample"
+  },
+  {
+   "path": "assets/av_r2k2.mp4",
+   "replacement": "locally authored silent motion sample"
+  },
+  {
+   "path": "assets/bgm.m4a",
+   "replacement": "silent audio sample (missing original audio)"
+  }
+ ],
+ "config": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "duration": 10,
+  "captionSafeArea": false
+ }
+}

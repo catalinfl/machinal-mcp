@@ -1,0 +1,195 @@
+{
+ "id": "blocks-cuboid-carousel",
+ "nativePath": "blocks/cuboid-carousel.svelte",
+ "sourceVersion": "sha256:e2d14fd024d8acf89656d84b2bac144213a1a12ce2c935c8eb987d560a5ab5b7",
+ "status": "ported",
+ "sourcePaths": [
+  "registry/blocks/cuboid-carousel/SKILL.upstream.md",
+  "registry/blocks/cuboid-carousel/assets/GSAP-NOTICE.txt",
+  "registry/blocks/cuboid-carousel/assets/Three-LICENSE.txt",
+  "registry/blocks/cuboid-carousel/assets/addons/environments/RoomEnvironment.js",
+  "registry/blocks/cuboid-carousel/assets/addons/utils/BufferGeometryUtils.js",
+  "registry/blocks/cuboid-carousel/assets/cuboid-motion.js",
+  "registry/blocks/cuboid-carousel/assets/gsap-3.14.2.min.js",
+  "registry/blocks/cuboid-carousel/assets/three.core.min.js",
+  "registry/blocks/cuboid-carousel/assets/three.module.min.js",
+  "registry/blocks/cuboid-carousel/cuboid-carousel.html",
+  "registry/blocks/cuboid-carousel/registry-item.json"
+ ],
+ "visualMode": "2d",
+ "requiredImages": [],
+ "requiredVideos": [],
+ "parameters": [
+  "design.ambientColor",
+  "design.ambientIntensity",
+  "design.backdrop",
+  "design.bevelSize",
+  "design.bevelThickness",
+  "design.bodyColor",
+  "design.bottomColor",
+  "design.bottomIntensity",
+  "design.cameraFov",
+  "design.cameraSettleFrame",
+  "design.cameraTargetFov",
+  "design.cameraTargetX",
+  "design.cameraTargetY",
+  "design.cameraTargetZ",
+  "design.cameraX",
+  "design.cameraY",
+  "design.cameraZ",
+  "design.cardsJson",
+  "design.cornerRadius",
+  "design.count",
+  "design.cuboidDepth",
+  "design.cuboidHeight",
+  "design.cuboidWidth",
+  "design.gap",
+  "design.handheldStrength",
+  "design.heroCard",
+  "design.heroExitX",
+  "design.heroExitY",
+  "design.heroExitZ",
+  "design.heroFillIntensity",
+  "design.heroScale",
+  "design.keyColor",
+  "design.keyIntensity",
+  "design.metalness",
+  "design.roughness",
+  "design.shadowMapSize",
+  "design.shadowRadius",
+  "design.smoothness",
+  "design.topColor",
+  "design.topIntensity"
+ ],
+ "adaptations": [
+  "Upstream markup and animation are adapted to the native frame clock; demo pages supply functional markup for paste-in primitives.",
+  "OFL font files are installed from pinned local Fontsource packages; no font CDN is required.",
+  "The upstream window.__timelines publication is handed to a component-owned slot so the scene controller can seek it.",
+  "Host variable lookups read the approved design prop through a small host shim.",
+  "CSS indentation is normalized without changing declarations; document-level selectors (html/body/:root/*) are retargeted to the port root so a mounted port cannot restyle the host page."
+ ],
+ "limitations": [
+  "Uses the original system-font fallbacks; installed operating-system fonts can differ between machines.",
+  "Verified by actual production-bundle frame capture in landscape and portrait; not claimed pixel-identical to the upstream page."
+ ],
+ "verification": {
+  "compiled": true,
+  "visualInspection": false,
+  "motionVerified": true,
+  "runtimeCapture": {
+   "rendered": true,
+   "sourceVersion": "sha256:e2d14fd024d8acf89656d84b2bac144213a1a12ce2c935c8eb987d560a5ab5b7",
+   "runtimeVersion": "sha256:03835aa76f9dc7600cc6541128775ec9824262bb37f60433dfa767172e8c7f9d",
+   "dependencySnapshot": "sha256:1c53a230c07d478b628f054934cdfbadf0ac81d8abc4fdb9699a760a9a6acb8a",
+   "checks": [
+    {
+     "width": 1920,
+     "height": 1080,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 8516,
+       "sha256": "56562f8a17f6b1752bd60dd331f3f25c103c8bd4f704599466d4d559b11638a0"
+      },
+      {
+       "frame": 80,
+       "bytes": 59770,
+       "sha256": "38e98683177b207e2de3dc2b7c22c923b95b53165d7a109a20eea0cf5ccea98e"
+      },
+      {
+       "frame": 160,
+       "bytes": 68468,
+       "sha256": "b370177fff5c37d49ec103e8157d924a5b50425f80238700d1f8167b94e4286b"
+      }
+     ],
+     "animated": true
+    },
+    {
+     "width": 1080,
+     "height": 1920,
+     "compiled": true,
+     "rendered": true,
+     "samples": [
+      {
+       "frame": 0,
+       "bytes": 10430,
+       "sha256": "e1f3e81f3e5c224c7a106a3bc5ea7dbd0b508bd46139ea353cdb49be412552de"
+      },
+      {
+       "frame": 80,
+       "bytes": 43252,
+       "sha256": "b42583a84af37497ea671d0c67c2904e81ae324e366945385954e762b3312ff6"
+      },
+      {
+       "frame": 160,
+       "bytes": 51187,
+       "sha256": "552e91018f08f520d9139eaffbf2af9cc8c2870daf590da6d967a5345888eb16"
+      }
+     ],
+     "animated": true
+    }
+   ]
+  },
+  "checks": [
+   {
+    "width": 1920,
+    "height": 1080,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 8516,
+      "sha256": "56562f8a17f6b1752bd60dd331f3f25c103c8bd4f704599466d4d559b11638a0"
+     },
+     {
+      "frame": 80,
+      "bytes": 59770,
+      "sha256": "38e98683177b207e2de3dc2b7c22c923b95b53165d7a109a20eea0cf5ccea98e"
+     },
+     {
+      "frame": 160,
+      "bytes": 68468,
+      "sha256": "b370177fff5c37d49ec103e8157d924a5b50425f80238700d1f8167b94e4286b"
+     }
+    ],
+    "animated": true
+   },
+   {
+    "width": 1080,
+    "height": 1920,
+    "compiled": true,
+    "rendered": true,
+    "samples": [
+     {
+      "frame": 0,
+      "bytes": 10430,
+      "sha256": "e1f3e81f3e5c224c7a106a3bc5ea7dbd0b508bd46139ea353cdb49be412552de"
+     },
+     {
+      "frame": 80,
+      "bytes": 43252,
+      "sha256": "b42583a84af37497ea671d0c67c2904e81ae324e366945385954e762b3312ff6"
+     },
+     {
+      "frame": 160,
+      "bytes": 51187,
+      "sha256": "552e91018f08f520d9139eaffbf2af9cc8c2870daf590da6d967a5345888eb16"
+     }
+    ],
+    "animated": true
+   }
+  ]
+ },
+ "animationRuntime": "gsap",
+ "mediaReplacements": [],
+ "config": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 6.666666666666667,
+  "captionSafeArea": false
+ }
+}

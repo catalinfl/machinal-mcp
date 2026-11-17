@@ -1,0 +1,60 @@
+{
+  "name": "@machinal/mcp",
+  "version": "0.6.3",
+  "description": "Resilient Machinal MCP setup for Codex, Claude Code and OpenCode: independent local or hosted server",
+  "type": "module",
+  "exports": {
+    ".": "./src/opencode-plugin/index.mjs"
+  },
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  },
+  "bin": {
+    "machinal-mcp": "bin/machinal-mcp.mjs",
+    "machinal": "bin/machinal-mcp.mjs"
+  },
+  "files": [
+    "bin/*.mjs",
+    "src/*.mjs",
+    "src/*.ps1",
+    "src/reference-files.json",
+    "src/opencode-plugin/*.mjs",
+    "src/opencode-plugin/package.json",
+    "skills/",
+    "library/",
+    "!library/runtime/**",
+    "!skills/**/.agents/**",
+    "!skills/**/.claude/**",
+    "!skills/**/.codex/**",
+    "!skills/**/.opencode/**",
+    "README.md"
+  ],
+  "scripts": {
+    "sync:reference": "node scripts/sync-reference.mjs",
+    "build:library": "node scripts/build-scene-library.mjs",
+    "update:library-contracts": "node scripts/build-scene-library.mjs --contracts",
+    "import:film-library": "node scripts/import-film-library.mjs",
+    "import:hyperframes": "node scripts/import-hyperframes.mjs",
+    "check:reference": "node scripts/sync-reference.mjs --check",
+    "prepack": "npm run check:reference",
+    "test:package": "node --test test/package.smoke.mjs",
+    "test:library-package": "node --test test/scene-library-package.smoke.mjs",
+    "test:clients": "node --test test/client-detection.smoke.mjs",
+    "test": "node --test test/*.test.mjs",
+    "prepublishOnly": "npm test && npm run test:package && npm run test:library-package"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.7.4",
+    "@opencode/plugin": "2.0.27",
+    "cross-spawn": "^7.0.6",
+    "jsonc-parser": "^3.3.1",
+    "toml-eslint-parser": "^1.0.3"
+  },
+  "optionalDependencies": {
+    "@napi-rs/keyring": "2.1.2"
+  }
+}
