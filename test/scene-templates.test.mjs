@@ -5,7 +5,7 @@ import test from 'node:test';
 import { planSkills } from '../src/skills.mjs';
 import { workspace } from './helpers.mjs';
 
-const source = new URL('../../../packages/mcp-installer/library/', import.meta.url);
+const source = new URL('../library/', import.meta.url);
 const templates = JSON.parse(await readFile(new URL('scene-templates.json', source), 'utf8'));
 
 test('all clients receive the exact effect sources, metadata and selection workflow offline', async (t) => {

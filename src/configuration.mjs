@@ -47,7 +47,13 @@ export async function configurationPath({ client, scope, cwd = process.cwd(), ho
     return scope === 'global' ? join(home, '.claude.json') : join(cwd, '.mcp.json');
   }
   if (client === 'codex') return join(scope === 'global' ? env.CODEX_HOME || join(home, '.codex') : join(cwd, '.codex'), 'config.toml');
-  throw new InstallerError('Choose opencode, claude, or codex.');
+  if (client === 'antigravity') {
+    if (scope !== 'global') {
+      throw new InstallerError('Google Antigravity reads standalone MCP servers from the global configuration (~/.gemini/config/mcp_config.json). Use --scope global or omit --scope.');
+    }
+    return join(home, '.gemini', 'config', 'mcp_config.json');
+  }
+  throw new InstallerError('Choose opencode, claude, codex, or antigravity.');
 }
 
 async function snapshot(file, maxBytes = MAX_CONFIG_BYTES) {

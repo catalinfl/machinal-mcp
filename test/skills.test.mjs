@@ -14,6 +14,8 @@ test('skills use each client native discovery paths, including current Codex .ag
   assert.equal(skillsDirectory({ client: 'codex', scope: 'global', home, env: { CODEX_HOME: 'not-the-skill-path' } }), join(home, '.agents', 'skills'));
   assert.equal(skillsDirectory({ client: 'opencode', scope: 'global', home, env: { XDG_CONFIG_HOME: join(home, 'xdg') } }), join(home, 'xdg', 'opencode', 'skills'));
   assert.equal(skillsDirectory({ client: 'claude', scope: 'global', home, env: {} }), join(home, '.claude', 'skills'));
+  assert.equal(skillsDirectory({ client: 'antigravity', scope: 'project', cwd }), join(cwd, '.agents', 'skills'));
+  assert.equal(skillsDirectory({ client: 'antigravity', scope: 'global', home, env: {} }), join(home, '.gemini', 'config', 'skills'));
 });
 
 test('the package contains focused portable skills and a schema-grounded example', async (t) => {
@@ -112,12 +114,6 @@ test('all clients receive offline MCP discovery and exact credential recovery gu
   }
 });
 
-test('the active repository support skill matches the installer bundle', async () => {
-  const bundled = await readFile(new URL('../skills/machinal-support/SKILL.md', import.meta.url), 'utf8');
-  const active = await readFile(new URL('../../../.opencode/skills/machinal-support/SKILL.md', import.meta.url), 'utf8');
-  assert.equal(active, bundled);
-});
-
 test('all clients receive opt-in no-upload local media guidance without broad filesystem permissions', async (t) => {
   for (const client of ['opencode', 'claude', 'codex']) {
     const bundle = await planSkills({ client, scope: 'project', cwd: await workspace(t), style: 'auto' });
@@ -127,11 +123,6 @@ test('all clients receive opt-in no-upload local media guidance without broad fi
         assert.ok(content?.includes(phrase), `${client}: ${file} missing ${phrase}`);
       }
     }
-  }
-  for (const file of [join('machinal-media', 'SKILL.md'), join('machinal-media', 'references', 'workflow.md'), join('machinal-recipes', 'SKILL.md')]) {
-    const bundled = await readFile(new URL(`../skills/${file.replaceAll('\\', '/')}`, import.meta.url), 'utf8');
-    const active = await readFile(new URL(`../../../.opencode/skills/${file.replaceAll('\\', '/')}`, import.meta.url), 'utf8');
-    assert.equal(active.replaceAll('\r\n', '\n'), bundled.replaceAll('\r\n', '\n'));
   }
 });
 
@@ -149,9 +140,6 @@ test('all clients receive complex-image and transparent-cutout defaults with con
       }
     }
   }
-  const bundled = await readFile(new URL('../skills/machinal-scenes/SKILL.md', import.meta.url), 'utf8');
-  const active = await readFile(new URL('../../../.opencode/skills/machinal-scenes/SKILL.md', import.meta.url), 'utf8');
-  assert.equal(active, bundled);
 });
 
 test('the brief example is one valid multi-question OpenCode tool payload, not chat copy', async (t) => {

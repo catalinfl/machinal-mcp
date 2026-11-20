@@ -156,3 +156,24 @@ test('server setup never accepts Docker flags or provider setup, and unknown tra
     await assert.rejects(run(['setup', '--client', 'claude', '--url', 'https://api.example/mcp', '--no-skills', '--yes', ...flags], context(cwd)));
   }
 });
+
+test('Google Antigravity (and agy alias) configures global ~/.gemini/config/mcp_config.json and global skills', async (t) => {
+  const cwd = await workspace(t);
+  const home = await workspace(t);
+  const endpoint = await serve(t, mcpHandler());
+  const args = ['setup', '--client', 'agy', '--url', endpoint, '--no-launch', '--yes'];
+  assert.equal(await run(args, context(cwd, { home, env: { MACHINAL_API_KEY: API_KEY } })), 0);
+  const file = join(home, '.gemini', 'config', 'mcp_config.json');
+  const parsed = JSON.parse(await readFile(file, 'utf8'));
+  const entry = parsed.mcpServers.machinal;
+  assert.equal(entry.command, process.execPath);
+  assert.match(entry.args[0], /runtime.*machinal-stdio\.mjs$/);
+  assert.ok(entry.args.includes(endpoint));
+  assert.equal(entry.type, undefined);
+  assert.ok(!JSON.stringify(parsed).includes(API_KEY));
+  assert.match(await readFile(join(home, '.gemini', 'config', 'skills', 'machinal-credits', 'SKILL.md'), 'utf8'), /get_credits/);
+  assert.deepEqual(await readdir(cwd), []);
+  const before = await readdir(dirname(file));
+  assert.equal(await run(args, context(cwd, { home, env: { MACHINAL_API_KEY: API_KEY } })), 0);
+  assert.deepEqual(await readdir(dirname(file)), before);
+});

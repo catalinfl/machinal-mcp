@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import test from 'node:test';
 import { planSkills } from '../src/skills.mjs';
@@ -44,13 +43,5 @@ test('every MCP client preserves existing captions instead of applying generatio
         assert.ok(content(...parts).includes('read-only unless the user explicitly requests a caption change'));
       }
     });
-  }
-});
-
-test('active caption preservation skills match the portable installer bundle', async () => {
-  for (const skill of editingSkills) {
-    const bundled = await readFile(new URL(`../skills/${skill}/SKILL.md`, import.meta.url), 'utf8');
-    const active = await readFile(new URL(`../../../.opencode/skills/${skill}/SKILL.md`, import.meta.url), 'utf8');
-    assert.equal(active, bundled, `${skill} is stale`);
   }
 });

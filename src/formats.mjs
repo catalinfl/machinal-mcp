@@ -9,8 +9,9 @@ export function bridgeEntry(client, { url, localConfig, catalogFile, command = p
     ...(localConfig ? ['--local-config', localConfig] : []), ...(catalogFile ? ['--catalog-file', catalogFile] : [])];
   if (client === 'opencode') return { type: 'local', command: [command, ...args] };
   if (client === 'claude') return { type: 'stdio', command, args };
-  if (client === 'codex') return { command, args, env_vars: ['MACHINAL_API_KEY', 'DIRECTION_API_KEY'], startup_timeout_sec: 30, tool_timeout_sec: 180 };
-  throw new InstallerError('Choose opencode, claude, or codex.');
+  if (client === 'codex') return { command, args, env_vars: ['MACHINAL_API_KEY', 'DIRECTION_API_KEY'], startup_timeout_sec: 30, tool_timeout_sec: 930 };
+  if (client === 'antigravity') return { command, args };
+  throw new InstallerError('Choose opencode, claude, codex, or antigravity.');
 }
 
 export function serverEntry(client, url) {
@@ -21,8 +22,10 @@ export function serverEntry(client, url) {
       return { type: 'http', url, headers: { Authorization: 'Bearer ${MACHINAL_API_KEY}' } };
     case 'codex':
       return { url, bearer_token_env_var: 'MACHINAL_API_KEY' };
+    case 'antigravity':
+      return { url, headers: { Authorization: 'Bearer ${MACHINAL_API_KEY}' } };
     default:
-      throw new InstallerError('Choose opencode, claude, or codex.');
+      throw new InstallerError('Choose opencode, claude, codex, or antigravity.');
   }
 }
 

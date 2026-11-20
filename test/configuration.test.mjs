@@ -18,6 +18,7 @@ test('config paths honor scope, XDG_CONFIG_HOME, and CODEX_HOME', async (t) => {
   assert.equal(await configurationPath({ client: 'claude', scope: 'project', cwd }), join(cwd, '.mcp.json'));
   assert.equal(await configurationPath({ client: 'codex', scope: 'global', home, env: { CODEX_HOME: join(home, 'codex') } }), join(home, 'codex', 'config.toml'));
   assert.equal(await configurationPath({ client: 'codex', scope: 'project', cwd }), join(cwd, '.codex', 'config.toml'));
+  assert.equal(await configurationPath({ client: 'antigravity', scope: 'global', home, env: {} }), join(home, '.gemini', 'config', 'mcp_config.json'));
 });
 
 test('the higher precedence existing .opencode config is edited instead of creating an ignored root entry', async (t) => {
@@ -34,6 +35,7 @@ test('ambiguous OpenCode files and unsupported client/scope combinations fail sa
   await assert.rejects(configurationPath({ ...connection, cwd }), /Both/);
   await assert.rejects(configurationPath({ client: 'other', scope: 'project', cwd }));
   await assert.rejects(configurationPath({ client: 'codex', scope: 'other', cwd }));
+  await assert.rejects(configurationPath({ client: 'antigravity', scope: 'project', cwd }), /global configuration/);
   await assert.rejects(configurationPath({ client: 'claude', scope: 'global', env: { CLAUDE_CONFIG_DIR: 'custom' } }));
 });
 

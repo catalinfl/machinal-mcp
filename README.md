@@ -1,6 +1,6 @@
 # machinal MCP installer
 
-Set up **Codex, Claude Code or OpenCode V2** with a resilient stdio adapter. Choose an independent local backend with your own OpenRouter key, or an existing server with a Machinal application key. A private stable runtime outside npm's cache runs with Node directly, including on Windows.
+Set up **Codex, Claude Code, OpenCode V2 or Google Antigravity** with a resilient stdio adapter. Choose an independent local backend with your own OpenRouter key, or an existing server with a Machinal application key. A private stable runtime outside npm's cache runs with Node directly, including on Windows.
 
 See the repository's [testing guide](../../docs/TESTING.md) for source-package and pre-publish checks.
 
@@ -137,6 +137,7 @@ machinal setup
 # Machinal Server: no URL entry, only your Machinal key:
 machinal setup --client opencode --mode server
 machinal setup --client codex --mode server
+machinal setup --client antigravity --mode server
 machinal setup --client claude --scope global --mode server
 # Independent local; the wizard asks for OpenRouter and model IDs:
 machinal setup --client codex --mode local --docker-dir /path/to/machinal
@@ -147,7 +148,7 @@ machinal setup --client opencode --mode custom --url https://YOUR-API/mcp
 
 The wizard asks for:
 
-1. **OpenCode V2**, **Claude Code**, or **Codex**.
+1. **OpenCode V2**, **Claude Code**, **Codex**, or **Google Antigravity**.
 2. Project or global scope (**Codex defaults to global**, because untrusted project config is ignored; other clients default to project).
 3. **Machinal Server**, **Local**, or **Custom server (advanced)**. Machinal Server automatically uses `https://api.machinal.app/mcp` and never asks for an address or starts Docker. Local builds an independent backend with loopback host publishing and separate volumes; its default is `http://127.0.0.1:8080/mcp`. Custom server asks for your own API URL, **not the frontend URL**, without offering localhost as a guessed hosted default.
 4. Whether to install bundled editing, YAML recipe, scene and credit-awareness skills, and a default editing style.

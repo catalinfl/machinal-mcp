@@ -7,7 +7,7 @@ import { syncReference } from '../scripts/sync-reference.mjs';
 import { planSkills } from '../src/skills.mjs';
 import { workspace } from './helpers.mjs';
 
-const reference = new URL('../../../packages/mcp-installer/library/', import.meta.url);
+const reference = new URL('../library/', import.meta.url);
 const bundle = new URL('../skills/machinal-hyperframes/references/', import.meta.url);
 const manifest = JSON.parse(await readFile(new URL('hyperframes-library/manifest.json', reference), 'utf8'));
 

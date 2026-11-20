@@ -32,8 +32,8 @@ Also available: launch <client>, doctor --url URL, key set, key delete.
 Requires Node.js 22.13+ (22.x) or 24+; Local needs Docker/Compose and a source checkout.
 
 Options for setup:
-  --client opencode|claude|codex
-  --scope project|global           Default: global for Codex, project otherwise
+  --client opencode|claude|codex|antigravity
+  --scope project|global           Default: global for Codex/Antigravity, project otherwise
   --mode server|local|custom       Machinal Server | independent Local | custom API
   --mode hosted                    Compatibility alias for server
   --url URL                        Custom server URL or optional local URL override
@@ -117,7 +117,7 @@ function parseOptions(argv) {
 export async function run(argv = process.argv.slice(2), runtime = {}) {
   const { values, positionals, forwarded } = parseOptions(argv);
   if (values.help) {
-    console.log(values.verbose ? HELP : `${HELP.split('Options for setup:')[0]}Setup: --client opencode|claude|codex · --mode server|local|custom\nMore options: machinal --help --verbose\n`);
+    console.log(values.verbose ? HELP : `${HELP.split('Options for setup:')[0]}Setup: --client opencode|claude|codex|antigravity · --mode server|local|custom\nMore options: machinal --help --verbose\n`);
     return 0;
   }
   if (values.version) { console.log(VERSION); return 0; }

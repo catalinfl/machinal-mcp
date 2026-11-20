@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "sha256:24495c29436996fc7edb46d9894cba46978cc05478e92a2726a306410fbb5f22",
+  "version": "sha256:c8a89aa4b61698b38e20356fd59b5f5a5985e318b19ee6772df6c7035985b398",
   "files": {
     "animation-skills/machinal-choreography.md": {
       "bytes": 3449,
@@ -47,8 +47,8 @@
       "sha256": "a9d2b9e1bb72d5c7ba8927a7429683d7a283ad404ac23d8b07c64edacef28fef"
     },
     "animation-skills/machinal-sound.md": {
-      "bytes": 4799,
-      "sha256": "4ab3bf8ade91abe62b068fd03d28cde4c495216008d80d308338f7d792945b49"
+      "bytes": 5152,
+      "sha256": "e8e063f5e272d6641679b6c16c8edf17826a6641b0566ae77cd6ec26871fbe34"
     },
     "animation-skills/machinal-spatial.md": {
       "bytes": 3147,
@@ -455,20 +455,20 @@
       "sha256": "a7d922aa3184f9b33b503906d2989cf75c37cea64ba693aaf23dc807a2a4f5f9"
     },
     "guides/brief.md": {
-      "bytes": 17692,
-      "sha256": "9b6572a41cc8666d426408ae7fb6272e65f7b817c6d00e494b275c86de99e47a"
+      "bytes": 18765,
+      "sha256": "f40624a10149fd5cd3c12499eb40ee4f281df6865163a8c58d17b07e742e1f43"
     },
     "guides/client-bootstrap.md": {
-      "bytes": 8492,
-      "sha256": "ea227bf1d9180735347ecea034cc016f05e4a26f2d020d8602d0a443e81ba77f"
+      "bytes": 8828,
+      "sha256": "9eee19199aa71581ce26c87645b0e941fde2602b1fa5cf24dc862d7699e0c529"
     },
     "guides/commands.md": {
       "bytes": 4194,
       "sha256": "e0ac5fdfaeb95a2cc843a089b5f53b4d627112c9df29da14eeab07551e1ba029"
     },
     "guides/credits.md": {
-      "bytes": 7519,
-      "sha256": "ebecb4ada7c2405330c07650852eb817206f260232f122be7d89a8ee53848975"
+      "bytes": 7536,
+      "sha256": "53136334c89cec09900f149ffb8d6eca28fdfe4e81e3b0b17935582080cf2d6f"
     },
     "guides/editing.md": {
       "bytes": 10100,
@@ -491,8 +491,8 @@
       "sha256": "7e656205f39bfd4b31277554442cb181a7e8110b5c5fb79118e2d75bdbf3602c"
     },
     "guides/jobs-scenes.md": {
-      "bytes": 37657,
-      "sha256": "bd44fc788d4038ab587b48ac05d98f93aac9e5b5d69ae74d94bd1c7b7b446a1b"
+      "bytes": 37745,
+      "sha256": "c02a49bea7b56845935293674d181f56101b7b7b8206c9119f84bd99355aa132"
     },
     "guides/looks-motion.md": {
       "bytes": 3405,
@@ -503,32 +503,32 @@
       "sha256": "592b54bcbf7ecf996514a59e91ddc23ff966ccd7f9311cb636c97b2ff8dd50bc"
     },
     "guides/production.md": {
-      "bytes": 28596,
-      "sha256": "5df985771623d18695cfb5bd420022a1a56b910790062cae2adaa1210afe45c6"
+      "bytes": 29137,
+      "sha256": "fec8f8159d7b7f3180ec69c9c85bba927f33bd7317884b9d33bbd55a60dbc0bd"
     },
     "guides/recipe-workflow.md": {
       "bytes": 25449,
       "sha256": "130ce6ca57fd9408ee9e6127ffd208ff0a3232edfda32cb40dbd265e3231f9fe"
     },
     "guides/reference-overview.md": {
-      "bytes": 13346,
-      "sha256": "247e1e05d0df3ef8033ef545f44da1b23a75d841280487258e8751281c142e66"
+      "bytes": 13448,
+      "sha256": "8b8f42977bc70f2386ddcfc254417623c1cc915245e30e3757ae07a226d27c47"
     },
     "guides/scene-authoring.md": {
       "bytes": 21233,
       "sha256": "9a206b40523b522f0027ec265db59c968e5dabd0858a54e9e83694a49058b1ca"
     },
     "guides/scene-templates.md": {
-      "bytes": 9666,
-      "sha256": "8ca315ac75f226e1027ddb4dde72a82cd6f57218b961b8b208f0c36fff752397"
+      "bytes": 9992,
+      "sha256": "5117dab5547ab43e7826b3e33b6ac6fed2fe96d91b3c4d301152323eaa29e20d"
     },
     "guides/styles.md": {
       "bytes": 3482,
       "sha256": "12e614705f0dfc5b579cc293db1bc95ba6c32ea02602bfa53dc16d19455be676"
     },
     "guides/text-audio.md": {
-      "bytes": 16869,
-      "sha256": "dc9d3b036d922605d30e92e8403fa437dc110e537098ce8e19656789c9ba299e"
+      "bytes": 17240,
+      "sha256": "2365d8ddc46b579a8bb9753eb5a59fa5e563b5c59e69c029f8f8894bfabc3a7d"
     },
     "guides/transitions.md": {
       "bytes": 4126,
@@ -11550,6 +11550,14 @@
       "bytes": 2049,
       "sha256": "2f9511df6c567f8b73be4d1f752d9974964edc38a65d7af92aefc93f090f35a4"
     },
+    "scene-templates/dialogue-stage-3d.svelte": {
+      "bytes": 2577,
+      "sha256": "84f379689b1f01fb1c5aaa921b5c29ffe4264276a0a14fc14ec4203afedbfde0"
+    },
+    "scene-templates/gateway-arrival-3d.svelte": {
+      "bytes": 2407,
+      "sha256": "7930f22e44b99d035edb3cfc38402f966e1fd9878bc0bcd5f52f8642b4abe619"
+    },
     "scene-templates/glitch-handoff.svelte": {
       "bytes": 1566,
       "sha256": "68061bd61c4ded93e6ba12843a39824f6533a3e09e96de2ef8b4114e8340fb81"
@@ -13419,8 +13427,8 @@
       "sha256": "76f0ac87e5871424cceeec4347a13390c50463c2e2a5fc60346b7337f64abca0"
     },
     "scene-templates.json": {
-      "bytes": 1355826,
-      "sha256": "ec3ab96f516450b30ca0b517022b5342badf745a5db803bc123b7790a989f29d"
+      "bytes": 1358194,
+      "sha256": "03b90ff7abb4444712e7f5653887a5e89c1e01fee94923acf553392cf856ab33"
     },
     "skills/machinal-choreography.md": {
       "bytes": 3449,
@@ -13431,12 +13439,12 @@
       "sha256": "3353702529f239ae568e2aa8770dcf4c1e9fb205946d2abbaf37dedf0645f310"
     },
     "skills/machinal-credits.md": {
-      "bytes": 4843,
-      "sha256": "d72ec78e93934f74d5e85cd382d3c0283e65609b3af543adede3c46198b8db90"
+      "bytes": 5024,
+      "sha256": "0f9f605da4812a06b557253c6a39de037fec1c3a252c741abc8e285aa82cfb8e"
     },
     "skills/machinal-editing.md": {
-      "bytes": 15229,
-      "sha256": "066d99248d4f8cad6fce8448462e144311d29d692ac4960d38c8341997c5d6bd"
+      "bytes": 15941,
+      "sha256": "f5b3761b47453db15a10523bf0081867b60d6fe5d5b1eb6b7dabffb1619b372c"
     },
     "skills/machinal-hyperframes-cli.md": {
       "bytes": 2505,
@@ -13475,28 +13483,28 @@
       "sha256": "374a52fb42b1905fef6f6aa4d0563219a3a17387663bace19ea39a7443395d61"
     },
     "skills/machinal-media.md": {
-      "bytes": 7050,
-      "sha256": "ef2992c49e19e880a4c567ac84ffdd8b15339d11f7603ae079aa06745f4cb25a"
+      "bytes": 7194,
+      "sha256": "d2d2600afb8da2694050af0d4418673fd32b4c43b1883db98a2f9d7302aba0e7"
     },
     "skills/machinal-motion.md": {
       "bytes": 3499,
       "sha256": "a9d2b9e1bb72d5c7ba8927a7429683d7a283ad404ac23d8b07c64edacef28fef"
     },
     "skills/machinal-recipes.md": {
-      "bytes": 14234,
-      "sha256": "7e0c2ea15c377855deccf80978001016bdd02c5ce9b2140eae8ca8a2dc94f0ec"
+      "bytes": 14349,
+      "sha256": "5468d84a5cde996cb55a0828fb6666097ca0906c87345c63b9be5dba365bea36"
     },
     "skills/machinal-review.md": {
       "bytes": 5739,
       "sha256": "a64cbe37a3d79187d09755314e3bd4f83d846268116f689ff4cdf85c731d2218"
     },
     "skills/machinal-scenes.md": {
-      "bytes": 19072,
-      "sha256": "5c8cac63671a8ea05fbf5902afb513300a592f2cdc51fb367c9d293545411a9a"
+      "bytes": 19164,
+      "sha256": "f14b91125ee9c3d7e59c3e34bf4c80f2763ca38f1754e0862d3d2a8dc540382c"
     },
     "skills/machinal-sound.md": {
-      "bytes": 4799,
-      "sha256": "4ab3bf8ade91abe62b068fd03d28cde4c495216008d80d308338f7d792945b49"
+      "bytes": 5152,
+      "sha256": "e8e063f5e272d6641679b6c16c8edf17826a6641b0566ae77cd6ec26871fbe34"
     },
     "skills/machinal-spatial.md": {
       "bytes": 3147,

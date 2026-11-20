@@ -117,7 +117,7 @@ export async function manageKey(action, values, context) {
     log(endpoint
       ? `API key saved in ${storageName(context)} after successful MCP verification.`
       : `API key saved in ${storageName(context)}. Its format was checked; run setup to verify API access.`);
-    if (context.verbose !== false) log('The automatic OpenCode MCP integration picks up saved-key changes without restarting OpenCode. Existing clients without that integration still use their previous key; use launch opencode / launch claude / launch codex for legacy environment-based connections.');
+    if (context.verbose !== false) log('The automatic OpenCode MCP integration picks up saved-key changes without restarting OpenCode. Existing clients without that integration still use their previous key; use launch opencode / launch claude / launch codex / launch antigravity for legacy environment-based connections.');
   } else {
     if (!values.yes && !interactive) throw new InstallerError('Run key delete interactively, or use key delete --yes to explicitly confirm removal.');
     if (!values.yes && !await ui.confirm({ message: `Delete the API key saved in ${storageName(context)}?`, default: false })) {

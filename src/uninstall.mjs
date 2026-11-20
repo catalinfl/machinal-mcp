@@ -12,7 +12,7 @@ import { inspectRemoval, removeDirectory, removeEmptyDirectory, removeFile } fro
 import { uninstallGlobalPackage } from './uninstall-package.mjs';
 import { InstallerError } from './errors.mjs';
 
-const CLIENTS = ['opencode', 'claude', 'codex'];
+const CLIENTS = ['opencode', 'claude', 'codex', 'antigravity'];
 const STATE_FILES = ['config.json', 'credentials.json', 'installations.json'];
 const STATE_DIRECTORIES = ['runtime', 'catalogs', 'local'];
 const BUNDLED_FILES = [...new Set([...SKILL_FILES, 'machinal-editing/references/preferences.md'])];
@@ -25,6 +25,7 @@ async function installationTargets(context) {
   for (const root of roots) {
     for (const client of CLIENTS) {
       targets.push({ ...root, client, scope: 'global', name: undefined });
+      if (client === 'antigravity') continue;
       for (let cwd = resolve(root.cwd); ; cwd = dirname(cwd)) {
         targets.push({ ...root, client, scope: 'project', cwd, name: undefined });
         if (dirname(cwd) === cwd) break;

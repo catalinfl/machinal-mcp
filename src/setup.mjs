@@ -15,12 +15,14 @@ async function confirmReplacement(conflict, allowed, message, errorMessage, { in
   if (!interactive || !await ui.confirm({ message, default: false })) throw new InstallerError(errorMessage);
 }
 
-async function scopeFor(values, { interactive, ui }) {
-  return values.scope ?? (interactive ? ui.select({
+async function scopeFor(values, client, { interactive, ui }) {
+  if (values.scope) return values.scope;
+  if (client === 'antigravity') return 'global';
+  return interactive ? ui.select({
     message: 'Available in', default: 'project', choices: [
       { name: 'This project', value: 'project' }, { name: 'All my projects', value: 'global' },
     ],
-  }) : 'project');
+  }) : 'project';
 }
 
 function reportConfiguration(result, saved, { log, verbose }, installed, file) {
@@ -101,7 +103,7 @@ export async function setup(values, context) {
     log('Connect your client. Setup does not render, generate media or use API credits.');
   }
   const client = await chooseClient(values.client, context);
-  const scope = await scopeFor(values, context);
+  const scope = await scopeFor(values, client, context);
   if (scope === 'project' && dirname(resolve(cwd)) === resolve(cwd)) {
     log('Warning: project setup is running at a drive/filesystem root. Its settings may apply to all descendant projects. Prefer running setup inside your project folder.');
   }
@@ -154,6 +156,7 @@ export async function setup(values, context) {
   }
   if (client === 'claude') log('If prompted, approve the project MCP configuration in Claude Code.');
   if (client === 'codex' && scope === 'project') log('Codex loads project MCP settings only in trusted projects.');
+  if (client === 'antigravity') log('Antigravity loads ~/.gemini/config/mcp_config.json across Antigravity CLI, IDE, and App.');
 
   await offerKeyStorage(credentials, context, keyOptions);
   if (!verbose) reportConfiguration(result, saved, context, installed, plan.file);

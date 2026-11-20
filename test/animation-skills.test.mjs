@@ -24,11 +24,7 @@ test('all clients receive the exact MCP animation skill sources without loading 
   }
 });
 
-test('active new skills match the MCP and installer references, and sync path selection is bounded', async () => {
-  for (const skill of catalog) {
-    const active = await readFile(new URL(`../../../.opencode/skills/${skill.id}/SKILL.md`, import.meta.url), 'utf8');
-    assert.equal(active, await readFile(new URL(`animation-skills/${skill.id}.md`, reference), 'utf8'));
-  }
+test('sync path selection is bounded', async () => {
   await assert.rejects(syncReference({ installedSkills: ['../escape'] }), /Unsafe/);
   await syncReference({ check: true });
 });

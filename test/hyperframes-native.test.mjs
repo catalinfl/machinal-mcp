@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { validateNativePort } from '../scripts/build-hyperframes-native.mjs';
 
-const reference = new URL('../../../packages/mcp-installer/library/', import.meta.url);
+const reference = new URL('../library/', import.meta.url);
 const entry = { id: 'components-example', category: 'components', upstreamName: 'example', files: [{ path: 'registry/components/example/example.html' }] };
 const metadata = {
   id: entry.id, nativePath: 'components/example.svelte', status: 'ported', visualMode: '2d',

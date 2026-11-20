@@ -40,11 +40,13 @@ export async function setupStdio(values, context) {
   const { cwd, home, env, interactive, ui, log } = context;
   log('Machinal', 'heading');
   const client = await chooseClient(values.client, context);
-  const defaultScope = client === 'codex' ? 'global' : 'project';
-  const scope = values.scope ?? (interactive ? await ui.select({ message: 'Available in', default: defaultScope, choices: [
-    { name: client === 'codex' ? 'All my projects (recommended for Codex discovery)' : 'All my projects', value: 'global' },
-    { name: 'This project only', value: 'project' },
-  ] }) : defaultScope);
+  const defaultScope = ['codex', 'antigravity'].includes(client) ? 'global' : 'project';
+  const scope = values.scope ?? (client === 'antigravity'
+    ? 'global'
+    : (interactive ? await ui.select({ message: 'Available in', default: defaultScope, choices: [
+      { name: client === 'codex' ? 'All my projects (recommended for Codex discovery)' : 'All my projects', value: 'global' },
+      { name: 'This project only', value: 'project' },
+    ] }) : defaultScope));
   if (scope === 'project' && dirname(resolve(cwd)) === resolve(cwd)) log('Warning: project setup is running at a drive/filesystem root. Its settings may apply to all descendant projects.');
   const endpoint = await chooseEndpoint(values, context);
   log(`Connection: ${{ server: 'Machinal Server', local: 'Local', custom: 'Custom server' }[endpoint.mode]}`);
@@ -125,6 +127,7 @@ export async function setupStdio(values, context) {
     : 'Codex loads .codex/config.toml only in trusted projects. Trust the project yourself or rerun with --scope global.');
   if (client === 'codex' && scope === 'project') log('Codex: trust this project to load its MCP configuration.');
   if (client === 'claude' && scope === 'project') log('Claude Code: approve project MCP settings if asked.');
+  if (context.verbose && client === 'antigravity') log('Antigravity: global config (~/.gemini/config/mcp_config.json) applies across Antigravity CLI (agy), IDE, and App. Check with agy mcp list.');
   if (context.verbose) log('Use connection_status to see Login required, Connection unavailable, or Connected. Client-owned MCP badges cannot be renamed by an API-key adapter.');
   if (!values['no-launch'] && interactive && result && credentials && await ui.confirm({ message: `Start ${client} now?`, default: true })) {
     if (local) return context.launch(client, undefined, { cwd, env, unkeyed: true });

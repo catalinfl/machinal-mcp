@@ -49,6 +49,13 @@ test('Claude preserves other settings and uses its literal environment syntax', 
   assert.equal(value.mcpServers.machinal.headers.Authorization, 'Bearer ${MACHINAL_API_KEY}');
 });
 
+test('Google Antigravity writes standard mcpServers JSON entries and preserves unrelated servers', () => {
+  const result = updateJSON('{"mcpServers":{"other":{"command":"example"}}}', 'antigravity', 'machinal', serverEntry('antigravity', URL));
+  const value = JSON.parse(result.content);
+  assert.deepEqual(value.mcpServers.other, { command: 'example' });
+  assert.deepEqual(value.mcpServers.machinal, { url: URL, headers: { Authorization: 'Bearer ${MACHINAL_API_KEY}' } });
+});
+
 test('JSON setup is idempotent and flags only changed existing servers as conflicts', () => {
   const entry = serverEntry('opencode', URL);
   const first = updateJSON('', 'opencode', 'machinal', entry);

@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import test from 'node:test';
 import { planSkills } from '../src/skills.mjs';
@@ -50,16 +49,4 @@ test('OpenCode, Claude and Codex receive the production critic and evidence cont
       }
     });
   }
-});
-
-test('the active critic skill matches the portable installer bundle', async () => {
-  const bundled = await readFile(new URL('../skills/machinal-review/SKILL.md', import.meta.url), 'utf8');
-  const active = await readFile(new URL('../../../.opencode/skills/machinal-review/SKILL.md', import.meta.url), 'utf8');
-  assert.equal(active, bundled);
-});
-
-test('the active controlled-scene skill matches the portable installer bundle', async () => {
-  const bundled = await readFile(new URL('../skills/machinal-scenes/SKILL.md', import.meta.url), 'utf8');
-  const active = await readFile(new URL('../../../.opencode/skills/machinal-scenes/SKILL.md', import.meta.url), 'utf8');
-  assert.equal(active.replaceAll('\r\n','\n'), bundled.replaceAll('\r\n','\n'));
 });

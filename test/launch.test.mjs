@@ -27,10 +27,10 @@ test('launch injects the key into the child environment, not its arguments or th
   assert.ok(!invocation[1].includes(API_KEY));
 });
 
-test('Claude/Codex arguments are forwarded unchanged and exit codes propagate', async () => {
-  for (const client of ['claude', 'codex']) {
+test('Claude/Codex/Antigravity arguments are forwarded unchanged and exit codes propagate', async () => {
+  for (const [client, expectedCommand] of [['claude', 'claude'], ['codex', 'codex'], ['antigravity', 'agy'], ['agy', 'agy']]) {
     const spawn = (command, args) => {
-      assert.equal(command, client);
+      assert.equal(command, expectedCommand);
       assert.deepEqual(args, ['--help']);
       const child = new EventEmitter();
       queueMicrotask(() => child.emit('exit', 7, null));

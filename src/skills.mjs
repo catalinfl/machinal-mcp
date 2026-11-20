@@ -26,7 +26,8 @@ export function skillsDirectory({ client, scope, cwd = process.cwd(), home = hom
   if (client === 'opencode') return join(scope === 'project' ? join(cwd, '.opencode') : join(env.XDG_CONFIG_HOME || join(home, '.config'), 'opencode'), 'skills');
   if (client === 'claude') return join(scope === 'project' ? join(cwd, '.claude') : env.CLAUDE_CONFIG_DIR || join(home, '.claude'), 'skills');
   if (client === 'codex') return join(scope === 'project' ? cwd : home, '.agents', 'skills');
-  throw new InstallerError('Choose opencode, claude, or codex.');
+  if (client === 'antigravity') return scope === 'project' ? join(cwd, '.agents', 'skills') : join(home, '.gemini', 'config', 'skills');
+  throw new InstallerError('Choose opencode, claude, codex, or antigravity.');
 }
 
 async function refuseSymlinkParents(file, root) {

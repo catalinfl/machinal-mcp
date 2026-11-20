@@ -59,6 +59,10 @@ test('the packed npm client contains every pinned library file and its installed
     const bridge = new MCPBridge({ url, env: {}, credentialStore: {
       read() { assert.fail('offline installed reads must never access credentials'); },
     }, fetchImpl() { assert.fail('offline installed reads must never contact the server'); } });
+    const initialized = await bridge.handle('initialize', { protocolVersion: '2025-03-26' });
+    assert.equal(initialized.protocolVersion, '2025-03-26');
+    assert.equal(initialized.serverInfo?.name, 'machinal');
+    assert.match(initialized.instructions, /Machinal MCP adapter/);
     for (const name of ['get_library_reference', 'get_editing_reference']) {
       for (const [id, effectCode] of [['blocks-aurora', 'createHyperframeShader'], ['blocks-glitch', 'gl_FragColor']]) {
         const result = await bridge.handle('tools/call', { name, arguments: { topic: 'hyperframes-components', id } });

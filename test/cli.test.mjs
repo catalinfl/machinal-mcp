@@ -29,7 +29,7 @@ test('help and version work without a key or network', async (t) => {
   assert.deepEqual(await readdir(cwd), []);
 });
 
-for (const client of ['opencode', 'claude', 'codex']) {
+for (const client of ['opencode', 'claude', 'codex', 'antigravity']) {
   test(`noninteractive ${client} setup validates and writes only environment references`, async (t) => {
     const cwd = await workspace(t);
     const calls = [];
@@ -43,11 +43,13 @@ for (const client of ['opencode', 'claude', 'codex']) {
     assert.match(result.stdout, /MCP verified: 3 tools\. Saving client configuration/);
     assert.match(result.stdout, /API credits: 900 available/);
     assert.ok(!`${result.stdout}${result.stderr}`.includes(API_KEY));
-    const file = client === 'opencode' ? join(cwd, 'opencode.jsonc') : client === 'claude' ? join(cwd, '.mcp.json') : join(cwd, '.codex', 'config.toml');
+    const file = client === 'opencode' ? join(cwd, 'opencode.jsonc') : client === 'claude' ? join(cwd, '.mcp.json') : client === 'codex' ? join(cwd, '.codex', 'config.toml') : join(cwd, '.gemini', 'config', 'mcp_config.json');
     const content = await readFile(file, 'utf8');
     assert.ok(!content.includes(API_KEY));
     assert.ok(content.includes('MACHINAL_API_KEY'));
-    const skillRoot = join(cwd, client === 'opencode' ? '.opencode' : client === 'claude' ? '.claude' : '.agents', 'skills');
+    const skillRoot = client === 'antigravity'
+      ? join(cwd, '.gemini', 'config', 'skills')
+      : join(cwd, client === 'opencode' ? '.opencode' : client === 'claude' ? '.claude' : '.agents', 'skills');
     assert.match(await readFile(join(skillRoot, 'machinal-credits', 'SKILL.md'), 'utf8'), /get_credits/);
     if (client === 'codex') assert.equal(getStaticTOMLValue(parseTOML(content)).mcp_servers.machinal.url, endpoint);
     const repeated = await runCLI(args, { cwd, env: { MACHINAL_API_KEY: API_KEY } });

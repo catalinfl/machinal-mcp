@@ -3,14 +3,16 @@ import { InstallerError } from './errors.mjs';
 import { validateAPIKey } from './connection.mjs';
 
 export async function launchClient(client, key, { args = [], cwd = process.cwd(), env = process.env, spawn = crossSpawn, unkeyed = false } = {}) {
-  if (!['opencode', 'claude', 'codex'].includes(client)) throw new InstallerError('Choose opencode, claude, or codex.');
-  if (client === 'opencode' && args.some((arg) => arg === '--server' || arg.startsWith('--server='))) {
+  const normalized = client === 'agy' ? 'antigravity' : client;
+  if (!['opencode', 'claude', 'codex', 'antigravity'].includes(normalized)) throw new InstallerError('Choose opencode, claude, codex, or antigravity.');
+  if (normalized === 'opencode' && args.some((arg) => arg === '--server' || arg.startsWith('--server='))) {
     throw new InstallerError('Launch uses a private OpenCode server so it can inherit the key. --server is not supported.');
   }
 
-  const commandArgs = client === 'opencode' ? ['--standalone', ...args] : args;
+  const command = normalized === 'antigravity' ? 'agy' : normalized;
+  const commandArgs = normalized === 'opencode' ? ['--standalone', ...args] : args;
   const apiKey = unkeyed ? undefined : validateAPIKey(key);
-  const child = spawn(client, commandArgs, {
+  const child = spawn(command, commandArgs, {
     cwd,
     env: {
       ...env,

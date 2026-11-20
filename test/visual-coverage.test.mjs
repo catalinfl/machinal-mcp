@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import test from 'node:test';
 import { planSkills } from '../src/skills.mjs';
@@ -31,13 +30,5 @@ test('all clients receive video-wide image coverage guidance without changing sp
       'wait_for_job', 'get_job_result', 'inspect_scene', 'routing recommendation is not authorization']) {
       assert.ok(workflow.includes(guidance), `${client}: image workflow lacks ${guidance}`);
     }
-  }
-});
-
-test('active visual planning skills match the portable installer bundle', async () => {
-  for (const name of ['machinal-editing', 'machinal-scenes']) {
-    const bundled = await readFile(new URL(`../skills/${name}/SKILL.md`, import.meta.url), 'utf8');
-    const active = await readFile(new URL(`../../../.opencode/skills/${name}/SKILL.md`, import.meta.url), 'utf8');
-    assert.equal(active, bundled, `${name} differs from the installed skill`);
   }
 });

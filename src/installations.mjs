@@ -4,7 +4,7 @@ import { stateDirectory } from './paths.mjs';
 import { readPrivateJSON, writePrivateJSON } from './private-json.mjs';
 import { InstallerError } from './errors.mjs';
 
-const CLIENTS = ['opencode', 'claude', 'codex'];
+const CLIENTS = ['opencode', 'claude', 'codex', 'antigravity'];
 const ROOT_VARIABLES = ['XDG_CONFIG_HOME', 'CODEX_HOME', 'CLAUDE_CONFIG_DIR'];
 
 export function installationsFile(context) {

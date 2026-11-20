@@ -7,12 +7,14 @@ export { DEFAULT_LOCAL_URL, MACHINAL_SERVER_URL };
 export const EDITING_STYLES = styleProfiles.map((profile) => profile.id);
 
 export async function chooseClient(value, { interactive, ui }) {
-  if (value && ['opencode', 'claude', 'codex'].includes(value)) return value;
-  if (value || !interactive) throw new InstallerError('Specify --client opencode, --client claude, or --client codex.');
+  const normalized = value === 'agy' ? 'antigravity' : value;
+  if (normalized && ['opencode', 'claude', 'codex', 'antigravity'].includes(normalized)) return normalized;
+  if (value || !interactive) throw new InstallerError('Specify --client opencode, --client claude, --client codex, or --client antigravity.');
   return ui.select({ message: 'Client', choices: [
     { name: 'OpenCode V2', value: 'opencode' },
     { name: 'Claude Code', value: 'claude' },
     { name: 'Codex', value: 'codex' },
+    { name: 'Google Antigravity', value: 'antigravity' },
   ] });
 }
 

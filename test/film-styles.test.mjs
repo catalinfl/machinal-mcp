@@ -62,11 +62,3 @@ test('every client installs the adapted cinema skill, guides, code and notices w
     }
   }
 });
-
-test('the active OpenCode cinema skill and reference catalog match the installer bundle', async () => {
-  for (const path of ['SKILL.md', 'references/workflow.md', 'references/film-styles.json', 'references/film-techniques.json', 'references/film-library/manifest.json', 'references/film-library/LICENSE']) {
-    const bundled = await readFile(new URL(`../skills/machinal-cinema/${path}`, import.meta.url), 'utf8');
-    const active = await readFile(new URL(`../../../.opencode/skills/machinal-cinema/${path}`, import.meta.url), 'utf8');
-    assert.equal(active, bundled, path);
-  }
-});

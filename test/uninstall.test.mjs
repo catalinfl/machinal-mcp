@@ -62,20 +62,21 @@ test('uninstall removes old 0.4.3 companions across global/project/ancestor conf
 
 test('uninstall cleans recorded projects and custom names from every client, then permits clean setup', async t => {
   const ctx = await context(t);
-  for (const client of ['opencode', 'claude', 'codex']) {
-    const options = { ...ctx, cwd: join(dirname(ctx.cwd), `other-${client}`), client, scope: 'project', name: 'video' };
+  for (const client of ['opencode', 'claude', 'codex', 'antigravity']) {
+    const scope = client === 'antigravity' ? 'global' : 'project';
+    const options = { ...ctx, cwd: join(dirname(ctx.cwd), `other-${client}`), client, scope, name: 'video' };
     await recordInstallation(options);
     await recordInstallation(options);
     const file = await configurationPath(options);
-    const own = { type: 'http', url: 'https://api.machinal.app/mcp' };
+    const own = client === 'antigravity' ? { url: 'https://api.machinal.app/mcp' } : { type: 'http', url: 'https://api.machinal.app/mcp' };
     await write(file, client === 'codex'
       ? '# Keep me\nmodel = "keep"\n[mcp_servers.video]\nurl = "https://api.machinal.app/mcp"\n[mcp_servers.video.headers]\nX = "own"\n[mcp_servers.docs]\ncommand = "keep"\n'
-      : JSON.stringify(client === 'claude'
+      : JSON.stringify(client === 'claude' || client === 'antigravity'
         ? { other: 'keep', mcpServers: { video: own, docs: { command: 'keep' } } }
         : { model: 'keep', plugins: ['@machinal/mcp@0.4.3', 'other'], mcp: { servers: { video: own, docs: { type: 'local', command: ['keep'] } } } }));
     await write(join(skillsDirectory(options), 'machinal-editing/SKILL.md'), 'Bundled file with user edits');
   }
-  assert.equal((await readInstallations(ctx)).length, 3);
+  assert.equal((await readInstallations(ctx)).length, 4);
   await write(join(stateDirectory(ctx), 'runtime/0.4.3-old/bin/machinal-stdio.mjs'), 'old');
   await write(join(stateDirectory(ctx), 'catalogs/old.json'), '{}');
   await write(join(stateDirectory(ctx), 'local/device/providers.env'), 'private local fixture');
@@ -86,11 +87,12 @@ test('uninstall cleans recorded projects and custom names from every client, the
   assert.deepEqual(await readInstallations(ctx), []);
   await assert.rejects(readdir(stateDirectory(ctx)), { code: 'ENOENT' });
   assert.equal(await readFile(media, 'utf8'), 'keep media');
-  for (const client of ['opencode', 'claude', 'codex']) {
-    const options = { ...ctx, cwd: join(dirname(ctx.cwd), `other-${client}`), client, scope: 'project' };
+  for (const client of ['opencode', 'claude', 'codex', 'antigravity']) {
+    const scope = client === 'antigravity' ? 'global' : 'project';
+    const options = { ...ctx, cwd: join(dirname(ctx.cwd), `other-${client}`), client, scope };
     const source = await readFile(await configurationPath(options), 'utf8');
     const config = client === 'codex' ? getStaticTOMLValue(parseTOML(source)) : parse(source);
-    const servers = client === 'codex' ? config.mcp_servers : client === 'claude' ? config.mcpServers : config.mcp.servers;
+    const servers = client === 'codex' ? config.mcp_servers : client === 'claude' || client === 'antigravity' ? config.mcpServers : config.mcp.servers;
     assert.deepEqual(Object.keys(servers), ['docs']);
     await assert.rejects(readFile(join(skillsDirectory(options), 'machinal-editing/SKILL.md')), { code: 'ENOENT' });
   }
