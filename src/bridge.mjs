@@ -236,7 +236,10 @@ export class MCPBridge {
         catch (error) { return toolResult({ message: error.message, submissionState: 'not-submitted' }, true); }
       }
       try {
-        const result = await this.rpc(method, params, { signal });
+        const requestedWait = params.name === 'wait_for_job' && params.arguments?.timeoutSeconds;
+        const result = Number.isInteger(requestedWait) && requestedWait > 120 && requestedWait <= 900
+          ? await this.waitForCompletion(params, requestedWait, signal)
+          : await this.rpc(method, params, { signal });
         if ([401, 402, 403, 429].includes(result.structuredContent?.statusCode)) this.failure({ status: result.structuredContent.statusCode });
         return result;
       } catch (error) {
@@ -268,6 +271,18 @@ export class MCPBridge {
       throw Object.assign(new Error('Connection unavailable'), { rpcCode: -32000 });
     }
     throw Object.assign(new Error('Method not found'), { rpcCode: -32601 });
+  }
+  // Keep each HTTP long poll below the hosted proxy timeout while exposing one tool call.
+  async waitForCompletion(params, seconds, signal) {
+    let result;
+    const deadline = Date.now() + seconds * 1000;
+    for (let remaining = seconds; remaining > 0;) {
+      const window = Math.min(120, remaining);
+      result = await this.rpc('tools/call', { ...params, arguments: { ...params.arguments, timeoutSeconds: window } }, { signal });
+      if (result.isError || !['queued', 'claimed', 'running'].includes(result.structuredContent?.data?.status)) break;
+      remaining = Math.min(remaining - window, Math.ceil((deadline - Date.now()) / 1000));
+    }
+    return result;
   }
 }
 

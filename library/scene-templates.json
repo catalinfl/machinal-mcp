@@ -1,5 +1,35 @@
 [
   {
+    "id": "dialogue-stage-3d",
+    "version": "1",
+    "label": "Dialogue stage 3D / dialog între două personaje",
+    "category": "narrative",
+    "description": "Two volumetric figures exchange gestures at a table; a camera shift transfers attention as the speaker changes.",
+    "visualMode": "3d",
+    "whenToUse": ["A narrative dialogue, conversation, negotiation or council meeting with two successive speakers."],
+    "avoid": ["Photoreal likeness, lip sync or overlapping speech."],
+    "config": {"width": 1920, "height": 1080, "fps": 30, "duration": 8, "captionSafeArea": true},
+    "parameters": [{"path":"design.turn","description":"Speaker handoff as a fraction of scene duration (0.15–0.85)."},{"path":"design.first","description":"First speaker coat color."},{"path":"design.second","description":"Second speaker coat color."}],
+    "requiredImages": [],
+    "choreography": {"reveal":"Establish both figures.", "action":"First speaker leans and gestures.", "hold":"Camera shifts to the replying speaker.", "exit":"Both settle for the cut."},
+    "adaptation":["Align design.turn with measured dialogue timing. Customize wardrobe and set for the story."]
+  },
+  {
+    "id": "gateway-arrival-3d",
+    "version": "1",
+    "label": "Gateway arrival 3D / sosire la poarta cetății",
+    "category": "narrative",
+    "description": "A traveler approaches a walled entrance; two gate leaves swing open and the figure crosses the threshold during a camera push.",
+    "visualMode": "3d",
+    "whenToUse": ["Establish a story location, arrival at a town gate, passage or journey."],
+    "avoid": ["Representing a specific historical site without adapting the architecture."],
+    "config": {"width": 1920, "height": 1080, "fps": 30, "duration": 7, "captionSafeArea": true},
+    "parameters": [{"path":"design.stone","description":"Wall and tower material color."},{"path":"design.gate","description":"Gate material color."},{"path":"design.traveler","description":"Traveling figure's cloak color."}],
+    "requiredImages": [],
+    "choreography": {"reveal":"Traveler and closed entrance share the frame.", "action":"Leaves open before the traveler crosses.", "hold":"The open path remains visible.", "exit":"Camera settles on the threshold."},
+    "adaptation":["Adapt the gateway, traveler and environment for the supplied location and period."]
+  },
+  {
     "id": "kinetic-type",
     "version": "1",
     "label": "Kinetic typography / text cinetic",

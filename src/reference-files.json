@@ -1961,6 +1961,8 @@
   "machinal-scenes/references/scene-templates.md",
   "machinal-scenes/references/scene-templates/blueprint-mechanism.svelte",
   "machinal-scenes/references/scene-templates/comparison-wipe.svelte",
+  "machinal-scenes/references/scene-templates/dialogue-stage-3d.svelte",
+  "machinal-scenes/references/scene-templates/gateway-arrival-3d.svelte",
   "machinal-scenes/references/scene-templates/glitch-handoff.svelte",
   "machinal-scenes/references/scene-templates/hyperframes-blocks-ai-answer-rank.svelte",
   "machinal-scenes/references/scene-templates/hyperframes-blocks-ai-chat-reveal.svelte",

@@ -2,6 +2,11 @@ export const DISCOVERY_PROFILES = ['educational', 'social', 'documentary', 'prod
 export const DISCOVERY_ASPECTS = ['portrait', 'landscape', 'square'];
 
 const roles = {
+  narrative: {
+    profiles: ['documentary', 'educational', 'social'],
+    names: /dialogue stage|gateway arrival/,
+    aliases: ['narrative 3d', '3d narrative', 'dialog', 'dialogue', 'scena narativa', 'sosire', 'arrival'],
+  },
   title: {
     profiles: ['educational', 'social', 'documentary', 'product'],
     names: /kinetic type|title ?card|text stagger|per word rise/,

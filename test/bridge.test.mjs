@@ -11,6 +11,22 @@ import { API_KEY, mcpHandler, memoryCredentialStore, reply, requestBody, serve, 
 
 const url = 'http://127.0.0.1:1/mcp';
 
+test('long completion wait consumes only bounded reads of the same job and stops at terminal status', async () => {
+  const bridge = new MCPBridge({ url, env: {}, credentialStore: null });
+  bridge.state = { status: 'connected' };
+  bridge.tools = [{ name: 'wait_for_job' }];
+  const calls = [];
+  bridge.rpc = async (method, params) => {
+    calls.push(params.arguments);
+    assert.equal(method, 'tools/call');
+    assert.equal(params.name, 'wait_for_job');
+    return { structuredContent: { data: { status: calls.length === 3 ? 'completed' : 'running' } } };
+  };
+  const result = await bridge.handle('tools/call', { name: 'wait_for_job', arguments: { projectId: 'p', jobId: 'j', timeoutSeconds: 300 } });
+  assert.equal(result.structuredContent.data.status, 'completed');
+  assert.deepEqual(calls.map(args => [args.jobId, args.timeoutSeconds]), [['j', 120], ['j', 120], ['j', 60]]);
+});
+
 test('diagnostics distinguish the official Machinal Server from custom deployments', () => {
   const official = new MCPBridge({ url: MACHINAL_SERVER_URL, env: {}, credentialStore: null });
   official.failure({ status: 401 });

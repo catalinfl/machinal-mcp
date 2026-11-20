@@ -49,6 +49,8 @@ Times below are fractions of scene progress, not measured narration cues. Each s
 | `swiss-grid-motion` | Independent modular bars wipe onto a precise grid; one signal tile departs from alignment. | Flat paper/black/one ink, no bounce; completed design holds .68–.90; exit rule motivates a matching cut. |
 | `blueprint-mechanism` | A rotating crank constrains a connecting rod and sliding piston; outlet markers move separately. | Cyanotype/ivory/warm accent; true geometric linkage, not asserted engineering measurements; settles by .80. |
 | `paper-stage-3d` | Two book leaves unfold, three facade panels rise on separate hinges and a lit camera arc settles. | Genuine SceneThree paper stage with actual depth; hold .74–.94; not a realistic reconstruction or substitute for detailed approved artwork. |
+| `dialogue-stage-3d` | Two speakers trade gestures at a table; camera attention follows their turn. | Set `design.turn` to the measured dialogue handoff. |
+| `gateway-arrival-3d` | A traveler passes through an opening gateway. | Establish a location or transition from approach to arrival; adapt architecture to the story. |
 
 These three native components accompany the cinematic reference library (`film-styles`/`film-techniques`). Pre-code critic: the grid is only appropriate when graphic organization is the subject; the mechanism needs actual moving linkage rather than a label; the paper stage must retain independently hinged scenery and a readable lit hold rather than one rotating box. Their reference contracts are source-reviewed, not proof of inspected pixels, sound or beauty. Adapt complete source to each production; importing style prompts does not train a model.
 
