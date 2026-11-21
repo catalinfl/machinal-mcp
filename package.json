@@ -1,6 +1,6 @@
 {
   "name": "@machinal/mcp",
-  "version": "0.7.2",
+  "version": "0.7.4",
   "description": "Resilient Machinal MCP setup for Codex, Claude Code, OpenCode and Google Antigravity: independent local or hosted server",
   "type": "module",
   "exports": {

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "sha256:fa0d96bf76988e939c14794ae148b5e31dbcc0fe20e97b99cc8c8bc5ee8a9ea5",
+  "version": "sha256:d97118a4415c523ba9113bef81f210088e44ce346a2f911adc7150d1cb2123f4",
   "files": {
     "animation-skills/machinal-choreography.md": {
       "bytes": 3449,
@@ -463,8 +463,8 @@
       "sha256": "f40624a10149fd5cd3c12499eb40ee4f281df6865163a8c58d17b07e742e1f43"
     },
     "guides/client-bootstrap.md": {
-      "bytes": 9970,
-      "sha256": "f0dd5e1893b85cd0a3f8c6d8f7665442a95c3e70f373a7519f91609749f0f2bf"
+      "bytes": 10060,
+      "sha256": "1ececd2942b5b9f105c91f6b79736adcd0fa6f9575d939cb966d13d96ba32308"
     },
     "guides/commands.md": {
       "bytes": 4194,
