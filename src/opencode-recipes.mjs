@@ -3,7 +3,7 @@ import { lstat, open, realpath, unlink } from 'node:fs/promises';
 import { dirname, isAbsolute, join, basename } from 'node:path';
 
 const maxRecipeBytes = 2 * 1024 * 1024;
-const recipeTools = ['validate_recipe', 'compile_recipe', 'generate_assets', 'render_video'];
+const recipeTools = ['validate_recipe', 'compile_recipe', 'generate_assets', 'render_video', 'render_preview'];
 
 function recipePath(path) {
   if (typeof path !== 'string' || !isAbsolute(path) || !/\.edit\.ya?ml$/i.test(path)) {
@@ -97,7 +97,7 @@ export async function installRecipeFiles(ctx, servers) {
               args.captionBaseline = await readRecipe(ctx, context, captionBaselineRecipeFile);
             }
             if (compositionFile !== undefined) {
-              if (args.composition !== undefined || args.sourceJobId !== undefined) throw new Error('Choose compositionFile, composition or sourceJobId, not multiple recipe sources.');
+              if (args.composition !== undefined || args.sourceJobId !== undefined || args.recipeRef !== undefined) throw new Error('Choose compositionFile, composition, recipeRef or sourceJobId, not multiple recipe sources.');
               args.composition = await readRecipe(ctx, context, compositionFile);
             }
             return original(args, context);

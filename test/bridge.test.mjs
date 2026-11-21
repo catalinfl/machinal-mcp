@@ -11,8 +11,9 @@ import { API_KEY, mcpHandler, memoryCredentialStore, reply, requestBody, serve, 
 
 const url = 'http://127.0.0.1:1/mcp';
 
-test('long completion wait consumes only bounded reads of the same job and stops at terminal status', async () => {
-  const bridge = new MCPBridge({ url, env: {}, credentialStore: null });
+test('long completion wait consumes only bounded reads of the same job, emits progress and stops at terminal status', async () => {
+  const notifications = [];
+  const bridge = new MCPBridge({ url, env: {}, credentialStore: null, maxWaitSeconds: 900, notify: msg => notifications.push(msg) });
   bridge.state = { status: 'connected' };
   bridge.tools = [{ name: 'wait_for_job' }];
   const calls = [];
@@ -22,9 +23,42 @@ test('long completion wait consumes only bounded reads of the same job and stops
     assert.equal(params.name, 'wait_for_job');
     return { structuredContent: { data: { status: calls.length === 3 ? 'completed' : 'running' } } };
   };
-  const result = await bridge.handle('tools/call', { name: 'wait_for_job', arguments: { projectId: 'p', jobId: 'j', timeoutSeconds: 300 } });
+  const result = await bridge.handle('tools/call', {
+    name: 'wait_for_job',
+    arguments: { projectId: 'p', jobId: 'j', timeoutSeconds: 300 },
+    _meta: { progressToken: 'tok-1' },
+  });
   assert.equal(result.structuredContent.data.status, 'completed');
   assert.deepEqual(calls.map(args => [args.jobId, args.timeoutSeconds]), [['j', 120], ['j', 120], ['j', 60]]);
+  assert.equal(notifications.length, 2);
+  assert.equal(notifications[0].method, 'notifications/progress');
+  assert.equal(notifications[0].params.progressToken, 'tok-1');
+  assert.equal(notifications[0].params.total, 300);
+});
+
+test('wait_for_job caps single calls to 120s by default to prevent MCP client transport timeouts', async () => {
+  const bridge = new MCPBridge({ url, env: {}, credentialStore: null });
+  bridge.state = { status: 'connected' };
+  bridge.tools = [{
+    name: 'wait_for_job',
+    description: 'Wait up to 900s.',
+    inputSchema: { type: 'object', properties: { timeoutSeconds: { type: 'integer', minimum: 1, maximum: 900 } } },
+  }];
+  const listed = (await bridge.handle('tools/list')).tools.find(tool => tool.name === 'wait_for_job');
+  assert.equal(listed.inputSchema.properties.timeoutSeconds.maximum, 120);
+  const calls = [];
+  bridge.rpc = async (_method, params) => {
+    calls.push(params.arguments);
+    return {
+      content: [{ type: 'text', text: JSON.stringify({ statusCode: 200, data: { status: 'running', jobId: 'j' } }) }],
+      structuredContent: { statusCode: 200, data: { status: 'running', jobId: 'j' } },
+    };
+  };
+  const running = await bridge.handle('tools/call', { name: 'wait_for_job', arguments: { projectId: 'p', jobId: 'j', timeoutSeconds: 900 } });
+  assert.deepEqual(calls, [{ projectId: 'p', jobId: 'j', timeoutSeconds: 120 }]);
+  assert.equal(running.structuredContent.data.waitCappedSeconds, 120);
+  assert.match(running.structuredContent.data.nextAction, /same jobId/);
+  assert.equal(JSON.parse(running.content[0].text).data.waitCappedSeconds, 120);
 });
 
 test('diagnostics distinguish the official Machinal Server from custom deployments', () => {
@@ -248,4 +282,109 @@ test('actual stdio dispatch serves metadata while eight long waits run and cance
   assert.equal(submitted, 8);
   gate.resolve();
   await Promise.all(Array.from({ length: 8 }, (_, index) => result(index + 10)));
+});
+
+test('stdio bridge supports local recipe, checkpoint, contract and Svelte componentFile without echoing large YAML', async t => {
+  const cwd = await workspace(t);
+  const outside = await workspace(t);
+  const recipe = 'document:\n  version: 2\n  texts:\n    - text: "FC Argeș 1953 — ș ț"\n';
+  const compositionVersion = `sha256:${'a'.repeat(64)}`;
+  const captionVersion = `sha256:${'b'.repeat(64)}`;
+  const upstreamCalls = [];
+  const bridge = new MCPBridge({ url, env: {}, credentialStore: null, fileRoots: [cwd] });
+  bridge.state = { status: 'connected' };
+  bridge.tools = [
+    { name: 'get_job_result', description: 'result', inputSchema: { type: 'object', required: ['projectId', 'jobId'], properties: { projectId: { type: 'string' }, jobId: { type: 'string' } } } },
+    { name: 'validate_recipe', description: 'validate', inputSchema: { type: 'object', required: ['projectId', 'composition'], properties: { projectId: { type: 'string' }, composition: { type: 'string' } } } },
+    { name: 'compile_recipe', description: 'compile', inputSchema: { type: 'object', required: ['projectId', 'composition'], properties: { projectId: { type: 'string' }, composition: { type: 'string' } } } },
+    { name: 'render_video', description: 'render', inputSchema: { type: 'object', required: ['projectId', 'composition'], properties: { projectId: { type: 'string' }, composition: { type: 'string' } } } },
+    { name: 'compile_scene', description: 'scene', inputSchema: { type: 'object', required: ['projectId', 'component'], properties: { projectId: { type: 'string' }, component: { type: 'string' } } } },
+  ];
+  bridge.rpc = async (_method, params) => {
+    upstreamCalls.push({ name: params.name, arguments: params.arguments });
+    const data = { status: 'completed', recipeYaml: recipe, compositionVersion, captionVersion, diagnostics: [], requirements: [] };
+    return { content: [{ type: 'text', text: JSON.stringify({ statusCode: 200, data }) }], structuredContent: { statusCode: 200, data } };
+  };
+
+  const listed = new Map((await bridge.handle('tools/list')).tools.map(tool => [tool.name, tool]));
+  assert.ok(listed.get('validate_recipe').inputSchema.properties.compositionFile);
+  assert.ok(listed.get('validate_recipe').inputSchema.properties.captionBaselineRecipeFile);
+  assert.ok(listed.get('compile_recipe').inputSchema.properties.productionContractFile);
+  assert.ok(listed.get('get_job_result').inputSchema.properties.recipeFile);
+  assert.ok(listed.get('compile_scene').inputSchema.properties.componentFile);
+  assert.deepEqual(listed.get('compile_scene').inputSchema.required, ['projectId']);
+
+  const baselineYaml = join(cwd, 'baseline.edit.yaml');
+  const baselineCkpt = join(cwd, 'baseline.checkpoint.json');
+  const saved = await bridge.handle('tools/call', {
+    name: 'get_job_result',
+    arguments: { projectId: 'owned', jobId: 'job-1', recipeFile: baselineYaml, checkpointFile: baselineCkpt },
+  });
+  assert.equal(saved.structuredContent.data.recipeYaml, undefined);
+  assert.equal(saved.structuredContent.data.recipeFile.bytes, Buffer.byteLength(recipe));
+  assert.equal(await readFile(baselineYaml, 'utf8'), recipe);
+  assert.equal(JSON.parse(await readFile(baselineCkpt, 'utf8')).captionVersion, captionVersion);
+
+  const conflict = await bridge.handle('tools/call', {
+    name: 'get_job_result',
+    arguments: { projectId: 'owned', jobId: 'job-1', recipeFile: baselineYaml },
+  });
+  assert.equal(conflict.structuredContent.data.recipeYaml, recipe);
+  assert.match(conflict.structuredContent.data.recipeFileError, /exists/);
+
+  const contractFile = join(cwd, 'contract.json');
+  const contract = { version: 1, beats: [{ id: 'beat1' }] };
+  await writeFile(contractFile, JSON.stringify(contract), 'utf8');
+  const preflightCkpt = join(cwd, 'preflight.checkpoint.json');
+  await bridge.handle('tools/call', {
+    name: 'compile_recipe',
+    arguments: {
+      compositionFile: baselineYaml,
+      captionBaselineRecipeFile: baselineYaml,
+      captionBaselineFile: baselineCkpt,
+      productionContractFile: contractFile,
+      checkpointFile: preflightCkpt,
+    },
+  });
+  const compiledCall = upstreamCalls.at(-1).arguments;
+  assert.equal(compiledCall.projectId, 'owned');
+  assert.equal(compiledCall.composition, recipe);
+  assert.equal(compiledCall.captionBaseline, recipe);
+  assert.equal(compiledCall.expectedCaptionVersion, captionVersion);
+  assert.deepEqual(compiledCall.productionContract, contract);
+  assert.equal(compiledCall.compositionFile, undefined);
+
+  await bridge.handle('tools/call', {
+    name: 'render_video',
+    arguments: { compositionFile: baselineYaml, checkpointFile: preflightCkpt, captionBaselineFile: baselineCkpt, userApproved: false, idempotencyKey: 'keep' },
+  });
+  const renderCall = upstreamCalls.at(-1).arguments;
+  assert.equal(renderCall.projectId, 'owned');
+  assert.equal(renderCall.expectedCompositionVersion, compositionVersion);
+  assert.equal(renderCall.expectedCaptionVersion, captionVersion);
+  assert.equal(renderCall.userApproved, false);
+
+  const sceneFile = join(cwd, 'scene1.svelte');
+  const svelte = '<script>const x = 1;</script><h1>Argeș</h1>\n';
+  await writeFile(sceneFile, svelte, 'utf8');
+  await bridge.handle('tools/call', {
+    name: 'compile_scene',
+    arguments: { projectId: 'owned', sourceFile: 'remote.scene.json', componentFile: sceneFile },
+  });
+  assert.deepEqual(upstreamCalls.at(-1).arguments, { projectId: 'owned', sourceFile: 'remote.scene.json', component: svelte });
+
+  const callsBeforeRejects = upstreamCalls.length;
+  const outsideFile = join(outside, 'escape.svelte');
+  await writeFile(outsideFile, svelte, 'utf8');
+  for (const call of [
+    { name: 'compile_scene', arguments: { projectId: 'owned', componentFile: outsideFile } },
+    { name: 'compile_scene', arguments: { projectId: 'owned', component: '<p/>', componentFile: sceneFile } },
+    { name: 'validate_recipe', arguments: { projectId: 'owned', compositionFile: join(cwd, '.env') } },
+    { name: 'render_video', arguments: { projectId: 'other', compositionFile: baselineYaml, checkpointFile: preflightCkpt } },
+  ]) {
+    const err = await bridge.handle('tools/call', call);
+    assert.equal(err.isError, true);
+    assert.equal(err.structuredContent.submissionState, 'not-submitted');
+  }
+  assert.equal(upstreamCalls.length, callsBeforeRejects);
 });

@@ -2,6 +2,7 @@ import { readFile, realpath, lstat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { HYBRID_EDIT_TOOL, planHybridEdit } from './hybrid-edit.mjs';
 import { buildDiscoveryIndex, rankComponents, validDiscoveryContext, DISCOVERY_PROFILES, DISCOVERY_ROLES, DISCOVERY_ASPECTS } from './component-discovery.mjs';
 
 export const LIBRARY_ROOT = fileURLToPath(new URL('../library/', import.meta.url));
@@ -14,7 +15,7 @@ const GUIDE_TOPICS = {
   'animation-skills': 'animation-skills', 'film-styles': 'film-styles', 'film-techniques': 'film-styles',
   'scene-templates': 'scene-templates',
 };
-export const LIBRARY_TOPICS = [...Object.keys(GUIDE_TOPICS), 'component-discovery', 'hyperframes-components', 'hyperframes-skills', 'hyperframes-files', 'hyperframes-native'];
+export const LIBRARY_TOPICS = [...Object.keys(GUIDE_TOPICS), 'quickstart', 'component-discovery', 'hyperframes-components', 'hyperframes-skills', 'hyperframes-files', 'hyperframes-native'];
 const MAX_SOURCE_BYTES = 4 * 1024 * 1024;
 const CHUNK_BYTES = 48 * 1024;
 const CATALOGS = {
@@ -47,14 +48,30 @@ export const LIBRARY_SCHEMA = {
     includeGuide: { type: 'boolean' },
   },
 };
+export const QUICKSTART_TOOL = {
+  name: 'production_quickstart',
+  description: 'Single offline bootstrap call for starting or resuming Machinal video production without multi-turn guide reads. Returns the compact workflow checklist, local file-transfer shortcuts (compositionFile, recipeFile, checkpointFile, componentFile), critical YAML rules, live bootstrap tools to batch in parallel, wait/concurrency limits, optional style profile presets and the brief guide. No API key, network, media access or spending.',
+  inputSchema: {
+    type: 'object',
+    additionalProperties: false,
+    properties: {
+      purpose: { type: 'string', enum: ['create', 'edit'], default: 'create', description: 'Whether starting a new video or editing an existing project.' },
+      profile: { type: 'string', maxLength: 64, description: 'Optional editing style profile ID (e.g. documentary, cinematic, social, educational, product, tutorial, sports, minimal) to include its exact catalog presets.' },
+      includeBriefGuide: { type: 'boolean', default: true, description: 'Include the full collaborative brief guide inline so a separate topic=brief read is not needed.' },
+    },
+  },
+  annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+};
 export const LIBRARY_TOOLS = [
   { name: 'get_library_reference', description: 'Read the installed scene/Hyperframes library offline. Before writing each distinct animated beat, use topic=component-discovery with its visible action or role, applicable profiles and aspect. Get two ranked installable candidates by default. Read the chosen source via scene-templates and pass its compileInput to compile_scene. Compilation/rendering still use the configured renderer. Not permission for media use or paid work.',
     inputSchema: LIBRARY_SCHEMA, annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false } },
   { name: 'get_hyperframes_source', description: 'Read an installed, pinned Hyperframes source by a discovered file ID. UTF-8 byte chunks, up to 48 KiB; continue with sourceNextOffset. No execution, user-media access or spending.',
     inputSchema: { type: 'object', required: ['id'], properties: { id: { type: 'string', maxLength: 128 }, offset: { type: 'integer', minimum: 0 } }, additionalProperties: false },
-    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false } },
+     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false } },
+  HYBRID_EDIT_TOOL,
+  QUICKSTART_TOOL,
 ];
-export const LIBRARY_INSTRUCTIONS = 'All authoring guides, skills, cinema styles, profiles, examples, scene templates and Hyperframes belong to the installed MCP package on this PC. Use get_library_reference (OpenCode native machinal_library); get_hyperframes_source reads original pinned Hyperframes files. The local adapter also routes legacy get_editing_reference authoring calls locally. These reads work offline without an API key. Read live scene-runtime, schema/capabilities, credits and project state for execution compatibility; the local preset catalog is a versioned snapshot, not proof of current server support. Library access grants no user-media, generation, render or delivery consent. Compile and render on the existing service with matching registered runtime modules; never execute upstream installers or replace the renderer.';
+export const LIBRARY_INSTRUCTIONS = 'All authoring guides, skills, cinema styles, profiles, examples, scene templates and Hyperframes belong to the installed MCP package on this PC. Start video production with one offline production_quickstart call (alongside parallel live metadata reads) instead of fetching multiple guides sequentially. Use get_library_reference (OpenCode native machinal_library); get_hyperframes_source reads original pinned Hyperframes files. The local adapter also routes legacy get_editing_reference authoring calls locally. These reads work offline without an API key. Read live scene-runtime, schema/capabilities, credits and project state for execution compatibility; the local preset catalog is a versioned snapshot, not proof of current server support. Library access grants no user-media, generation, render or delivery consent. Compile and render on the existing service with matching registered runtime modules; never execute upstream installers or replace the renderer.';
 
 function validateInput(input) {
   if (!LIBRARY_TOPICS.includes(input.topic) || input.id !== undefined && (typeof input.id !== 'string' || input.id.length > 128)
@@ -149,8 +166,115 @@ export class SceneLibrary {
     };
   }
 
+  async quickstart(input = {}) {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Invalid quickstart input.');
+    const allowed = new Set(['purpose', 'profile', 'includeBriefGuide']);
+    if (Object.keys(input).some(key => !allowed.has(key))) throw new Error('Unsupported quickstart field.');
+    const purpose = input.purpose ?? 'create';
+    if (!['create', 'edit'].includes(purpose)) throw new Error('purpose must be create or edit.');
+    if (input.profile !== undefined && (typeof input.profile !== 'string' || !input.profile.trim() || input.profile.length > 64)) {
+      throw new Error('profile must be a style profile ID (1–64 chars).');
+    }
+    if (input.includeBriefGuide !== undefined && typeof input.includeBriefGuide !== 'boolean') {
+      throw new Error('includeBriefGuide must be a boolean.');
+    }
+    const manifest = await this.manifest();
+    const styles = await this.catalog('styles');
+    let styleProfile;
+    if (input.profile !== undefined) {
+      const requested = input.profile.trim().toLowerCase();
+      styleProfile = styles.find(entry => entry.id === requested);
+      if (!styleProfile) {
+        throw new Error(`Unknown style profile "${input.profile}". Available: ${styles.map(entry => entry.id).join(', ')}.`);
+      }
+    }
+    const includeBriefGuide = input.includeBriefGuide ?? true;
+    const briefGuide = includeBriefGuide ? (await this.bytes('guides/brief.md')).toString('utf8') : undefined;
+    const localFileShortcuts = {
+      get_job_result: 'Pass recipeFile (.edit.yaml) and checkpointFile (.checkpoint.json) to save resolved YAML and hashes directly to disk without echoing large YAML into context.',
+      validate_recipe: 'Pass compositionFile, captionBaselineRecipeFile or captionBaselineFile, and checkpointFile instead of repeating YAML inline.',
+      compile_recipe: 'Pass compositionFile, captionBaselineRecipeFile/captionBaselineFile, productionContractFile, productionBaselineFile and checkpointFile.',
+      generate_assets: 'Pass compositionFile (or sourceJobId/recipeRef) and checkpointFile/captionBaselineFile.',
+      render_video: 'Pass compositionFile (or sourceJobId/recipeRef) and the ready preflight checkpointFile + captionBaselineFile.',
+      render_preview: 'Pass compositionFile (or recipeRef) and the ready preflight checkpointFile.',
+      compile_scene: 'Pass componentFile (.svelte path) or templateId + templateEdits instead of repeating Svelte source inline.',
+    };
+    const yamlRules = [
+      'Use numeric version: 2, but string compatibility pins: catalogVersion: "1" and compilerVersion: "1".',
+      'Always satisfy outPoint = inPoint + timelineDuration * playbackRate; account for outgoing transition overlap handles.',
+      'For image.generate use ratio strings like "9:16", "16:9", "1:1" — never output aliases like "portrait".',
+      'Preserve ALL resolved caption/text entries and resultTextIds verbatim; edit local .edit.yaml files and verify with captionBaselineRecipeFile/captionBaselineFile.',
+      'For new TikTok captions use fontFamily: montserrat and fontWeight: 700 unless the user chooses another font.',
+    ];
+    const stageChecklist = purpose === 'edit'
+      ? [
+          '1. Batch free metadata reads in parallel: get_project (compact first, fullResult=true before editing), get_capabilities, get_credits, and production_quickstart.',
+          '2. Save baseline recipe/checkpoint locally via get_job_result(recipeFile, checkpointFile) when continuing a job, or edit a local working copy.',
+          '3. Preserve existing captions, pins and unrelated tracks; recompile modified scenes via compile_scene(componentFile, sourceFile) (up to 2 concurrent).',
+          '4. Run validate_recipe + compile_recipe using compositionFile and captionBaselineFile/captionBaselineRecipeFile, saving a fresh checkpointFile.',
+          '5. Submit render_video using compositionFile + checkpointFile and poll wait_for_job(timeoutSeconds<=120) until terminal.',
+        ]
+      : [
+          '1. Batch free bootstrap calls in ONE turn: production_quickstart + get_workflow_preferences + get_recipe_schema + get_capabilities + get_credits + list_speech_models.',
+          '2. Ask ONLY missing brief decisions (duration, aspect+resolution, visuals/scenes, TTS model, and a separate sound-effects question) in ONE native question form; reuse existing approvals.',
+          '3. For narration, submit timing-first pass (speech.generate + requested captions.generate ONLY), wait with wait_for_job(timeoutSeconds<=120), then save resolved YAML via get_job_result(recipeFile, checkpointFile).',
+          '4. For image-led cinematic/documentary edits call plan_hybrid_edit; run component-discovery per animated beat; compile scenes up to 2 concurrently with compile_scene(componentFile | templateId).',
+          '5. Patch the local .edit.yaml file (never rewrite full YAML in tool arguments), run validate_recipe + compile_recipe with compositionFile + captionBaselineRecipeFile/captionBaselineFile + checkpointFile.',
+          '6. Run render_video(compositionFile, checkpointFile, userApproved, idempotencyKey), poll wait_for_job(timeoutSeconds<=120) for the SAME jobId until completed, then deliver via get_video_result.',
+        ];
+    const guide = [
+      `# Machinal Production Quickstart (${purpose})`,
+      '',
+      '## Stage Checklist',
+      ...stageChecklist.map(step => `- ${step}`),
+      '',
+      '## Local File Shortcuts (avoid emitting large YAML/Svelte inline)',
+      ...Object.entries(localFileShortcuts).map(([tool, hint]) => `- **${tool}**: ${hint}`),
+      '',
+      '## Critical YAML & Wait Rules',
+      ...yamlRules.map(rule => `- ${rule}`),
+      '- **wait_for_job**: adapter caps each call to <=120s by default to prevent MCP transport timeouts; call wait_for_job again for the SAME jobId while still running.',
+      '- **Concurrency**: up to 2 compile_scene calls can run concurrently; inspect_scene runs 1 at a time.',
+      '',
+      '## On-Demand Deep References (fetch ONLY when needed for the active stage)',
+      '- `yaml`, `text`, `effects`, `transitions`, `looks`, `production`, `scene-authoring`, `component-discovery`, `film-styles`, `animation-skills` (e.g. `machinal-sound`), `media`, `credits`.',
+    ].join('\n');
+    return {
+      topic: 'quickstart',
+      origin: 'installed-client-library',
+      libraryVersion: manifest.version,
+      purpose,
+      liveBootstrapBatch: ['get_workflow_preferences', 'get_recipe_schema', 'get_capabilities', 'get_credits', 'list_speech_models'],
+      stageChecklist,
+      localFileShortcuts,
+      yamlRules,
+      waitAndConcurrency: { maxWaitSecondsDefault: 120, compileSceneConcurrency: 2, inspectSceneConcurrency: 1 },
+      ...(styleProfile ? { styleProfile } : { availableProfiles: styles.map(entry => entry.id) }),
+      guide,
+      ...(briefGuide ? { briefGuide } : {}),
+      onDemandTopics: {
+        brief: 'get_library_reference(topic="brief")',
+        yaml: 'get_library_reference(topic="yaml")',
+        textAndAudio: 'get_library_reference(topic="text")',
+        soundEffects: 'get_library_reference(topic="animation-skills", id="machinal-sound")',
+        scenes: 'get_library_reference(topic="scene-authoring") + get_editing_reference(topic="scene-runtime")',
+        components: 'get_library_reference(topic="component-discovery", query=..., role=..., profiles=..., aspect=...)',
+        cinema: 'get_library_reference(topic="film-styles", query=...)',
+        review: 'get_library_reference(topic="production")',
+        mediaDelivery: 'get_library_reference(topic="media")',
+      },
+      trustNotice: TRUST,
+    };
+  }
+
   async reference(input = {}) {
     validateInput(input);
+    if (input.topic === 'quickstart') {
+      return this.quickstart({
+        ...(input.id ? { profile: input.id } : input.query ? { profile: input.query } : {}),
+        ...(input.includeGuide !== undefined ? { includeBriefGuide: input.includeGuide } : {}),
+      });
+    }
     if (input.topic === 'component-discovery') return this.discoverComponents(input);
     const catalog = await this.catalog(input.topic);
     const query = (input.query ?? '').trim().toLowerCase();
@@ -185,13 +309,17 @@ export class SceneLibrary {
   }
 
   handles(name, input = {}) {
-    return name === 'get_library_reference' || name === 'get_hyperframes_source'
+    return LIBRARY_TOOLS.some(tool => tool.name === name)
       || name === 'get_editing_reference' && input.topic !== 'commands' && LIBRARY_TOPICS.includes(input.topic);
   }
 
   async call(name, input) {
     try {
-      const data = name === 'get_hyperframes_source' ? await this.source(input) : await this.reference(input);
+      let data;
+      if (name === HYBRID_EDIT_TOOL.name) data = planHybridEdit(input);
+      else if (name === QUICKSTART_TOOL.name) data = await this.quickstart(input);
+      else if (name === 'get_hyperframes_source') data = await this.source(input);
+      else data = await this.reference(input);
       const value = { statusCode: 200, data };
       return { content: [{ type: 'text', text: JSON.stringify(value) }], structuredContent: value };
     } catch (error) {
@@ -207,10 +335,15 @@ export class SceneLibrary {
       uri: `machinal://skills/${name}`, name: `local-skill-${name}`, mimeType: 'text/markdown',
     });
     resources.push({ uri: 'machinal://recipes/guide', name: 'local-recipe-workflow', mimeType: 'text/markdown' });
+    resources.push({ uri: 'machinal://reference/quickstart', name: 'local-production-quickstart', description: 'Compact single-call production quickstart checklist and local file shortcuts', mimeType: 'text/markdown' });
     return resources;
   }
 
   async resource(uri) {
+    if (uri === 'machinal://reference/quickstart') {
+      const quickstart = await this.quickstart({ includeBriefGuide: false });
+      return { contents: [{ uri, mimeType: 'text/markdown', text: quickstart.guide }] };
+    }
     const aliases = {
       'machinal://skills/editing': 'editing',
       'machinal://skills/scenes': 'jobs-scenes',

@@ -11,6 +11,7 @@ export const startupSkills = ['machinal-editing', 'machinal-cinema'];
 
 const briefAndComponents = 'Read the request and earlier replies before asking anything. If sound is undecided, ask “sound effects or no sound effects?” in the same native form, separately from voice/captions and licensed music. Include only missing permissions; offer delegated CC0 search/import/use when needed. Reuse approval from chat or the brief through sound selection/import/mixing, paid generation, scene-frame rendering, final encoding and requested delivery wherever covered. Do not reconfirm under a different tool, after a checkpoint or after a credit check within scope and budget. Before writing each distinct animated beat, search the local library with topic=component-discovery and its visible action, role, applicable profiles and aspect. Compare two relevant native candidates by default; after a miss, browse the broader role once. Read the chosen exact scene-templates source, compile via the candidate’s templateId, and place the returned pinned scene on the timeline. Record beat → templateId → placed clip, or use customSceneReason to explain the specific mismatch. A catalog hit is not reuse. Do not force a component when none fits or ask the user to choose implementation IDs.';
 const maxComponentBytes = 64000;
+const hybridWorkflow = 'For an image-led documentary or cinematic edit, use machinal_hybrid_edit after timing and before component discovery. Native camera moves on image clips do not need a component. Compile only the short independently animated beats using the returned compileSettings; keep explicit output choices and existing pins.';
 
 async function installedSkills(ctx) {
   try {
@@ -73,7 +74,7 @@ export async function installWorkflowStartup(ctx, servers = []) {
         clearSceneCandidates(context.sessionID);
         if (prepared.size > 128) prepared.delete(prepared.keys().next().value);
         return { content: JSON.stringify({ status: 'ready', purpose: input.purpose, loadedSkills: startupSkills,
-          next: `${briefAndComponents} ${templateCompileHelp} If not already authorized, offer exact transcription fixes against approved narration in the initial brief. Fetch stage-specific guides only as needed and resume existing jobs/assets.` }) };
+          next: `${hybridWorkflow} ${briefAndComponents} ${templateCompileHelp} If not already authorized, offer exact transcription fixes against approved narration in the initial brief. Fetch stage-specific guides only as needed and resume existing jobs/assets.` }) };
       },
     });
     for (const server of names) {

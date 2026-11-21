@@ -7,6 +7,13 @@
     "syntheticMetadata": true
   },
   {
+    "id": "hybrid-documentary",
+    "description": "60s at 24 fps: four native image treatments, two short compiled scenes and two half-second dissolves",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
+  },
+  {
     "id": "cinematic-sequence",
     "description": "Uniform sequence, fine-film, motion override and 600ms overlap",
     "pendingGeneration": false,

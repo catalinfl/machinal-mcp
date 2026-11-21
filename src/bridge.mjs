@@ -8,14 +8,23 @@ import { VERSION } from './version.mjs';
 import { MACHINAL_SERVER_URL } from './endpoints.mjs';
 import { RequestScheduler, requestClass, requestLimits } from './request-scheduler.mjs';
 import { SceneLibrary, LIBRARY_TOOLS, LIBRARY_TOPICS, LIBRARY_INSTRUCTIONS } from './scene-library.mjs';
-import { templateCompileSchema, resolveTemplateCompile, templateCompileHelp } from './template-compile.mjs';
+import { decorateStdioTool, parseAllowedRoots, prepareStdioToolCall } from './stdio-files.mjs';
 
 const MAX_REQUEST = 4 * 1024 * 1024;
 const MAX_RESPONSE = 2 * 1024 * 1024;
 const MAX_PENDING_REQUESTS = 64;
+const DEFAULT_MAX_WAIT_SECONDS = 120;
 const PROTOCOL = '2025-11-25';
 const VERSIONS = ['2025-03-26', '2025-06-18', PROTOCOL];
 const CLIENT_VERSIONS = ['2024-11-05', ...VERSIONS];
+
+function parseMaxWaitSeconds(option, env) {
+  const candidate = option !== undefined ? option : env?.MACHINAL_MCP_MAX_WAIT_SECONDS;
+  if (candidate === undefined || candidate === '') return DEFAULT_MAX_WAIT_SECONDS;
+  const value = typeof candidate === 'number' ? candidate : /^\d+$/.test(String(candidate).trim()) ? Number(String(candidate).trim()) : NaN;
+  if (!Number.isInteger(value) || value < 1 || value > 900) return DEFAULT_MAX_WAIT_SECONDS;
+  return value;
+}
 export const STATUS_TOOL = Object.freeze({
   name: 'connection_status',
   description: 'Free connection diagnostics. Distinguishes login required, connection unavailable and account access from an MCP transport failure. Reconnect reloads credentials and tool discovery only; never retries submitted work. Never pass keys in tool arguments or chat.',
@@ -69,7 +78,7 @@ async function jsonResponse(response) {
 }
 
 export class MCPBridge {
-  constructor({ url, localConfig, catalogFile, env = process.env, credentialStore = createCredentialStore({ env }), fetchImpl = fetch, signal, notify = () => {} }) {
+  constructor({ url, localConfig, catalogFile, env = process.env, credentialStore = createCredentialStore({ env }), fetchImpl = fetch, signal, notify = () => {}, maxWaitSeconds, fileRoots }) {
     this.url = normalizeEndpoint(url);
     this.localConfig = localConfig;
     this.catalogFile = catalogFile;
@@ -78,6 +87,8 @@ export class MCPBridge {
     this.fetch = fetchImpl;
     this.signal = signal;
     this.notify = notify;
+    this.maxWaitSeconds = parseMaxWaitSeconds(maxWaitSeconds, env);
+    this.allowedRoots = parseAllowedRoots(fileRoots, env);
     this.tools = [];
     this.state = { status: 'unchecked', message: 'Connection has not been checked.' };
     this.nextID = 0;
@@ -88,6 +99,7 @@ export class MCPBridge {
   status() {
     return { ...this.state, transport: 'connected', mode: this.localConfig ? 'local' : 'server', endpoint: this.url,
       requestConcurrency: requestLimits,
+      maxWaitSeconds: this.maxWaitSeconds,
       credentialSource: this.credentialSource ?? 'unchecked',
       ...(this.localConfig ? {} : { credentialStore: this.credentialStore?.description ?? { supported: false } }),
       service: this.localConfig ? 'Local' : this.url === MACHINAL_SERVER_URL ? 'Machinal Server' : 'Custom server',
@@ -213,12 +225,17 @@ export class MCPBridge {
     if (method === 'tools/list') {
       if (this.state.status === 'unchecked') await this.connect();
       const tools = this.tools.filter(tool => !LIBRARY_TOOLS.some(local => local.name === tool.name)).map(tool => {
-        if (tool.name === 'compile_scene') return { ...tool, description: `${tool.description} ${templateCompileHelp}`, inputSchema: templateCompileSchema(tool.inputSchema) };
-        if (tool.name !== 'get_editing_reference') return tool;
-        const schema = structuredClone(tool.inputSchema);
-        const topic = schema.properties?.topic;
-        if (topic?.enum) topic.enum = [...new Set([...topic.enum, ...LIBRARY_TOPICS])];
-        return { ...tool, inputSchema: schema };
+        if (tool.name === 'get_editing_reference') {
+          const schema = structuredClone(tool.inputSchema);
+          const topic = schema.properties?.topic;
+          if (topic?.enum) topic.enum = [...new Set([...topic.enum, ...LIBRARY_TOPICS])];
+          if (schema.properties) {
+            const { role, profiles, aspect } = LIBRARY_TOOLS[0].inputSchema.properties;
+            Object.assign(schema.properties, { role, profiles, aspect });
+          }
+          return { ...tool, inputSchema: schema };
+        }
+        return decorateStdioTool(tool, { maxWaitSeconds: this.maxWaitSeconds });
       });
       return { tools: [STATUS_TOOL, ...LIBRARY_TOOLS, ...tools] };
     }
@@ -231,17 +248,47 @@ export class MCPBridge {
       if (this.state.status !== 'connected') await this.connect();
       if (this.state.status !== 'connected') return toolResult(this.status(), true);
       if (!this.tools.some((tool) => tool.name === params.name)) return toolResult({ message: 'Unknown tool. Refresh the Machinal catalog.' }, true);
-      if (params.name === 'compile_scene') {
-        try { params = { ...params, arguments: await resolveTemplateCompile(params.arguments ?? {}, this.library) }; }
-        catch (error) { return toolResult({ message: error.message, submissionState: 'not-submitted' }, true); }
-      }
+      let prepared;
       try {
-        const requestedWait = params.name === 'wait_for_job' && params.arguments?.timeoutSeconds;
-        const result = Number.isInteger(requestedWait) && requestedWait > 120 && requestedWait <= 900
-          ? await this.waitForCompletion(params, requestedWait, signal)
-          : await this.rpc(method, params, { signal });
+        prepared = await prepareStdioToolCall(params.name, params.arguments ?? {}, {
+          library: this.library,
+          allowedRoots: this.allowedRoots,
+          signal,
+        });
+      } catch (error) {
+        return toolResult({ message: error.message, submissionState: 'not-submitted' }, true);
+      }
+      let callParams = prepared.args === params.arguments ? params : { ...params, arguments: prepared.args };
+      let waitCapped = false;
+      try {
+        let result;
+        if (params.name === 'wait_for_job') {
+          const requestedWait = callParams.arguments?.timeoutSeconds;
+          let effectiveWait = requestedWait;
+          if (Number.isInteger(requestedWait) && requestedWait > this.maxWaitSeconds && requestedWait <= 900) {
+            effectiveWait = this.maxWaitSeconds;
+            waitCapped = true;
+            callParams = { ...callParams, arguments: { ...callParams.arguments, timeoutSeconds: effectiveWait } };
+          }
+          result = Number.isInteger(effectiveWait) && effectiveWait > 120 && effectiveWait <= 900
+            ? await this.waitForCompletion(callParams, effectiveWait, signal)
+            : await this.rpc(method, callParams, { signal });
+          if (waitCapped && !result.isError && ['queued', 'claimed', 'running'].includes(result.structuredContent?.data?.status)) {
+            const updated = {
+              ...result.structuredContent,
+              data: {
+                ...result.structuredContent.data,
+                waitCappedSeconds: this.maxWaitSeconds,
+                nextAction: 'Job is still running; call wait_for_job again for the same jobId without resubmitting.',
+              },
+            };
+            result = { ...result, content: [{ type: 'text', text: JSON.stringify(updated) }], structuredContent: updated };
+          }
+        } else {
+          result = await this.rpc(method, callParams, { signal });
+        }
         if ([401, 402, 403, 429].includes(result.structuredContent?.statusCode)) this.failure({ status: result.structuredContent.statusCode });
-        return result;
+        return prepared.postProcess ? await prepared.postProcess(result) : result;
       } catch (error) {
         this.failure(error);
         return toolResult({ ...this.status(), submissionState: 'unknown',
@@ -276,11 +323,25 @@ export class MCPBridge {
   async waitForCompletion(params, seconds, signal) {
     let result;
     const deadline = Date.now() + seconds * 1000;
+    const progressToken = params._meta?.progressToken;
     for (let remaining = seconds; remaining > 0;) {
       const window = Math.min(120, remaining);
       result = await this.rpc('tools/call', { ...params, arguments: { ...params.arguments, timeoutSeconds: window } }, { signal });
       if (result.isError || !['queued', 'claimed', 'running'].includes(result.structuredContent?.data?.status)) break;
       remaining = Math.min(remaining - window, Math.ceil((deadline - Date.now()) / 1000));
+      if (progressToken !== undefined && remaining > 0) {
+        const status = result.structuredContent?.data?.status ?? 'running';
+        this.notify({
+          jsonrpc: '2.0',
+          method: 'notifications/progress',
+          params: {
+            progressToken,
+            progress: Math.min(seconds, seconds - remaining),
+            total: seconds,
+            message: `Job ${status}; continuing bounded wait`,
+          },
+        });
+      }
     }
     return result;
   }

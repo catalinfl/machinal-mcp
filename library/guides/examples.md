@@ -5,6 +5,7 @@ Topic `examples` returns complete YAML composition strings; use `id` to retrieve
 | ID | Demonstrates | Expected pure compile |
 | --- | --- | --- |
 | `cinematic-sequence` | v2 sequence, fine-film look, explicit no-motion override, cross-dissolve geometry | Finished composition, no generation |
+| `hybrid-documentary` | 60s at 24 fps: a title and 2D split-screen, four long native image shots with looks/motions and cue-preserving dissolves | Finished visual track, synthetic pinned assets, no generation |
 | `social-hook` | Explicit video tracks, short named transition, first-clip motion rule, readable title | Finished composition, no generation |
 | `tutorial-clean` | Step label, deliberate static treatment and real source audio | Finished composition, no generation |
 | `caption-audio` | Verified example word timings, active-word preset, percent music volume/fit/repeat | Finished composition, no generation |

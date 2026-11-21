@@ -53,6 +53,18 @@ publishing npm and deploying the API
 remain separate explicit operations. Existing installed users do not receive
 unpublished checkout changes automatically.
 
+### Faster image-led documentary edits
+
+Call `plan_hybrid_edit` (OpenCode: `machinal_hybrid_edit`) with measured beat durations, before compiling scenes. Example input:
+
+```json
+{"beats":[{"id":"title","action":"layers","duration":4},{"id":"exterior","action":"camera","duration":13,"dissolve":0.5,"assetId":"street-photo"},{"id":"detail","action":"camera","duration":14,"motion":"zoom-in","assetId":"window-photo"}]}
+```
+
+Use `camera` for a native still, `layers` for independent 2D animation, `spatial` when the shot needs actual 3D. The tool returns a recipe fragment, missing bindings, settings for each new scene and a capture-frame count; it never opens a project or submits jobs. `assetId` on an animated beat reuses a matching compiled scene instead of requesting a new one. Verify source duration and version. Defaults are **1080p/24 fps** for both new scenes and output; pass the agreed values instead when different. An explicit 720p draft keeps its own recipe/checkpoint.
+
+The complete `hybrid-documentary` library example is 60s long: 8s of browser capture (192 frames) and the remaining shots on the native timeline. This is a workload count, not an end-to-end speed claim. To review a change in OpenCode, `render_preview` accepts `compositionFile` and a ready preflight `checkpointFile`, plus `start`, `duration` (up to 15s) and the usual approval/idempotency arguments. Preview billing can include transition/effect dependencies outside the excerpt. Keep the project, pins and scene ranges stable and check job cache hits on subsequent renders.
+
 ### Version 0.5.1: bounded concurrency and recipe diagnostics
 
 ### Version 0.6.1: guided component discovery and safer scene authoring

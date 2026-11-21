@@ -12,7 +12,7 @@ const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const FILES = ['bin/machinal-stdio.mjs', 'src/bridge.mjs', 'src/connection.mjs', 'src/credential-store.mjs',
   'src/credits.mjs', 'src/endpoints.mjs', 'src/errors.mjs', 'src/presentation.mjs', 'src/paths.mjs',
   'src/private-json.mjs', 'src/request-scheduler.mjs', 'src/scene-library.mjs', 'src/component-discovery.mjs',
-  'src/template-compile.mjs', 'src/version.mjs', 'package.json'];
+  'src/stdio-files.mjs', 'src/template-compile.mjs', 'src/hybrid-edit.mjs', 'src/version.mjs', 'package.json'];
 
 export function isManagedRuntimeCommand(command, context = {}) {
   if (!Array.isArray(command) || !isAbsolute(command[1] ?? '')) return false;

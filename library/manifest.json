@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "sha256:c8a89aa4b61698b38e20356fd59b5f5a5985e318b19ee6772df6c7035985b398",
+  "version": "sha256:fa0d96bf76988e939c14794ae148b5e31dbcc0fe20e97b99cc8c8bc5ee8a9ea5",
   "files": {
     "animation-skills/machinal-choreography.md": {
       "bytes": 3449,
@@ -82,6 +82,10 @@
       "bytes": 935,
       "sha256": "8a70ee0df801e9bb0055c83f6216743ee1477a9080d8374bf1c1d5711bd30d35"
     },
+    "examples/hybrid-documentary.yaml": {
+      "bytes": 2105,
+      "sha256": "129c19e46cb9e9ab38ebd9e428508b3e19191432a4672bd2acc0e590577f3ed0"
+    },
     "examples/modify-snapshot.yaml": {
       "bytes": 758,
       "sha256": "4ae04b507fcbb49c528b25fbcfee84a8cd573c98e53e3149a26b38dcb47d76a4"
@@ -127,8 +131,8 @@
       "sha256": "a2bf1969dad9ec5bddf48f90dda10674546f7cb3ca8e4f6324a6c9a47261e5e2"
     },
     "examples.json": {
-      "bytes": 3365,
-      "sha256": "a7a291a1c18764098632fab6fc0c42bd94c8930c99bceb7bb58e13b751620dca"
+      "bytes": 3614,
+      "sha256": "fdbf7309c592b253d1ec5c982c8efcf4ee5d97d55e6c4179295306fcc88c0d98"
     },
     "film-library/core/lib.js": {
       "bytes": 2782,
@@ -459,8 +463,8 @@
       "sha256": "f40624a10149fd5cd3c12499eb40ee4f281df6865163a8c58d17b07e742e1f43"
     },
     "guides/client-bootstrap.md": {
-      "bytes": 8828,
-      "sha256": "9eee19199aa71581ce26c87645b0e941fde2602b1fa5cf24dc862d7699e0c529"
+      "bytes": 9970,
+      "sha256": "f0dd5e1893b85cd0a3f8c6d8f7665442a95c3e70f373a7519f91609749f0f2bf"
     },
     "guides/commands.md": {
       "bytes": 4194,
@@ -479,8 +483,8 @@
       "sha256": "aa6ca80098f006c2369b401ead219ebc0db1e4dc5b25322e0506cdf3ead638a2"
     },
     "guides/examples.md": {
-      "bytes": 4686,
-      "sha256": "3235d39c969e1b2d623cc97849aca8caf6c207d8392d08db2458d407782e19a2"
+      "bytes": 4898,
+      "sha256": "916830da21ae6a704e196a3f75d9428cc9a5716825d350212faab47437f4c406"
     },
     "guides/film-styles.md": {
       "bytes": 9510,
@@ -503,8 +507,8 @@
       "sha256": "592b54bcbf7ecf996514a59e91ddc23ff966ccd7f9311cb636c97b2ff8dd50bc"
     },
     "guides/production.md": {
-      "bytes": 29137,
-      "sha256": "fec8f8159d7b7f3180ec69c9c85bba927f33bd7317884b9d33bbd55a60dbc0bd"
+      "bytes": 31421,
+      "sha256": "96d94755e86cf7a2c51e0ca9ff3009925af0181aeedb8b44146f8e8321a53c6e"
     },
     "guides/recipe-workflow.md": {
       "bytes": 25449,
@@ -13443,8 +13447,8 @@
       "sha256": "0f9f605da4812a06b557253c6a39de037fec1c3a252c741abc8e285aa82cfb8e"
     },
     "skills/machinal-editing.md": {
-      "bytes": 15941,
-      "sha256": "f5b3761b47453db15a10523bf0081867b60d6fe5d5b1eb6b7dabffb1619b372c"
+      "bytes": 16623,
+      "sha256": "35e2cf7478d735c19df6d8a25343c95e8aa6c9d674c09fea305cfa2b0fbbc53c"
     },
     "skills/machinal-hyperframes-cli.md": {
       "bytes": 2505,

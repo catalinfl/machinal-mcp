@@ -4,7 +4,7 @@ import { filePermission, readBoundedUTF8, readProductionContract, resultJSON, sa
 
 const preflightTools = ['validate_recipe', 'compile_recipe'];
 const freeTools = [...preflightTools, 'get_job_result'];
-const paidTools = ['render_video', 'generate_assets'];
+const paidTools = ['render_video', 'render_preview', 'generate_assets'];
 const versionPattern = /^sha256:[a-f0-9]{64}$/;
 
 async function checkpointPath(ctx, context, path, action) {
@@ -48,12 +48,13 @@ export async function installCheckpoints(ctx, servers) {
         editor.update(`${server}_${name}`.replace(/[^a-z\d_-]/gi, '_'), tool => {
           const original = tool.execute;
           const paid = paidTools.includes(name);
-          tool.input = { ...tool.input, required: name === 'get_job_result' ? tool.input.required : (tool.input.required ?? []).filter(key => key !== 'projectId'), properties: { ...tool.input.properties,
+          const preview = name === 'render_preview';
+          tool.input = { ...tool.input, required: name === 'get_job_result' ? tool.input.required : (tool.input.required ?? []).filter(key => key !== 'projectId' && !(preview && key === 'expectedCompositionVersion')), properties: { ...tool.input.properties,
             projectId: { type: 'string', description: 'Owned project ID. May be omitted only when supplied by an approved checkpointFile/captionBaselineFile; conflicting project IDs are rejected before execution.' },
             checkpointFile: { type: 'string', description: paid
               ? 'Optional saved .checkpoint.json from free preflight. Read with host permission and apply its exact compositionVersion as the server stale-review guard; never creates spending consent.'
               : 'Optional absolute new .checkpoint.json. Save compact versions, project/job IDs and diagnostics for deterministic recovery; never overwrite.' },
-            ...(name === 'get_job_result' ? {} : { captionBaselineFile: { type: 'string', description: 'Optional .checkpoint.json from the resolved baseline. Apply its captionVersion before submission to detect any changed text entry or caption resultTextIds. Omit only for authorized text edits.' } }),
+            ...(name === 'get_job_result' || preview ? {} : { captionBaselineFile: { type: 'string', description: 'Optional .checkpoint.json from the resolved baseline. Apply its captionVersion before submission to detect any changed text entry or caption resultTextIds. Omit only for authorized text edits.' } }),
             ...(name === 'compile_recipe' ? { productionBaselineFile: { type: 'string', description: 'Original contract-bearing .checkpoint.json. Verifies original beat IDs survive the final review; cannot replace caption or spending approval.' } } : {}),
           } };
           tool.execute = async (input, context) => {
@@ -70,6 +71,7 @@ export async function installCheckpoints(ctx, servers) {
               args.productionBaseline = baseline.productionContract;
             }
             if (captionBaselineFile !== undefined) {
+              if (preview) throw new Error('Compare captions during free preflight, then use its checkpointFile on render_preview.');
               const baseline = await readCheckpoint(ctx, context, captionBaselineFile, args.projectId);
               args.projectId = baseline.projectId;
               if (!versionPattern.test(baseline.captionVersion)) throw new Error('Baseline has no text/caption fingerprint. Retrieve the existing resolved result; never regenerate it.');
@@ -81,13 +83,14 @@ export async function installCheckpoints(ctx, servers) {
               if (paid) {
                 const checkpoint = await readCheckpoint(ctx, context, checkpointFile, args.projectId);
                 args.projectId = checkpoint.projectId;
-                const render = name === 'render_video';
+                const render = name === 'render_video' || preview;
                 if (!(render ? checkpoint.ready : checkpoint.valid) || !preflightTools.includes(checkpoint.operation) || render && ['revision_required', 'not_ready'].includes(checkpoint.productionReview?.status)) throw new Error('Checkpoint has unresolved preflight/review findings. Repair and save a new free preflight; no paid action was submitted.');
                 if (args.expectedCompositionVersion !== undefined && args.expectedCompositionVersion !== checkpoint.compositionVersion) throw new Error('Conflicting composition checkpoint versions.');
                 args.expectedCompositionVersion = checkpoint.compositionVersion;
               } else destination = await checkpointPath(ctx, context, checkpointFile, 'edit');
             }
             if (!/^[a-z\d_-]{1,64}$/i.test(args.projectId ?? '')) throw new Error('Use an owned projectId or a matching baseline/preflight checkpoint. No project was guessed.');
+            if (preview && !versionPattern.test(args.expectedCompositionVersion)) throw new Error('Preview needs a matching preflight checkpointFile or exact expectedCompositionVersion.');
             const result = await original(args, context);
             if (!destination) return result;
             const output = resultJSON(result);

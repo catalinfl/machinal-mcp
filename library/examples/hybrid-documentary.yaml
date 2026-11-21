@@ -1,0 +1,28 @@
+# Synthetic 60s visual track. Replace every asset with returned project metadata.
+# The two 4s inserts were authored at 24 fps (96 frames each); the four
+# image clips are native. For narration, merge into the resolved timing pass.
+document:
+  version: 2
+  mode: assemble
+  tracks:
+    - id: hybrid-visuals
+      type: video
+      clips:
+        - {id: intro, assetId: title-scene, start: 0, inPoint: 0, outPoint: 4}
+        - {id: exterior, assetId: street-photo, start: 4, inPoint: 0, outPoint: 13.5, look: creator-natural, motion: drift}
+        - {id: window, assetId: window-photo, start: 17, inPoint: 0, outPoint: 14, look: creator-natural, motion: zoom-in}
+        - {id: light-dark, assetId: split-scene, start: 31, inPoint: 0, outPoint: 4}
+        - {id: detail, assetId: detail-photo, start: 35, inPoint: 0, outPoint: 12.5, look: creator-natural, motion: ken-burns}
+        - {id: dusk, assetId: dusk-photo, start: 47, inPoint: 0, outPoint: 13, look: creator-natural, motion: none}
+  transitions:
+    - {id: hybrid-dissolve-2, trackId: hybrid-visuals, leftClipId: exterior, rightClipId: window, preset: cross-dissolve, duration: 0.5}
+    - {id: hybrid-dissolve-5, trackId: hybrid-visuals, leftClipId: detail, rightClipId: dusk, preset: cross-dissolve, duration: 0.5}
+  output: {aspect: landscape, resolution: 1080p, fps: 24, format: mp4}
+bindings: {}
+assets:
+  - {id: title-scene, file: ai_scene_0123456789abcdef0123456789abcdef_01.scene.json, version: example-only, kind: video, duration: 4s, width: 1920, height: 1080}
+  - {id: split-scene, file: ai_scene_0123456789abcdef0123456789abcdef_02.scene.json, version: example-only, kind: video, duration: 4s, width: 1920, height: 1080}
+  - {id: street-photo, file: street.png, version: example-only, kind: image, width: 1920, height: 1080}
+  - {id: window-photo, file: window.png, version: example-only, kind: image, width: 1920, height: 1080}
+  - {id: detail-photo, file: detail.png, version: example-only, kind: image, width: 1920, height: 1080}
+  - {id: dusk-photo, file: dusk.png, version: example-only, kind: image, width: 1920, height: 1080}

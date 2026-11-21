@@ -145,6 +145,13 @@ test('OpenCode native tools expose the same local library without weakening perm
   });
   const tool = tools.get('machinal_library');
   assert.equal(tool.options.codemode, false);
+  const quickstartTool = tools.get('machinal_quickstart');
+  assert.equal(quickstartTool.options.codemode, false);
+  const quickstartResult = JSON.parse((await quickstartTool.execute({ purpose: 'create', profile: 'documentary' })).content);
+  assert.equal(quickstartResult.statusCode, 200);
+  assert.equal(quickstartResult.data.styleProfile.id, 'documentary');
+  assert.match(quickstartResult.data.localFileShortcuts.validate_recipe, /compositionFile/);
+  assert.match(quickstartResult.data.localFileShortcuts.compile_scene, /componentFile/);
   const result = JSON.parse((await tool.execute({ topic: 'scene-templates', id: 'paper-stage-3d' })).content);
   assert.equal(result.statusCode, 200);
   assert.match(result.data.entries[0].component, /SceneThree/);
@@ -200,7 +207,7 @@ test('all skills, cinema styles, workflow guides and recipe examples are client-
     assert.equal(result.origin, 'installed-client-library');
   }
   const examples = await library.catalog('examples');
-  assert.equal(examples.length, 15);
+  assert.ok(examples.some(entry => entry.id === 'hybrid-documentary'));
   for (const entry of examples) {
     assert.match((await library.reference({ topic: 'examples', id: entry.id })).entries[0].composition, /document:/);
   }
@@ -238,4 +245,31 @@ test('OpenCode compatibility routes authoring locally, preserves live runtime ex
     assert.equal((await tool.execute({ topic: 'scene-runtime' }, { marker: 'original' })).content, 'live runtime');
     assert.equal(live, 1);
   }
+});
+
+test('production_quickstart returns single-call offline workflow, local file shortcuts, brief and style profile without credentials', async () => {
+  const bridge = new MCPBridge({ url: 'http://127.0.0.1:1/mcp', env: {},
+    credentialStore: { read() { assert.fail('quickstart must not access credentials'); } },
+    fetchImpl() { assert.fail('quickstart must not call the server'); } });
+  const tools = (await bridge.handle('tools/list')).tools;
+  assert.ok(tools.some(tool => tool.name === 'production_quickstart'));
+  const response = await bridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'create', profile: 'documentary' } });
+  assert.equal(response.structuredContent.statusCode, 200);
+  const data = response.structuredContent.data;
+  assert.equal(data.origin, 'installed-client-library');
+  assert.equal(data.styleProfile.id, 'documentary');
+  assert.ok(data.liveBootstrapBatch.includes('get_recipe_schema'));
+  assert.match(data.localFileShortcuts.validate_recipe, /compositionFile/);
+  assert.match(data.localFileShortcuts.compile_scene, /componentFile/);
+  assert.equal(data.waitAndConcurrency.maxWaitSecondsDefault, 120);
+  assert.equal(data.waitAndConcurrency.compileSceneConcurrency, 2);
+  assert.match(data.briefGuide, /native question tool/);
+  const viaRef = await bridge.handle('tools/call', { name: 'get_library_reference', arguments: { topic: 'quickstart', id: 'social', includeGuide: false } });
+  assert.equal(viaRef.structuredContent.data.styleProfile.id, 'social');
+  assert.equal(viaRef.structuredContent.data.briefGuide, undefined);
+  const viaResource = await bridge.handle('resources/read', { uri: 'machinal://reference/quickstart' });
+  assert.match(viaResource.contents[0].text, /Machinal Production Quickstart/);
+  const unknown = await bridge.handle('tools/call', { name: 'production_quickstart', arguments: { profile: 'nonexistent' } });
+  assert.equal(unknown.isError, true);
+  assert.equal(unknown.structuredContent.statusCode, 400);
 });

@@ -7,7 +7,7 @@ import { installRecipeFiles } from '../src/opencode-recipes.mjs';
 import { installCheckpoints } from '../src/opencode-checkpoints.mjs';
 
 const recipe = 'document:\n  version: 2\n  texts:\n    - text: "Dacă lumea — René Guénon ș ț"\n      words: [{text: "Dacă", start: 0, end: 1}]\n';
-const operations = ['validate_recipe', 'compile_recipe', 'generate_assets', 'render_video', 'get_job_result'];
+const operations = ['validate_recipe', 'compile_recipe', 'generate_assets', 'render_video', 'get_job_result', 'render_preview'];
 
 async function fixture(t) {
   const directory = await mkdtemp(join(tmpdir(), 'machinal-recipe-'));
@@ -24,7 +24,8 @@ async function fixture(t) {
   const response = { statusCode: 200, data: { status: 'completed', recipeYaml: recipe, cost: { knownCredits: 2 }, compositionVersion: `sha256:${'a'.repeat(64)}`, captionVersion: `sha256:${'b'.repeat(64)}`, diagnostics: [], requirements: [] } };
   const createTools = () => {
     const tools = new Map(operations.map(name => [`custom-server_${name}`, {
-      input: { type: 'object', properties: { projectId: { type: 'string' } }, required: ['projectId'], additionalProperties: false },
+      input: { type: 'object', properties: { projectId: { type: 'string' } }, required: name === 'render_preview'
+        ? ['projectId', 'start', 'duration', 'expectedCompositionVersion', 'userApproved', 'idempotencyKey'] : ['projectId'], additionalProperties: false },
       description: name, options: { permission: 'original' },
       execute: async (input, context) => {
         calls.push({ name, input, context });
@@ -119,6 +120,29 @@ test('generation checkpoints allow declared pending jobs but rendering requires 
   assert.equal(f.calls.at(-1).input.expectedCompositionVersion, f.response.data.compositionVersion);
   const calls = f.calls.length;
   await assert.rejects(tools.get('custom-server_render_video').execute({ ...input, userApproved: true, idempotencyKey: 'final' }, f.context));
+  assert.equal(f.calls.length, calls);
+});
+
+test('preview accepts ready checkpoint and exact recipeFile without changing the paid excerpt request', async t => {
+  const f = await fixture(t);
+  const tools = f.createTools();
+  const path = join(f.directory, 'ready.checkpoint.json');
+  const file = join(f.directory, 'final.edit.yaml');
+  await writeFile(file, recipe);
+  await tools.get('custom-server_compile_recipe').execute({ projectId: 'owned', compositionFile: file, checkpointFile: path }, f.context);
+  const preview = tools.get('custom-server_render_preview');
+  assert.deepEqual(preview.input.required, ['start', 'duration', 'userApproved', 'idempotencyKey']);
+  assert.equal(preview.input.properties.captionBaselineFile, undefined);
+  const params = { start: 31, duration: 3, userApproved: false, idempotencyKey: 'keep' };
+  const input = { ...params, checkpointFile: path, compositionFile: file };
+  await preview.execute(input, f.context);
+  assert.deepEqual(f.calls.at(-1).input, { ...params, projectId: 'owned', composition: recipe, expectedCompositionVersion: f.response.data.compositionVersion });
+  const calls = f.calls.length;
+  for (const extra of [{ expectedCompositionVersion: 'stale' }, { projectId: 'other' }, { recipeRef: 'other' }, { captionBaselineFile: path }])
+    await assert.rejects(preview.execute({ ...input, ...extra }, f.context));
+  await assert.rejects(preview.execute({ ...params, composition: recipe, projectId: 'owned' }, f.context), /preflight/);
+  await writeFile(path, JSON.stringify({ ...JSON.parse(await readFile(path)), ready: false }));
+  await assert.rejects(preview.execute(input, f.context), /unresolved/);
   assert.equal(f.calls.length, calls);
 });
 

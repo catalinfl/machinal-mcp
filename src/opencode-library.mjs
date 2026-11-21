@@ -30,10 +30,15 @@ export async function installSceneLibrary(ctx, servers = []) {
         };
       });
     }
-    for (const [index, name] of ['machinal_library', 'machinal_hyperframes_source'].entries()) {
-      const tool = LIBRARY_TOOLS[index];
+    const nativeNames = {
+      get_library_reference: 'machinal_library',
+      get_hyperframes_source: 'machinal_hyperframes_source',
+      plan_hybrid_edit: 'machinal_hybrid_edit',
+      production_quickstart: 'machinal_quickstart',
+    };
+    for (const tool of LIBRARY_TOOLS) {
       editor.add({
-        name, description: tool.description, input: tool.inputSchema, options: { codemode: false },
+        name: nativeNames[tool.name], description: tool.description, input: tool.inputSchema, options: { codemode: false },
         async execute(input, context) {
           const result = await library.call(tool.name, input);
           recordDiscovery(context?.sessionID, result.structuredContent.data);

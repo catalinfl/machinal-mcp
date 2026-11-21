@@ -51,7 +51,36 @@ test('classification separates waits from read-only hints and treats unknown cal
   assert.equal(requestClass('tools/call', { name: 'get_project' }, tools), 'read');
   assert.equal(requestClass('tools/call', { name: 'get_job', arguments: { waitSeconds: 25 } }, tools), 'wait');
   assert.equal(requestClass('tools/call', { name: 'render_video' }, tools), 'work');
-  assert.equal(requestLimits[requestClass('tools/call', { name: 'compile_scene' }, tools)], 1);
+  assert.equal(requestLimits[requestClass('tools/call', { name: 'compile_scene' }, tools)], 2);
+  assert.equal(requestLimits[requestClass('tools/call', { name: 'inspect_scene' }, tools)], 1);
   assert.equal(requestClass('ping'), 'control');
   assert.equal(requestClass('resources/read'), 'read');
+});
+
+test('two scene compilations run concurrently while a third queues and inspect_scene remains serialized', async () => {
+  const scheduler = new RequestScheduler();
+  const gate = Promise.withResolvers();
+  let activeCompiles = 0;
+  let peakCompiles = 0;
+  const compiles = Array.from({ length: 3 }, () => scheduler.run('scene', async () => {
+    activeCompiles++;
+    peakCompiles = Math.max(peakCompiles, activeCompiles);
+    await gate.promise;
+    activeCompiles--;
+  }));
+  assert.equal(activeCompiles, 2);
+  assert.equal(peakCompiles, 2);
+  const inspectGate = Promise.withResolvers();
+  let activeInspects = 0;
+  const inspects = Array.from({ length: 2 }, () => scheduler.run('inspect', async () => {
+    activeInspects++;
+    await inspectGate.promise;
+    activeInspects--;
+  }));
+  assert.equal(activeInspects, 1);
+  gate.resolve();
+  inspectGate.resolve();
+  await Promise.all([...compiles, ...inspects]);
+  assert.equal(activeCompiles, 0);
+  assert.equal(activeInspects, 0);
 });
