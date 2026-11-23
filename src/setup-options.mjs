@@ -18,16 +18,15 @@ export async function chooseClient(value, { interactive, ui }) {
   ] });
 }
 
-export async function chooseEndpoint(values, { env, interactive, ui }) {
+export async function chooseEndpoint(values, { env, interactive, ui, promptLocalURL = false }) {
   let mode = values.mode === 'hosted' ? 'server' : values.mode;
   if (mode && !['local', 'server', 'custom'].includes(mode)) throw new InstallerError('Choose --mode server (Machinal Server), local or custom (--mode hosted is an alias for server).');
   const customDefault = env.MACHINAL_API_ORIGIN || env.DIRECTION_API_ORIGIN;
   if (!mode && values.url) mode = 'custom';
   if (!mode && interactive && !values.url) {
     mode = await ui.select({ message: 'API location', default: 'server', choices: [
-      { name: 'Machinal Server', value: 'server', short: 'Machinal Server', description: 'Official hosted service. Only your Machinal API key is needed.' },
+      { name: 'Server Machinal (cloud)', value: 'server', short: 'Server Machinal (cloud)', description: 'Official hosted service. Only your Machinal API key is needed.' },
       { name: 'Local', value: 'local', short: 'Local', description: 'Independent Docker backend with your own OpenRouter key.' },
-      { name: 'Custom server (advanced)', value: 'custom', short: 'Custom server', description: 'Your own deployment. Enter its API URL.' },
     ] });
   }
   mode ??= customDefault ? 'custom' : 'server';
@@ -36,7 +35,7 @@ export async function chooseEndpoint(values, { env, interactive, ui }) {
   if (mode === 'server') return { mode, url: MACHINAL_SERVER_URL };
   let rawURL = values.url || customDefault;
   if (mode === 'local' && !values.url && (!rawURL || !isLoopbackEndpoint(normalizeEndpoint(rawURL)))) rawURL = DEFAULT_LOCAL_URL;
-  if (interactive && !values.url) {
+  if (interactive && !values.url && (mode !== 'local' || promptLocalURL)) {
     rawURL = await ui.input({
       message: mode === 'local' ? 'Local API URL' : 'Custom server API URL (not the website)',
       ...(rawURL ? { default: rawURL } : {}), required: true,

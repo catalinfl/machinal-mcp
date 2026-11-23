@@ -36,13 +36,24 @@ function dockerContext(root, { images = true, host = 'npipe:////./pipe/docker_en
   };
 }
 
-test('checkout discovery walks ancestors or uses an explicit checkout, without assuming npm contains Dockerfiles', async (t) => {
+test('checkout discovery walks ancestors, sibling machinal-studio folders, and quoted explicit paths', async (t) => {
   const root = await checkout(t);
   const project = await workspace(t);
   assert.equal(await findCheckout(join(root, 'nested/project')), root);
   assert.equal(await findCheckout(project), null);
   assert.equal(await findCheckout(project, root), root);
+  assert.equal(await findCheckout(project, `"${root}"`), root);
   assert.equal(await findCheckout(project, join(root, 'missing')), null);
+  const container = await workspace(t);
+  const studio = join(container, 'machinal-studio');
+  const sibling = join(container, 'machinal-mcp', 'sub');
+  await mkdir(sibling, { recursive: true });
+  for (const file of ['compose.editengine.yaml', 'api/Dockerfile', 'services/scene-renderer/Dockerfile']) {
+    await mkdir(join(studio, file, '..'), { recursive: true });
+    await writeFile(join(studio, file), '# fixture');
+  }
+  assert.equal(await findCheckout(sibling), studio);
+  assert.equal(await findCheckout(project, container), studio);
 });
 
 for (const images of [true, false]) {
@@ -104,7 +115,7 @@ test('DOCKER_CONTEXT takes precedence over DOCKER_HOST just as it does for Docke
 
 test('missing checkout, custom ports and unconfigured .env explain recovery without starting anything', async (t) => {
   const ctx = dockerContext(await workspace(t));
-  await assert.rejects(prepareLocalDocker({}, DEFAULT_LOCAL_URL, ctx), /--docker-dir PATH/);
+  await assert.rejects(prepareLocalDocker({}, DEFAULT_LOCAL_URL, ctx), /https:\/\/github\.com\/catalinfl\/machinal-studio.*--docker-dir PATH/);
   await assert.rejects(prepareLocalDocker({}, 'http://localhost:9999/mcp', ctx), /custom deployment/);
   assert.deepEqual(ctx.calls, []);
   const unconfigured = dockerContext(await checkout(t, { configured: false }));

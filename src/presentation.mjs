@@ -4,6 +4,7 @@ import { MACHINAL_APP_URL } from './endpoints.mjs';
 export const API_KEYS_URL = `${MACHINAL_APP_URL}/api-keys`;
 export const MEMBERSHIP_URL = `${MACHINAL_APP_URL}/membership`;
 export const DOCKER_URL = 'https://docs.docker.com/get-started/get-docker/';
+export const MACHINAL_STUDIO_URL = 'https://github.com/catalinfl/machinal-studio';
 
 export function terminalStyle({ stream = process.stdout, env = process.env } = {}) {
   const color = Boolean(stream.isTTY && !Object.hasOwn(env, 'NO_COLOR') && env.TERM !== 'dumb');

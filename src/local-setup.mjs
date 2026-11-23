@@ -3,11 +3,23 @@ import { lstat, mkdir, readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { parseEnv } from 'node:util';
 import { InstallerError } from './errors.mjs';
+import { isLoopbackEndpoint } from './connection.mjs';
 import { findCheckout, runDocker } from './docker.mjs';
 import { localCredentials } from './bridge.mjs';
 import { planTextFile, saveConfiguration } from './configuration.mjs';
+import { MACHINAL_STUDIO_URL } from './presentation.mjs';
+import { readSettings, saveSettings } from './settings.mjs';
 
-const MODELS = ['OPENROUTER_MODEL', 'OPENROUTER_SCENE_MODEL', 'OPENROUTER_STT_MODEL'];
+const OPENROUTER_KEY_CHECK_URL = 'https://openrouter.ai/api/v1/key';
+const DEFAULT_OPENROUTER_STT_MODEL = 'openai/whisper-large-v3';
+export const DEFAULT_OPENROUTER_MODELS = Object.freeze({
+  OPENROUTER_MODEL: 'deepseek/deepseek-v4.1-flash',
+  OPENROUTER_VISION_MODEL: 'qwen/qwen3.7-flash',
+  OPENROUTER_STT_MODEL: DEFAULT_OPENROUTER_STT_MODEL,
+  OPENROUTER_IMAGE_MODEL: 'openai/gpt-image-2.5-sunburst',
+  OPENROUTER_SPEECH_MODEL: 'fish-audio/s2.1-pro',
+  OPENROUTER_JEV_MODEL: 'typesafe/jev-1.13',
+});
 
 async function fileExists(file) {
   try { const info = await lstat(file); if (!info.isFile() || info.isSymbolicLink()) throw new Error(); return true; } catch (error) {
@@ -22,23 +34,182 @@ function providerKey(value) {
   return key;
 }
 
-async function providers(context) {
-  const { env, interactive, ui } = context;
-  let key = env.OPENROUTER_API_KEY;
-  if (!key && interactive) key = await ui.password({ message: 'Your OpenRouter API key (hidden; charged directly by OpenRouter)', mask: '*',
-    validate: (value) => { try { providerKey(value); return true; } catch (error) { return error.message; } } });
-  const values = { OPENROUTER_API_KEY: providerKey(key) };
-  for (const name of MODELS) {
-    const fallback = name === 'OPENROUTER_SCENE_MODEL' ? values.OPENROUTER_MODEL : '';
-    const hint = name === 'OPENROUTER_MODEL' ? 'required' : name === 'OPENROUTER_SCENE_MODEL' ? 'optional; falls back to OPENROUTER_MODEL' : 'optional; empty disables transcription';
-    const value = interactive ? await ui.input({ message: `${name} (${hint})`,
-      default: env[name] || fallback || '', required: name === 'OPENROUTER_MODEL' }) : env[name] || fallback || '';
-    if ((name === 'OPENROUTER_MODEL' && !value) || (value && !/^[\w~./:@+-]{1,200}$/.test(value))) {
-      throw new InstallerError(`Set ${name} to a provider/model identifier, not a URL or credential.`);
-    }
-    values[name] = value;
+function modelIdentifier(name, value) {
+  const normalized = value?.trim() ?? '';
+  if (normalized && !/^[\w~./:@+-]{1,200}$/.test(normalized)) {
+    throw new InstallerError(`Set ${name} to a provider/model identifier, not a URL or credential.`);
   }
+  return normalized;
+}
+
+function qualifiedModel(value) {
+  const normalized = value?.trim() ?? '';
+  return /^[\w~.-]+\/[\w~./:@+-]{1,180}$/.test(normalized) ? normalized : '';
+}
+
+export async function verifyOpenRouterKey(apiKey, { fetchImpl = fetch, timeout = 15_000 } = {}) {
+  let key;
+  try { key = providerKey(apiKey); } catch (error) {
+    return { status: 'invalid', message: error.message };
+  }
+  let response;
+  try {
+    response = await fetchImpl(OPENROUTER_KEY_CHECK_URL, {
+      method: 'GET',
+      redirect: 'error',
+      signal: AbortSignal.timeout(timeout),
+      headers: { Authorization: `Bearer ${key}` },
+    });
+  } catch {
+    return { status: 'unavailable', message: 'Could not reach OpenRouter to verify the API key. Check your internet connection.' };
+  }
+  await response.body?.cancel();
+  if (response.status === 200) return { status: 'valid' };
+  if (response.status === 401 || response.status === 403) {
+    return { status: 'invalid', httpStatus: response.status, message: 'OpenRouter rejected this API key. Enter an active key from https://openrouter.ai/keys.' };
+  }
+  if (response.status === 429) {
+    return { status: 'rate_limited', httpStatus: 429, message: 'OpenRouter rate-limited key verification (429). Wait a moment and retry.' };
+  }
+  return { status: 'unavailable', httpStatus: response.status, message: `OpenRouter could not verify the API key (HTTP ${response.status}).` };
+}
+
+function checkOpenRouter(key, context = {}) {
+  if (context.verifyOpenRouterKey) return context.verifyOpenRouterKey(key);
+  return verifyOpenRouterKey(key, { fetchImpl: context.fetchImpl });
+}
+
+export async function checkSavedOpenRouterKey(localConfig, context = {}) {
+  if (!await fileExists(localConfig)) return { status: 'invalid', message: 'The saved local profile is missing.' };
+  const saved = parseEnv(await readFile(localConfig, 'utf8'));
+  return checkOpenRouter(saved.OPENROUTER_API_KEY ?? '', context);
+}
+
+async function syncOpenRouterKeyToBackend(endpoint, apiKey, context = {}) {
+  if (!isLoopbackEndpoint(endpoint)) return false;
+  if (context.checkConnection && !context.fetchImpl) return false;
+  const fetchImpl = context.fetchImpl ?? fetch;
+  try {
+    const response = await fetchImpl(new URL('/settings/openrouter', endpoint).href, {
+      method: 'POST',
+      redirect: 'error',
+      signal: AbortSignal.timeout(15_000),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey }),
+    });
+    await response.body?.cancel();
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function obtainVerifiedOpenRouterKey(context) {
+  const { env = {}, interactive, ui, log = () => {} } = context;
+  const envKey = env.OPENROUTER_API_KEY?.trim();
+  if (envKey) {
+    const normalized = providerKey(envKey);
+    const check = await checkOpenRouter(normalized, context);
+    if (check.status === 'valid') return normalized;
+    if (check.status === 'rate_limited' || check.status === 'unavailable') {
+      log(`Warning: ${check.message}`);
+      return normalized;
+    }
+    if (!interactive) throw new InstallerError(check.message);
+    log(`OPENROUTER_API_KEY in the environment did not pass verification (${check.message})`);
+  }
+  if (!interactive) return providerKey('');
+  let validatedKey = null;
+  let validatedState = null;
+  const entered = await ui.password({
+    message: 'Your OpenRouter API key (hidden; charged directly by OpenRouter)',
+    mask: '*',
+    validate: async (value) => {
+      let normalized;
+      try { normalized = providerKey(value); } catch (error) { return error.message; }
+      const check = await checkOpenRouter(normalized, context);
+      if (check.status === 'invalid') return check.message;
+      validatedKey = normalized;
+      validatedState = check;
+      return true;
+    },
+  });
+  const normalized = providerKey(entered);
+  const state = validatedKey === normalized ? validatedState : await checkOpenRouter(normalized, context);
+  if (state.status === 'invalid') throw new InstallerError(state.message);
+  if (state.status !== 'valid') log(`Warning: ${state.message}`);
+  return normalized;
+}
+
+function providerModels(env = {}, saved = {}) {
+  const values = {};
+  for (const [name, fallback] of Object.entries(DEFAULT_OPENROUTER_MODELS)) {
+    values[name] = modelIdentifier(name, env[name]) || qualifiedModel(saved[name]) || fallback;
+  }
+  const sceneModel = modelIdentifier('OPENROUTER_SCENE_MODEL', env.OPENROUTER_SCENE_MODEL) || qualifiedModel(saved.OPENROUTER_SCENE_MODEL);
+  if (sceneModel) values.OPENROUTER_SCENE_MODEL = sceneModel;
+  const sttProvider = modelIdentifier('OPENROUTER_STT_PROVIDER', env.OPENROUTER_STT_PROVIDER)
+    || modelIdentifier('OPENROUTER_STT_PROVIDER', saved.OPENROUTER_STT_PROVIDER)
+    || (values.OPENROUTER_STT_MODEL === DEFAULT_OPENROUTER_STT_MODEL ? 'groq' : '');
+  if (sttProvider) values.OPENROUTER_STT_PROVIDER = sttProvider;
   return values;
+}
+
+function formatEnv(settings) {
+  return Object.entries(settings).map(([name, value]) => `${name}='${value}'`).join('\n') + '\n';
+}
+
+async function providers(context) {
+  const key = await obtainVerifiedOpenRouterKey(context);
+  return { OPENROUTER_API_KEY: key, ...providerModels(context.env) };
+}
+
+async function savedCheckout(composeFile, context) {
+  const candidates = [];
+  if (await fileExists(composeFile)) {
+    try {
+      const compose = JSON.parse(await readFile(composeFile, 'utf8'));
+      const apiContext = compose?.services?.api?.build?.context;
+      if (typeof apiContext === 'string' && apiContext.trim()) candidates.push(dirname(apiContext));
+    } catch { /* Ignore unreadable legacy compose files during discovery. */ }
+  }
+  try {
+    const settings = await readSettings(context);
+    if (typeof settings.localCheckout === 'string' && settings.localCheckout.trim()) candidates.push(settings.localCheckout);
+  } catch { /* Ignore invalid/unreadable settings during discovery. */ }
+  for (const candidate of candidates) {
+    const found = await findCheckout(context.cwd, candidate);
+    if (found) return found;
+  }
+  return null;
+}
+
+const MIN_SCENE_PIDS_LIMIT = 512;
+
+async function ensureLocalComposeDefaults(composeFile) {
+  let compose;
+  try { compose = JSON.parse(await readFile(composeFile, 'utf8')); } catch { return; }
+  let updated = false;
+  const api = compose?.services?.api;
+  if (api && typeof api === 'object') {
+    if (Array.isArray(api.environment)) {
+      if (!api.environment.some((entry) => typeof entry === 'string' && entry.startsWith('HOST='))) {
+        api.environment = [...api.environment, 'HOST=0.0.0.0'];
+        updated = true;
+      }
+    } else if (api.environment?.HOST !== '0.0.0.0') {
+      api.environment = { ...(api.environment && typeof api.environment === 'object' ? api.environment : {}), HOST: '0.0.0.0' };
+      updated = true;
+    }
+  }
+  const renderer = compose?.services?.['scene-renderer'];
+  if (renderer && typeof renderer === 'object' && (!Number.isInteger(renderer.pids_limit) || renderer.pids_limit < MIN_SCENE_PIDS_LIMIT)) {
+    renderer.pids_limit = MIN_SCENE_PIDS_LIMIT;
+    updated = true;
+  }
+  if (!updated) return;
+  const plan = await planTextFile(composeFile, JSON.stringify(compose, null, 2));
+  await saveConfiguration({ ...plan, mode: 0o600 });
 }
 
 export async function prepareIndependentLocal(values, endpoint, localConfig, context) {
@@ -50,14 +221,54 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
   if (await fileExists(localConfig)) {
     const key = await localCredentials(localConfig, endpoint);
     existing = { key, values: parseEnv(await readFile(localConfig, 'utf8')) };
-    if (!values['configure-local']) return { key, localConfig, start: () => startLocal(composeFile, context, values) };
+    if (!values['configure-local']) {
+      const keyState = await checkOpenRouter(existing.values.OPENROUTER_API_KEY ?? '', context);
+      if (keyState.status === 'valid') {
+        return { key, localConfig, start: () => startLocal(composeFile, context, values) };
+      }
+      if (keyState.status === 'rate_limited' || keyState.status === 'unavailable') {
+        log(`Warning: ${keyState.message}`);
+        return { key, localConfig, start: () => startLocal(composeFile, context, values) };
+      }
+      log(`Saved OpenRouter API key is not valid (${keyState.message})`);
+      const replacementKey = await obtainVerifiedOpenRouterKey(context);
+      const sceneToken = existing.values.SCENE_SERVICE_TOKEN ?? randomBytes(32).toString('hex');
+      const models = providerModels(context.env, existing.values);
+      const modelsChanged = Object.entries(models).some(([name, value]) => existing.values[name] !== value)
+        || (Boolean(existing.values.OPENROUTER_SCENE_MODEL) && !models.OPENROUTER_SCENE_MODEL);
+      const repairedSettings = {
+        OPENROUTER_API_KEY: replacementKey,
+        ...models,
+        HOST: '0.0.0.0',
+        MACHINAL_LOCAL_URL: endpoint,
+        MACHINAL_MODE: 'local',
+        MACHINAL_LOCAL_CONTAINER: '1',
+        MACHINAL_LOCAL_TOKEN: key,
+        SCENE_SERVICE_TOKEN: sceneToken,
+        SCENE_SERVICE_URL: existing.values.SCENE_SERVICE_URL || 'http://scene-renderer:8091',
+        DATA_DIR: existing.values.DATA_DIR || '/data',
+      };
+      const profilePlan = await planTextFile(localConfig, formatEnv(repairedSettings));
+      await saveConfiguration({ ...profilePlan, mode: 0o600 });
+      log('Updated OpenRouter API key in local profile.');
+      const synced = await syncOpenRouterKeyToBackend(endpoint, replacementKey, context);
+      if (synced) log('Synced OpenRouter API key to the running local backend.');
+      if (synced && modelsChanged && (values['start-docker'] || (interactive && await ui.confirm({
+        message: 'Restart the local API container to apply repaired OpenRouter model defaults? Existing data volumes are preserved.', default: true,
+      })))) {
+        await startLocal(composeFile, context, { ...values, 'start-docker': true });
+      }
+      return { key, localConfig, start: () => startLocal(composeFile, context, values) };
+    }
   }
   let checkout = await findCheckout(cwd, values['docker-dir']);
+  if (!checkout && !values['docker-dir']) checkout = await savedCheckout(composeFile, context);
   if (!checkout && interactive) {
-    const path = await ui.input({ message: 'Machinal source checkout folder (Docker builds locally)', required: true });
-    checkout = await findCheckout(cwd, path);
+    log(`Local Machinal Studio checkout not detected. Get it at ${MACHINAL_STUDIO_URL}`);
+    const path = await ui.input({ message: 'Machinal Studio folder path (leave empty to cancel)', required: false });
+    if (path?.trim()) checkout = await findCheckout(cwd, path.trim());
   }
-  if (!checkout) throw new InstallerError('Independent local mode needs Docker/Compose and a Machinal source checkout. Use --docker-dir PATH. No public image is assumed and no Machinal account/API key is needed.');
+  if (!checkout) throw new InstallerError(`Local Machinal Studio was not detected. Clone ${MACHINAL_STUDIO_URL}, then rerun setup with --docker-dir PATH. Independent local mode needs Docker/Compose and no Machinal account/API key.`);
   const configuration = await providers(context);
   const approved = values['start-docker'] || (interactive && await ui.confirm({
     message: `Install/start local API + renderer? Downloads dependencies, uses disk/CPU and saves provider secrets in ${directory}. OpenRouter bills your key.`, default: false,
@@ -65,7 +276,7 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
   if (!approved) throw new InstallerError('Local setup cancelled. No provider files or containers were changed. --yes alone does not authorize Docker startup; use --start-docker.');
   const key = existing?.key ?? `local_${randomBytes(32).toString('hex')}`;
   const sceneToken = existing?.values.SCENE_SERVICE_TOKEN ?? randomBytes(32).toString('hex');
-  const settings = { ...configuration, MACHINAL_LOCAL_URL: endpoint, MACHINAL_MODE: 'local', MACHINAL_LOCAL_CONTAINER: '1',
+  const settings = { ...configuration, HOST: '0.0.0.0', MACHINAL_LOCAL_URL: endpoint, MACHINAL_MODE: 'local', MACHINAL_LOCAL_CONTAINER: '1',
     MACHINAL_LOCAL_TOKEN: key, SCENE_SERVICE_TOKEN: sceneToken, SCENE_SERVICE_URL: 'http://scene-renderer:8091', DATA_DIR: '/data' };
   const port = new URL(endpoint).port || '80';
   const host = new URL(endpoint).hostname === '[::1]' ? '[::1]' : '127.0.0.1';
@@ -73,22 +284,25 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
     name: `machinal-local-${directory.split(/[\\/]/).at(-1)}`,
     services: {
       api: { build: { context: join(checkout, 'api'), target: 'runtime' }, ports: [`${host}:${port}:8080`],
+        environment: { HOST: '0.0.0.0' },
         env_file: [localConfig], volumes: ['local-data:/data'], depends_on: ['scene-renderer'], restart: 'unless-stopped', stop_grace_period: '45s' },
       'scene-renderer': { init: true, build: { context: join(checkout, 'services', 'scene-renderer'), target: 'service',
         additional_contexts: { 'client-source': join(checkout, 'client') } },
         environment: { SCENE_SERVICE_TOKEN: sceneToken, SCENE_CACHE_DIR: '/var/cache/scene', SCENE_WORKERS: 'auto' },
-        volumes: ['scene-cache:/var/cache/scene', 'scene-work:/tmp'], shm_size: '1gb', mem_limit: '3g', cpus: 4, pids_limit: 256,
+        volumes: ['scene-cache:/var/cache/scene', 'scene-work:/tmp'], shm_size: '1gb', mem_limit: '3g', cpus: 4, pids_limit: MIN_SCENE_PIDS_LIMIT,
         read_only: true, tmpfs: ['/home/scene:rw,nosuid,size=64m,uid=10001,gid=10001'], cap_drop: ['ALL'], security_opt: ['no-new-privileges:true'], restart: 'unless-stopped' },
     },
     volumes: { 'local-data': {}, 'scene-cache': {}, 'scene-work': {} },
   };
   await mkdir(directory, { recursive: true, mode: 0o700 });
-  const profilePlan = await planTextFile(localConfig, Object.entries(settings).map(([name, value]) => `${name}='${value}'`).join('\n') + '\n');
+  const profilePlan = await planTextFile(localConfig, formatEnv(settings));
   const composePlan = await planTextFile(composeFile, JSON.stringify(compose, null, 2));
   await saveConfiguration({ ...profilePlan, mode: 0o600 });
   await saveConfiguration({ ...composePlan, mode: 0o600 });
   log(`Local profile: ${localConfig}. Keep this file and backups private.`);
   await startLocal(composeFile, context, { ...values, 'start-docker': true });
+  await syncOpenRouterKeyToBackend(endpoint, configuration.OPENROUTER_API_KEY, context);
+  await saveSettings({ localCheckout: checkout }, context);
   return { key, localConfig, start: () => startLocal(composeFile, context, values) };
 }
 
@@ -104,6 +318,7 @@ async function startLocal(composeFile, context, values) {
   if (!values['start-docker'] && !(interactive && await ui.confirm({ message: 'Start the saved independent local Docker profile? Existing data volumes are preserved.', default: false }))) {
     throw new InstallerError('Local API is unavailable. Start its saved Docker profile or rerun with --start-docker. The MCP adapter can still report the connection problem.');
   }
+  await ensureLocalComposeDefaults(composeFile);
   const compose = ['compose', '-f', resolve(composeFile)];
   const images = (await docker([...compose, 'config', '--images'])).split(/\r?\n/).filter(Boolean);
   let build = images.length === 0;

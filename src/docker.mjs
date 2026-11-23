@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import { InstallerError } from './errors.mjs';
 import { DEFAULT_LOCAL_URL } from './setup-options.mjs';
-import { DOCKER_URL } from './presentation.mjs';
+import { DOCKER_URL, MACHINAL_STUDIO_URL } from './presentation.mjs';
 
 const exec = promisify(execFile);
 const COMPOSE_FILE = 'compose.editengine.yaml';
@@ -39,11 +39,37 @@ async function regularFile(file) {
   }
 }
 
+async function isCheckout(root) {
+  return (await Promise.all([COMPOSE_FILE, 'api/Dockerfile', 'services/scene-renderer/Dockerfile'].map((file) => regularFile(join(root, file))))).every(Boolean);
+}
+
+function explicitCandidates(start, explicit) {
+  const cleaned = explicit.trim().replace(/^(['"])(.*)\1$/, '$2').trim();
+  if (!cleaned) return [];
+  const candidates = [resolve(start, cleaned)];
+  if (/^[a-zA-Z]:(?![\\/])/.test(cleaned)) {
+    const rooted = `${cleaned.slice(0, 2)}\\${cleaned.slice(2)}`;
+    const resolved = resolve(start, rooted);
+    if (!candidates.includes(resolved)) candidates.push(resolved);
+  }
+  return candidates;
+}
+
 export async function findCheckout(start, explicit) {
-  let root = resolve(start, explicit ?? '.');
+  if (explicit) {
+    for (const candidate of explicitCandidates(start, explicit)) {
+      if (await isCheckout(candidate)) return candidate;
+      const nested = join(candidate, 'machinal-studio');
+      if (await isCheckout(nested)) return nested;
+    }
+    return null;
+  }
+  let root = resolve(start, '.');
   while (true) {
-    if ((await Promise.all([COMPOSE_FILE, 'api/Dockerfile', 'services/scene-renderer/Dockerfile'].map((file) => regularFile(join(root, file))))).every(Boolean)) return root;
-    if (explicit || dirname(root) === root) return null;
+    if (await isCheckout(root)) return root;
+    const nested = join(root, 'machinal-studio');
+    if (await isCheckout(nested)) return nested;
+    if (dirname(root) === root) return null;
     root = dirname(root);
   }
 }
@@ -62,7 +88,7 @@ export async function prepareLocalDocker(values, url, context) {
     throw new InstallerError('No API is listening at this local URL. The bundled Docker checkout exposes port 8080. Start your custom deployment yourself, or rerun with --mode local --url http://127.0.0.1:8080/mcp. No Docker changes were made.');
   }
   const root = await findCheckout(cwd, values['docker-dir']);
-  if (!root) throw new InstallerError('No running local API or machinal checkout was found. Use --docker-dir PATH to a checkout containing compose.editengine.yaml, api/ and services/scene-renderer/. Configure api/.env first. To use an existing deployment instead, choose --mode server --url YOUR-API. No image is downloaded from an unverified registry.');
+  if (!root) throw new InstallerError(`No running local API or machinal-studio checkout was found. Clone ${MACHINAL_STUDIO_URL} and use --docker-dir PATH to a checkout containing compose.editengine.yaml, api/ and services/scene-renderer/. Configure api/.env first. To use an existing deployment instead, choose --mode server --url YOUR-API. No image is downloaded from an unverified registry.`);
   const docker = context.docker ?? ((args, options = {}) => runDocker(args, { cwd: root, env, ...options }));
   const compose = ['compose', '--project-directory', root, '-f', join(root, COMPOSE_FILE)];
   log(`Local Docker checkout: ${root}. Checking Docker, containers, and images (no changes yet)...`);

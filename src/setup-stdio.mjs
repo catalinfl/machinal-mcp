@@ -49,7 +49,7 @@ export async function setupStdio(values, context) {
     ] }) : defaultScope));
   if (scope === 'project' && dirname(resolve(cwd)) === resolve(cwd)) log('Warning: project setup is running at a drive/filesystem root. Its settings may apply to all descendant projects.');
   const endpoint = await chooseEndpoint(values, context);
-  log(`Connection: ${{ server: 'Machinal Server', local: 'Local', custom: 'Custom server' }[endpoint.mode]}`);
+  log(`Connection: ${{ server: 'Server Machinal (cloud)', local: 'Local', custom: 'Custom server' }[endpoint.mode]}`);
   const local = endpoint.mode === 'local';
   if (!local && (values['docker-dir'] || values['start-docker'] || values['configure-local'])) throw new InstallerError('Docker/provider setup options require --mode local. Server mode never configures providers or Docker.');
   if (local && (values['session-key'] || values['defer-login'])) throw new InstallerError('Local mode uses an automatically generated device token, not a Machinal login.');

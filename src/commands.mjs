@@ -6,7 +6,8 @@ import { compactCreditSummaryLines, creditSummaryLines } from './credits.mjs';
 import { MACHINAL_SERVER_URL, DEFAULT_LOCAL_URL } from './endpoints.mjs';
 import { InstallerError } from './errors.mjs';
 import { readKey } from './keys.mjs';
-import { prepareIndependentLocal } from './local-setup.mjs';
+import { checkSavedOpenRouterKey, prepareIndependentLocal } from './local-setup.mjs';
+import { MACHINAL_STUDIO_URL } from './presentation.mjs';
 import { endpointFiles } from './runtime.mjs';
 import { readSettings, saveSettings, settingsFile } from './settings.mjs';
 
@@ -60,7 +61,7 @@ export async function manageLocal(action, values, context) {
   if (action === 'status') {
     let installed;
     try { installed = await lstat(localConfig); } catch (error) { if (error.code !== 'ENOENT') throw new InstallerError('The local profile is not accessible.'); }
-    if (!installed) { context.log('Local backend: not installed. Run machinal local install --docker-dir PATH.'); return 1; }
+    if (!installed) { context.log(`Local backend: not installed. Clone ${MACHINAL_STUDIO_URL} and run machinal local install --docker-dir PATH.`); return 1; }
     let key;
     try { key = await localCredentials(localConfig, endpoint); } catch {
       context.log('Local backend: profile invalid or unreadable. Check its ownership, permissions and device token; no file was changed.');
@@ -69,9 +70,18 @@ export async function manageLocal(action, values, context) {
     try {
       const result = await (context.checkConnection ?? checkConnection)(endpoint, key, { local: true });
       if (!result.local) throw new InstallerError('The endpoint is not an independent local backend.');
-      context.log(`Local backend: ready · ${endpoint}`);
-      return 0;
     } catch { context.log('Local backend: configured, not verified. Run machinal local install to start it; check Docker and the local device token.'); return 1; }
+    const openRouter = await checkSavedOpenRouterKey(localConfig, context);
+    if (openRouter.status === 'invalid') {
+      context.log(`Local backend: MCP reachable at ${endpoint}, but the saved OpenRouter API key is invalid (${openRouter.message}). Run machinal setup --mode local or machinal local install to enter a working key.`);
+      return 1;
+    }
+    if (openRouter.status !== 'valid') {
+      context.log(`Local backend: ready · ${endpoint} (OpenRouter key not verified: ${openRouter.message})`);
+      return 0;
+    }
+    context.log(`Local backend: ready · ${endpoint}`);
+    return 0;
   }
   const profile = await prepareIndependentLocal(values, endpoint, localConfig, context);
   let result;

@@ -388,3 +388,19 @@ test('stdio bridge supports local recipe, checkpoint, contract and Svelte compon
   }
   assert.equal(upstreamCalls.length, callsBeforeRejects);
 });
+
+test('local stdio bridge connects to machinal-local upstream while server mode rejects it', async (t) => {
+  const cwd = await workspace(t);
+  const endpoint = await serve(t, mcpHandler([], {
+    serverName: 'machinal-local',
+    tools: [{ name: 'list_projects' }, { name: 'get_recipe_schema' }, { name: 'compile_scene' }],
+  }));
+  const localConfig = join(cwd, 'providers.env');
+  await writeFile(localConfig, `MACHINAL_LOCAL_URL='${endpoint}'\nMACHINAL_LOCAL_TOKEN='local_${'d'.repeat(64)}'\n`);
+  const localBridge = new MCPBridge({ url: endpoint, localConfig, env: {}, credentialStore: null });
+  const localStatus = await localBridge.connect();
+  assert.equal(localStatus.status, 'connected');
+  assert.equal(localStatus.toolCount, 3);
+  const serverBridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null });
+  assert.equal((await serverBridge.connect()).status, 'service_error');
+});

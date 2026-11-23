@@ -149,8 +149,9 @@ export async function checkConnection(endpoint, apiKey, { fetchImpl = fetch, tim
     },
   });
 
-  const serverName = initialized.serverInfo?.name;
-  if (typeof serverName !== 'string' || serverName.toLowerCase() !== 'machinal' || !SUPPORTED_VERSIONS.has(initialized.protocolVersion)) {
+  const serverName = typeof initialized.serverInfo?.name === 'string' ? initialized.serverInfo.name.toLowerCase() : '';
+  const isLocalServer = local && serverName === 'machinal-local';
+  if ((serverName !== 'machinal' && !isLocalServer) || !SUPPORTED_VERSIONS.has(initialized.protocolVersion)) {
     throw new InstallerError('This is not a supported machinal MCP endpoint. No configuration was saved.');
   }
 
@@ -169,6 +170,9 @@ export async function checkConnection(endpoint, apiKey, { fetchImpl = fetch, tim
     result.referenceWarning = 'Live editing reference unavailable: update the API for get_editing_reference. Installed guides are offline snapshots; verify the deployed schema/catalog.';
   }
   if (!names.has('get_credits')) {
+    if (isLocalServer) {
+      return { ...result, local: true, creditsWarning: 'Local mode: no Machinal credits or subscription. Provider usage is billed directly to your own API key.' };
+    }
     return { ...result, creditsWarning: 'Live credits unavailable: this API does not expose get_credits. Update the API; no balance was assumed.' };
   }
   try {

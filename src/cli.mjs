@@ -34,7 +34,7 @@ Requires Node.js 22.13+ (22.x) or 24+; Local needs Docker/Compose and a source c
 Options for setup:
   --client opencode|claude|codex|antigravity
   --scope project|global           Default: global for Codex/Antigravity, project otherwise
-  --mode server|local|custom       Machinal Server | independent Local | custom API
+  --mode server|local|custom       Server Machinal (cloud) | independent Local | custom API
   --mode hosted                    Compatibility alias for server
   --url URL                        Custom server URL or optional local URL override
   --docker-dir PATH                Local: machinal source checkout
@@ -72,8 +72,9 @@ Machinal Server uses https://api.machinal.app/mcp automatically; no URL prompt.
 It reads MACHINAL_API_KEY, saved credentials, or hidden entry.
 Custom server asks for your own API URL; --url also selects custom mode for legacy scripts.
 Windows uses Credential Manager. Linux uses a private plaintext credentials.json (0600).
-Local mode asks for OPENROUTER_API_KEY and model settings, builds the source
-checkout with Docker, and keeps private provider settings outside the project.
+Local mode asks only for OPENROUTER_API_KEY (using machinal.app default AI models), builds
+the local checkout (https://github.com/catalinfl/machinal-studio) with Docker, and keeps
+private provider settings outside the project.
 Local requires no Machinal account, subscription, credits or PocketBase.
 OpenRouter usage is charged directly to your own key; local rendering uses your CPU.
 --yes alone never authorizes Docker startup; use --start-docker explicitly.

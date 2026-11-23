@@ -108,6 +108,7 @@ test('local status detects missing installation without Docker, providers or fil
   const ctx = context(home, { docker: () => assert.fail('Status must not install or inspect Docker') });
   assert.equal(await run(['local', 'status'], ctx), 1);
   assert.match(ctx.logs.join('\n'), /not installed/);
+  assert.match(ctx.logs.join('\n'), /https:\/\/github\.com\/catalinfl\/machinal-studio/);
   assert.deepEqual(await readdir(home), []);
 });
 
@@ -121,8 +122,9 @@ test('local installation builds missing images, reuses the saved token and never
   const commands = [];
   const provider = `sk-or-v1-${'a'.repeat(64)}`;
   let online = false;
-  const ctx = context(home, { env: { OPENROUTER_API_KEY: provider, OPENROUTER_MODEL: 'provider/model' },
+  const ctx = context(home, { env: { OPENROUTER_API_KEY: provider },
     credentialStore: { read: () => assert.fail('No hosted key in Local mode') },
+    verifyOpenRouterKey: async () => ({ status: 'valid' }),
     docker: async args => {
       commands.push(args);
       if (args[0] === 'context') return 'unix:///var/run/docker.sock';

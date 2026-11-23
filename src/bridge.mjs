@@ -187,7 +187,9 @@ export class MCPBridge {
       }
       if (!this.key) { this.failure({ status: 401 }); return this.status(); }
       const initialized = await this.rpc('initialize', { protocolVersion: PROTOCOL, capabilities: {}, clientInfo: { name: 'machinal-mcp-adapter', version: VERSION } }, { timeout: 3000 });
-      if (initialized.serverInfo?.name?.toLowerCase() !== 'machinal' || !VERSIONS.includes(initialized.protocolVersion)) throw { protocolError: true };
+      const upstreamName = initialized.serverInfo?.name?.toLowerCase();
+      const validUpstream = upstreamName === 'machinal' || (Boolean(this.localConfig) && upstreamName === 'machinal-local');
+      if (!validUpstream || !VERSIONS.includes(initialized.protocolVersion)) throw { protocolError: true };
       this.protocol = initialized.protocolVersion;
       await this.rpc('notifications/initialized', {}, { notification: true, timeout: 3000 });
       const tools = [];

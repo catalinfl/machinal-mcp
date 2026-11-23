@@ -173,3 +173,13 @@ test('optional credit transport failures degrade to a warning, but HTTP authoriz
     }
   }
 });
+
+test('independent local machinal-local endpoint without get_credits verifies in local mode only', async (t) => {
+  const localTools = [{ name: 'list_projects' }, { name: 'get_recipe_schema' }, { name: 'compile_scene' }];
+  const endpoint = await serve(t, mcpHandler([], { serverName: 'machinal-local', tools: localTools }));
+  const localToken = `local_${'a'.repeat(64)}`;
+  const verified = await checkConnection(endpoint, localToken, { local: true });
+  assert.equal(verified.local, true);
+  assert.equal(verified.toolCount, 3);
+  await assert.rejects(checkConnection(endpoint, API_KEY, { local: false }), /not a supported machinal MCP endpoint/);
+});
