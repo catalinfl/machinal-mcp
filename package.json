@@ -41,8 +41,7 @@
     "test:package": "node --test test/package.smoke.mjs",
     "test:library-package": "node --test test/scene-library-package.smoke.mjs",
     "test:clients": "node --test test/client-detection.smoke.mjs",
-    "test": "node --test test/*.test.mjs",
-    "prepublishOnly": "npm test && npm run test:package && npm run test:library-package"
+    "test": "node --test test/*.test.mjs"
   },
   "publishConfig": {
     "access": "public"
