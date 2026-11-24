@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { lstat, open, realpath, unlink } from 'node:fs/promises';
 import { dirname, isAbsolute, join, basename } from 'node:path';
+import { hydrateProductionContractVersion } from './stdio-files.mjs';
 
 const maxRecipeBytes = 2 * 1024 * 1024;
 const recipeTools = ['validate_recipe', 'compile_recipe', 'generate_assets', 'render_video', 'render_preview'];
@@ -99,6 +100,9 @@ export async function installRecipeFiles(ctx, servers) {
             if (compositionFile !== undefined) {
               if (args.composition !== undefined || args.sourceJobId !== undefined || args.recipeRef !== undefined) throw new Error('Choose compositionFile, composition, recipeRef or sourceJobId, not multiple recipe sources.');
               args.composition = await readRecipe(ctx, context, compositionFile);
+            }
+            if (name === 'compile_recipe' && args.productionContract && typeof args.composition === 'string') {
+              args.productionContract = hydrateProductionContractVersion(args.productionContract, args.composition);
             }
             return original(args, context);
           };

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { writeFile } from 'node:fs/promises';
 import test from 'node:test';
 import { EventEmitter } from 'node:events';
 import { parse } from 'jsonc-parser';
@@ -411,4 +412,100 @@ test('automatic authentication configuration preserves other plugins and merges 
   assert.equal(config.model, 'keep');
   assert.ok(second.includes('// Keep me\r\n'));
   assert.equal(configureOpenCodeAuth(second, 'custom-team', 'https://api.example.com/mcp'), second);
+});
+
+test('local OpenCode companion provides the full editing harness without reading hosted credentials or injecting MACHINAL_API_KEY', async (t) => {
+  const cwd = await workspace(t);
+  const localToken = `local_${'9'.repeat(64)}`;
+  const localConfig = join(cwd, 'providers.env');
+  await writeFile(localConfig, `MACHINAL_LOCAL_URL='${ENDPOINT}'\nMACHINAL_LOCAL_TOKEN='${localToken}'\n`);
+  const runtimeRoot = join(homedir(), '.config', 'machinal', 'runtime');
+  const oldCommand = [process.execPath, join(runtimeRoot, `0.7.2-win32-x64-${'a'.repeat(16)}`, 'bin', 'machinal-stdio.mjs'), 'serve', '--url', ENDPOINT, '--local-config', localConfig];
+  const newScript = join(runtimeRoot, `${VERSION}-win32-x64-${'b'.repeat(16)}`, 'bin', 'machinal-stdio.mjs');
+  const original = new Map([['machinal', { type: 'local', command: oldCommand }]]);
+  const transforms = [];
+  const toolTransforms = [];
+  const hooks = [];
+  let current;
+  const apply = () => {
+    current = structuredClone(original);
+    const editor = { get: (name) => current.get(name), update: (name, fn) => fn(current.get(name)), remove: (name) => current.delete(name) };
+    for (const transform of transforms) transform(editor);
+  };
+  const addedTools = new Map();
+  const updatedTools = new Map();
+  const ctx = {
+    options: { servers: { machinal: ENDPOINT }, commands: { machinal: oldCommand }, localConfigs: { machinal: localConfig } },
+    mcp: {
+      transform: async (fn) => { transforms.push(fn); apply(); },
+      reload: async () => { apply(); },
+      list: async () => ({ data: [...current].map(([name, config]) => ({ name, status: { status: config.disabled ? 'disabled' : 'connected' } })) }),
+    },
+    tool: {
+      transform: async (fn) => {
+        toolTransforms.push(fn);
+        fn({
+          add: (definition) => { addedTools.set(definition.name, definition); },
+          update: (id, updater) => { updatedTools.set(id, updater); },
+        });
+      },
+    },
+    session: { hook: async (_, fn) => { hooks.push(fn); } },
+    permission: { assert: async () => {} },
+    skill: { list: async () => [] },
+  };
+  const store = memoryCredentialStore(API_KEY);
+  let verifiedLocal = false;
+  t.after(await installOpenCodeAuth(ctx, {
+    credentialStore: store, env: { MACHINAL_API_KEY: API_KEY },
+    prepareRuntime: async () => newScript,
+    verify: async (url, key, opts) => {
+      assert.equal(url, ENDPOINT);
+      assert.equal(key, localToken);
+      assert.equal(opts?.local, true);
+      verifiedLocal = true;
+    },
+  }));
+  // Hosted credentials are never read or injected into local stdio commands.
+  assert.deepEqual(store.calls, []);
+  const serverEntry = current.get('machinal');
+  assert.equal(serverEntry.command[1], newScript);
+  assert.equal(serverEntry.environment, undefined);
+  // Full OpenCode editing harness tools are installed.
+  for (const name of ['machinal_connection', 'machinal_prepare_video', 'machinal_library', 'machinal_hyperframes_source', 'machinal_hybrid_edit', 'machinal_quickstart', 'machinal_upload', 'machinal_download']) {
+    assert.ok(addedTools.has(name), `missing harness tool: ${name}`);
+  }
+  assert.ok(updatedTools.has('machinal_compile_scene'));
+  assert.ok(updatedTools.has('machinal_render_video'));
+  assert.ok(updatedTools.has('machinal_validate_recipe'));
+  assert.ok(updatedTools.has('machinal_compile_recipe'));
+  assert.ok(updatedTools.has('machinal_get_job_result'));
+  assert.equal(updatedTools.has('machinal_get_credits'), false, 'local mode must not expose get_credits direct tool');
+  // Quickstart runs in local mode without get_credits.
+  const quickstart = JSON.parse((await addedTools.get('machinal_quickstart').execute({ purpose: 'create', includeBriefGuide: false }, {})).content);
+  assert.equal(quickstart.data.deploymentMode, 'local');
+  assert.equal(quickstart.data.liveBootstrapBatch.includes('get_credits'), false);
+  // machinal_connection status, reconnect and replace behave in local mode without leaking secrets.
+  const connStatus = JSON.parse((await addedTools.get('machinal_connection').execute({ action: 'status' }, { signal: new AbortController().signal, progress: async () => {} })).content);
+  assert.equal(connStatus.mode, 'local');
+  assert.equal(connStatus.source, 'local-profile');
+  assert.equal(connStatus.registrations[0].mode, 'local');
+  assert.equal(connStatus.registrations[0].configuration, 'matched');
+  assert.equal(connStatus.apiKeysURL, undefined);
+  const reconnected = JSON.parse((await addedTools.get('machinal_connection').execute({ action: 'reconnect' }, { signal: new AbortController().signal, progress: async () => {} })).content);
+  assert.equal(verifiedLocal, true);
+  assert.equal(reconnected.mode, 'local');
+  const replaced = JSON.parse((await addedTools.get('machinal_connection').execute({ action: 'replace' }, { signal: new AbortController().signal, progress: async () => {} })).content);
+  assert.equal(replaced.code, 'local-profile-managed');
+  assert.ok(!JSON.stringify({ connStatus, reconnected, replaced }).includes(localToken));
+  assert.ok(!JSON.stringify({ connStatus, reconnected, replaced }).includes(API_KEY));
+  // Context hooks emit local profile guidance without hosted Credential Manager instructions.
+  const event = { system: [] };
+  for (const hook of hooks) await hook(event);
+  const systemText = event.system.map((part) => part.text).join('\n');
+  assert.match(systemText, /Independent Local Docker profile/);
+  assert.match(systemText, /machinal_prepare_video/);
+  assert.match(systemText, /machinal_library/);
+  assert.doesNotMatch(systemText, /Windows Credential Manager/);
+  assert.doesNotMatch(systemText, /machinal\.app\/api-keys/);
 });

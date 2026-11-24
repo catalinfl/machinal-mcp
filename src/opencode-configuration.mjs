@@ -23,7 +23,7 @@ function companion(config, context = {}) {
     const entry = typeof plugins[index] === 'string' ? {} : plugins[index].options ?? {};
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) throw new InstallerError('The machinal authentication plugin options are invalid. No configuration was changed.');
     for (const [key, value] of Object.entries(entry)) {
-      if (['servers', 'commands'].includes(key)) {
+      if (['servers', 'commands', 'localConfigs'].includes(key)) {
         if (!value || typeof value !== 'object' || Array.isArray(value)) throw new InstallerError('The machinal authentication plugin options are invalid. No configuration was changed.');
         options[key] ??= {};
         for (const [name, setting] of Object.entries(value)) {
@@ -71,9 +71,17 @@ export function removeOpenCodeAuthServer(content, name) {
     if (!isMachinalPlugin(entry) || !entry.options?.servers?.[name]) return [entry];
     const servers = { ...entry.options.servers };
     const commands = { ...entry.options.commands };
+    const localConfigs = { ...entry.options.localConfigs };
     delete servers[name];
     delete commands[name];
-    return Object.keys(servers).length ? [{ ...entry, options: { ...entry.options, servers, commands } }] : [];
+    delete localConfigs[name];
+    if (!Object.keys(servers).length) return [];
+    const nextOptions = { ...entry.options, servers };
+    if (Object.keys(commands).length) nextOptions.commands = commands;
+    else delete nextOptions.commands;
+    if (Object.keys(localConfigs).length) nextOptions.localConfigs = localConfigs;
+    else delete nextOptions.localConfigs;
+    return [{ ...entry, options: nextOptions }];
   });
   if (JSON.stringify(plugins) === JSON.stringify(config.plugins)) return content;
   return applyEdits(content, modify(content, ['plugins'], plugins, { formattingOptions: { insertSpaces: true, tabSize: 2 } }));
@@ -88,7 +96,15 @@ export function configureOpenCodeAuth(content, name, url, command, context = {})
   const commands = { ...existing.commands };
   if (command) commands[name] = command;
   else delete commands[name];
-  return writeCompanion(content, current, { ...existing, servers, ...(Object.keys(commands).length ? { commands } : {}) });
+  const localConfigs = { ...existing.localConfigs };
+  if (context.localConfig) localConfigs[name] = context.localConfig;
+  else delete localConfigs[name];
+  const nextOptions = { ...existing, servers };
+  if (Object.keys(commands).length) nextOptions.commands = commands;
+  else delete nextOptions.commands;
+  if (Object.keys(localConfigs).length) nextOptions.localConfigs = localConfigs;
+  else delete nextOptions.localConfigs;
+  return writeCompanion(content, current, nextOptions);
 }
 
 export function upgradeOpenCodeAuth(content, { script, home, env }) {

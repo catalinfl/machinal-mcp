@@ -47,6 +47,8 @@ const roles = {
 export const DISCOVERY_ROLES = Object.keys(roles);
 const stopWords = new Set(['a', 'an', 'the', 'of', 'in', 'on', 'to', 'for', 'with', 'and', 'or',
   'de', 'din', 'la', 'pe', 'cu', 'si', 'un', 'o', 'pentru', 'intre', 'care', 'prin']);
+const imageQueryTerms = new Set(['image', 'images', 'photo', 'photos', 'photograph', 'photographs', 'collage', 'cutout', 'poster',
+  'imagine', 'imagini', 'poza', 'poze', 'fotografie', 'fotografii', 'colaj', 'decupaj', 'afis']);
 const hasPhrase = (text, phrase) => text === phrase || ` ${text} `.includes(` ${phrase} `);
 const normalize = text => text.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').match(/[\p{L}\p{N}]+/gu)?.join(' ') ?? '';
 const words = text => text ? text.split(' ') : [];
@@ -85,7 +87,7 @@ export function buildDiscoveryIndex(templates, hyperframes, native, files) {
     const details = new Set(words(normalize(`${template.description ?? ''} ${(template.whenToUse ?? []).join(' ')}`)));
     const entryRoles = DISCOVERY_ROLES.filter(role => roles[role].names.test(`${id} ${label}`) || template.category === role);
     return [{
-      id, label, name: new Set(words(`${normalize(template.id)} ${label}`)), tags, details, roles: entryRoles,
+      id, label, name: new Set(words(`${id} ${label}`)), tags, details, roles: entryRoles,
       profiles: DISCOVERY_PROFILES.filter(profile => entryRoles.some(role => roles[role].profiles.includes(profile))),
       candidate: {
         id: template.id, label: template.label, description: template.description,
@@ -115,10 +117,12 @@ function scoreCandidate(entry, search) {
   const { format } = entry.candidate;
   const verifiedAspect = format.verifiedAspects.includes(requestedAspect);
   const defaultAspect = requestedAspect && format.defaultAspect === requestedAspect;
+  const imageMatch = entry.candidate.requiredImages.length > 0 && terms.some(term => imageQueryTerms.has(term));
   const reasons = [
     ...(exact ? ['Exact template name'] : phraseMatch ? ['Action phrase in template name'] : []),
     ...(matchingRoles.length ? [`Scene role: ${matchingRoles.join(', ')}`] : []),
     ...(coverage ? [`Matched action terms: ${terms.filter((_, index) => hits[index]).join(', ')}`] : []),
+    ...(imageMatch ? ['Supports attached project images'] : []),
     ...(matchingProfiles.length ? [`Profile fit: ${matchingProfiles.join(', ')}`] : []),
     ...(defaultAspect ? [`Default layout: ${requestedAspect}`] : []),
     ...(verifiedAspect ? [`Recorded runtime capture: ${requestedAspect}`] : []),
@@ -127,6 +131,7 @@ function scoreCandidate(entry, search) {
     + hits.reduce((total, value) => total + value, 0)
     + (terms.length ? 10 * coverage / terms.length : 0)
     + (matchingRole ? 17 : matchingRoles.length ? 14 : 0)
+    + (imageMatch ? 4 : 0)
     + matchingProfiles.length * 2 + (verifiedAspect ? 5 : 0) + (defaultAspect ? 8 : 0)
     + (entry.candidate.editableParameters.length ? 2 : 0);
   return { score, candidate: { ...entry.candidate, roles: entry.roles, profiles: entry.profiles, matchReasons: reasons } };

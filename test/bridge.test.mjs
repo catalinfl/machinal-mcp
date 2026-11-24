@@ -401,6 +401,228 @@ test('local stdio bridge connects to machinal-local upstream while server mode r
   const localStatus = await localBridge.connect();
   assert.equal(localStatus.status, 'connected');
   assert.equal(localStatus.toolCount, 3);
+  assert.equal(localStatus.deployment.kind, 'local');
+  assert.equal(localStatus.deployment.supportsCreditsTool, false);
+  assert.equal(localStatus.deployment.supportsS3, false);
   const serverBridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null });
   assert.equal((await serverBridge.connect()).status, 'service_error');
+});
+
+test('Cloud and Local profiles are strictly separated across initialize, upstream identity, catalog cache and quickstart', async (t) => {
+  const cwd = await workspace(t);
+  const { endpointFiles } = await import('../src/runtime.mjs');
+  const cloudEndpoint = await serve(t, mcpHandler([], {
+    serverName: 'machinal',
+    tools: [{ name: 'list_projects' }, { name: 'get_recipe_schema' }, { name: 'get_credits' }],
+  }));
+  const localEndpoint = await serve(t, mcpHandler([], {
+    serverName: 'machinal-local',
+    tools: [{ name: 'list_projects' }, { name: 'get_recipe_schema' }],
+  }));
+  const localConfig = join(cwd, 'providers.env');
+  await writeFile(localConfig, `MACHINAL_LOCAL_URL='${localEndpoint}'\nMACHINAL_LOCAL_TOKEN='local_${'e'.repeat(64)}'\n`);
+  const mismatchConfig = join(cwd, 'mismatch.env');
+  await writeFile(mismatchConfig, `MACHINAL_LOCAL_URL='${cloudEndpoint}'\nMACHINAL_LOCAL_TOKEN='local_${'f'.repeat(64)}'\n`);
+
+  // Local bridge MUST reject a hosted 'machinal' upstream (strict bidirectional separation).
+  const localToCloud = new MCPBridge({ url: cloudEndpoint, localConfig: mismatchConfig, env: {}, credentialStore: null });
+  assert.equal((await localToCloud.connect()).status, 'service_error');
+
+  // Mode-separated catalog files for the same URL never collide.
+  const localFiles = endpointFiles(localEndpoint, { home: cwd, env: {} }, { local: true });
+  const serverFiles = endpointFiles(localEndpoint, { home: cwd, env: {} }, { local: false });
+  assert.notEqual(localFiles.catalogFile, serverFiles.catalogFile);
+
+  // Even if pointed at the same catalogFile path, mode mismatches never load stale tools/instructions across modes.
+  const sharedCatalog = join(cwd, 'shared-catalog.json');
+  const localBridge = new MCPBridge({ url: localEndpoint, localConfig, catalogFile: sharedCatalog, env: {}, credentialStore: null });
+  assert.equal((await localBridge.connect()).status, 'connected');
+  const serverReadingLocalCache = new MCPBridge({ url: localEndpoint, catalogFile: sharedCatalog, env: {}, credentialStore: null });
+  await serverReadingLocalCache.loadCatalog();
+  assert.deepEqual(serverReadingLocalCache.tools, []);
+  assert.equal(serverReadingLocalCache.instructions, undefined);
+
+  // Initialize instructions and production_quickstart are strictly mode-scoped with zero cross-contamination.
+  const localInit = await localBridge.handle('initialize', { protocolVersion: '2025-11-25' });
+  assert.match(localInit.instructions, /Independent Local Profile/i);
+  assert.match(localInit.instructions, /storage: "volume"|storage=volume/i);
+  assert.doesNotMatch(localInit.instructions, /Below 30 credits|cloud publication must complete|Never reveal signed S3 URLs/i);
+  const localQuickstart = (await localBridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'create', includeBriefGuide: false } })).structuredContent.data;
+  assert.equal(localQuickstart.deploymentMode, 'local');
+  assert.equal(localQuickstart.deployment.supportsCreditsTool, false);
+  assert.equal(localQuickstart.liveBootstrapBatch.includes('get_credits'), false);
+  assert.equal(localQuickstart.onDemandTopics.credits, undefined);
+
+  const cloudBridge = new MCPBridge({ url: 'https://api.machinal.app/mcp', env: {}, credentialStore: null, fetchImpl() { assert.fail('offline initialize/quickstart'); } });
+  const cloudInit = await cloudBridge.handle('initialize', { protocolVersion: '2025-11-25' });
+  assert.match(cloudInit.instructions, /Machinal Cloud Profile/i);
+  assert.match(cloudInit.instructions, /get_credits/);
+  assert.doesNotMatch(cloudInit.instructions, /DEPLOYMENT PROFILE: INDEPENDENT LOCAL DOCKER/i);
+  assert.equal(cloudBridge.status().deployment.kind, 'cloud');
+  const cloudQuickstart = (await cloudBridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'create', includeBriefGuide: false } })).structuredContent.data;
+  assert.equal(cloudQuickstart.deploymentMode, 'cloud');
+  assert.equal(cloudQuickstart.deployment.supportsCreditsTool, true);
+  assert.equal(cloudQuickstart.liveBootstrapBatch.includes('get_credits'), true);
+  assert.ok(cloudQuickstart.onDemandTopics.credits);
+});
+
+test('multimodal tool results preserve structuredContent diagnostics alongside images without duplicating base64', async (t) => {
+  const endpoint = await serve(t, async (request, response) => {
+    const body = JSON.parse(await new Promise((resolve) => {
+      let raw = '';
+      request.on('data', chunk => { raw += chunk; });
+      request.on('end', () => resolve(raw));
+    }));
+    const send = (result) => {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ jsonrpc: '2.0', id: body.id, result }));
+    };
+    if (body.method === 'initialize') return send({ protocolVersion: '2025-11-25', serverInfo: { name: 'machinal', version: '1.0.0' }, capabilities: { tools: {} } });
+    if (body.method === 'notifications/initialized') { response.writeHead(202); response.end(); return; }
+    if (body.method === 'tools/list') return send({ tools: [{ name: 'list_projects' }, { name: 'get_recipe_schema' }, { name: 'inspect_render' }, { name: 'inspect_scene' }] });
+    if (body.params?.name === 'inspect_render') {
+      return send({
+        content: [
+          { type: 'text', text: 'Composed MP4 sample at 5 seconds.' },
+          { type: 'image', data: 'iVBORw0KGgo=', mimeType: 'image/jpeg' },
+        ],
+        structuredContent: {
+          statusCode: 200,
+          data: {
+            audio: { integratedLufs: -14.2, truePeakDbtp: -1.1, clippingRisk: false },
+            frames: [{ index: 0, seconds: 5, imageBase64: 'A'.repeat(500) }],
+          },
+        },
+      });
+    }
+    if (body.params?.name === 'inspect_scene') {
+      return send({
+        content: [
+          { type: 'text', text: JSON.stringify({ statusCode: 200, data: { objects: [{ id: 'hero' }] } }) },
+          { type: 'image', data: 'iVBORw0KGgo=', mimeType: 'image/png' },
+        ],
+        structuredContent: { statusCode: 200, data: { objects: [{ id: 'hero' }] } },
+      });
+    }
+  });
+  const bridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null });
+  await bridge.connect();
+  const renderRes = await bridge.handle('tools/call', { name: 'inspect_render', arguments: { projectId: 'p1', jobId: 'j1', userApproved: true } });
+  assert.equal(renderRes.content.length, 3);
+  const appended = JSON.parse(renderRes.content[2].text);
+  assert.equal(appended.data.audio.integratedLufs, -14.2);
+  assert.equal(appended.data.audio.clippingRisk, false);
+  assert.equal(appended.data.frames[0].imageBase64, undefined, 'large inline base64 should not be duplicated into text JSON');
+  // When upstream already includes a JSON text block, do not duplicate it.
+  const sceneRes = await bridge.handle('tools/call', { name: 'inspect_scene', arguments: { projectId: 'p1', sourceFile: 's.scene.json', userApproved: true } });
+  assert.equal(sceneRes.content.length, 2);
+});
+
+test('search_sound_effects caches successful searches and retries once on transient 502/504 without poisoning connection state', async (t) => {
+  let attempts = 0;
+  let failingAttempts = 0;
+  const endpoint = await serve(t, async (request, response) => {
+    const body = JSON.parse(await new Promise((resolve) => {
+      let raw = '';
+      request.on('data', chunk => { raw += chunk; });
+      request.on('end', () => resolve(raw));
+    }));
+    const send = (result) => {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ jsonrpc: '2.0', id: body.id, result }));
+    };
+    if (body.method === 'initialize') return send({ protocolVersion: '2025-11-25', serverInfo: { name: 'machinal', version: '1.0.0' }, capabilities: { tools: {} } });
+    if (body.method === 'notifications/initialized') { response.writeHead(202); response.end(); return; }
+    if (body.method === 'tools/list') return send({ tools: [{ name: 'list_projects' }, { name: 'get_recipe_schema' }, { name: 'search_sound_effects', annotations: { readOnlyHint: true } }] });
+    if (body.params?.name === 'search_sound_effects') {
+      const q = body.params.arguments?.query;
+      if (q === 'stamp') {
+        attempts++;
+        if (attempts === 1) {
+          return send({ isError: true, content: [{ type: 'text', text: '{"statusCode":504}' }], structuredContent: { statusCode: 504, data: { message: 'Openverse timeout' } } });
+        }
+        return send({ content: [{ type: 'text', text: '{"statusCode":200,"data":{"results":[{"id":"sfx-1"}]}}' }], structuredContent: { statusCode: 200, data: { results: [{ id: 'sfx-1' }] } } });
+      }
+      if (q === 'always-502') {
+        failingAttempts++;
+        response.writeHead(502);
+        response.end();
+        return;
+      }
+    }
+  });
+  const bridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null, soundRetryDelayMs: 0 });
+  await bridge.connect();
+  const first = await bridge.handle('tools/call', { name: 'search_sound_effects', arguments: { query: 'stamp', limit: 3 } });
+  assert.equal(attempts, 2, 'should retry once after transient 504');
+  assert.equal(first.structuredContent.statusCode, 200);
+  // Second identical search hits session cache with zero extra upstream calls.
+  const second = await bridge.handle('tools/call', { name: 'search_sound_effects', arguments: { limit: 3, query: 'stamp' } });
+  assert.equal(attempts, 2, 'identical query should be served from session cache');
+  assert.deepEqual(second.structuredContent.data.results, [{ id: 'sfx-1' }]);
+  // Persistent 502 retries once, returns an error, and keeps the bridge connected.
+  const failed = await bridge.handle('tools/call', { name: 'search_sound_effects', arguments: { query: 'always-502' } });
+  assert.equal(failingAttempts, 2);
+  assert.equal(failed.isError, true);
+  assert.equal(bridge.state.status, 'connected');
+});
+
+test('compile_recipe hydrates productionContract.compositionVersion when set to auto and preserves omitted or explicit values verbatim', async (t) => {
+  const cwd = await workspace(t);
+  const { compositionVersionHash } = await import('../src/stdio-files.mjs');
+  const upstreamCalls = [];
+  const endpoint = await serve(t, async (request, response) => {
+    const body = JSON.parse(await new Promise((resolve) => {
+      let raw = '';
+      request.on('data', chunk => { raw += chunk; });
+      request.on('end', () => resolve(raw));
+    }));
+    const send = (result) => {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ jsonrpc: '2.0', id: body.id, result }));
+    };
+    if (body.method === 'initialize') return send({ protocolVersion: '2025-11-25', serverInfo: { name: 'machinal', version: '1.0.0' }, capabilities: { tools: {} } });
+    if (body.method === 'notifications/initialized') { response.writeHead(202); response.end(); return; }
+    if (body.method === 'tools/list') return send({ tools: [{ name: 'list_projects' }, { name: 'get_recipe_schema' }, { name: 'compile_recipe' }] });
+    if (body.method === 'tools/call') {
+      upstreamCalls.push(body.params);
+      return send({ content: [{ type: 'text', text: '{"statusCode":200,"data":{"diagnostics":[],"requirements":[]}}' }], structuredContent: { statusCode: 200, data: { diagnostics: [], requirements: [] } } });
+    }
+  });
+  const bridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null, fileRoots: [cwd] });
+  await bridge.connect();
+  const recipe = 'document:\r\n  version: 2\r\n';
+  const expected = compositionVersionHash(recipe);
+  const recipePath = join(cwd, 'test.edit.yaml');
+  const contractPath = join(cwd, 'contract.json');
+  await writeFile(recipePath, recipe, 'utf8');
+  await writeFile(contractPath, JSON.stringify({ version: 1, compositionVersion: 'auto', beats: [{ id: 'b1' }] }), 'utf8');
+
+  await bridge.handle('tools/call', {
+    name: 'compile_recipe',
+    arguments: { projectId: 'owned', compositionFile: recipePath, productionContractFile: contractPath },
+  });
+  assert.equal(upstreamCalls.at(-1).arguments.productionContract.compositionVersion, expected);
+
+  // Inline 'auto' is also hydrated.
+  await bridge.handle('tools/call', {
+    name: 'compile_recipe',
+    arguments: { projectId: 'owned', composition: recipe, productionContract: { version: 1, compositionVersion: 'auto', beats: [{ id: 'b1' }] } },
+  });
+  assert.equal(upstreamCalls.at(-1).arguments.productionContract.compositionVersion, expected);
+
+  // Omitted compositionVersion is passed verbatim without mutating the caller's contract.
+  await bridge.handle('tools/call', {
+    name: 'compile_recipe',
+    arguments: { projectId: 'owned', composition: recipe, productionContract: { version: 1, beats: [{ id: 'b1' }] } },
+  });
+  assert.equal(upstreamCalls.at(-1).arguments.productionContract.compositionVersion, undefined);
+
+  // Explicit hash is preserved untouched.
+  const explicit = `sha256:${'9'.repeat(64)}`;
+  await bridge.handle('tools/call', {
+    name: 'compile_recipe',
+    arguments: { projectId: 'owned', composition: recipe, productionContract: { version: 1, compositionVersion: explicit, beats: [{ id: 'b1' }] } },
+  });
+  assert.equal(upstreamCalls.at(-1).arguments.productionContract.compositionVersion, explicit);
 });

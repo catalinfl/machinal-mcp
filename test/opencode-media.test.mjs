@@ -184,3 +184,15 @@ test('untrusted descriptors and error payloads never leak URLs, credentials or s
   assert.ok(!JSON.stringify(result).includes(TOKEN));
   assert.deepEqual(await readdir(directory), []);
 });
+
+test('local connections default downloads to storage=volume and refuse storage=s3', async (t) => {
+  const directory = await workspace(t);
+  const server = await api(t, directory);
+  const h = await host({ getConnection: async () => ({ endpoint: server.endpoint, key: API_KEY, local: true }) });
+  const ok = await h.execute({ projectId: 'owned', jobId: JOB_ID, userApproved: true });
+  assert.equal(ok.status, 'completed');
+  assert.deepEqual(server.calls.find(({ body }) => body).body, { file: 'video.mp4', storage: 'volume' });
+  const rejected = await h.execute({ projectId: 'owned', file: 'photo.png', storage: 's3', directory, userApproved: true });
+  assert.equal(rejected.status, 'failed');
+  assert.match(rejected.error, /S3 is unavailable in independent local mode/);
+});

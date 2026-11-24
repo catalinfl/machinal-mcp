@@ -6,14 +6,18 @@ import { normalizeEndpoint, validateAPIKey, isLoopbackEndpoint } from './connect
 import { createCredentialStore } from './credential-store.mjs';
 import { VERSION } from './version.mjs';
 import { MACHINAL_SERVER_URL } from './endpoints.mjs';
+import { describeDeployment } from './deployment.mjs';
 import { RequestScheduler, requestClass, requestLimits } from './request-scheduler.mjs';
-import { SceneLibrary, LIBRARY_TOOLS, LIBRARY_TOPICS, LIBRARY_INSTRUCTIONS } from './scene-library.mjs';
+import { SceneLibrary, LIBRARY_TOOLS, LIBRARY_TOPICS, libraryInstructions } from './scene-library.mjs';
 import { decorateStdioTool, parseAllowedRoots, prepareStdioToolCall } from './stdio-files.mjs';
 
 const MAX_REQUEST = 4 * 1024 * 1024;
 const MAX_RESPONSE = 2 * 1024 * 1024;
 const MAX_PENDING_REQUESTS = 64;
 const DEFAULT_MAX_WAIT_SECONDS = 120;
+const SOUND_CACHE_TTL_MS = 5 * 60 * 1000;
+const SOUND_CACHE_MAX_ENTRIES = 64;
+const TRANSIENT_GATEWAY_STATUSES = new Set([502, 503, 504]);
 const PROTOCOL = '2025-11-25';
 const VERSIONS = ['2025-03-26', '2025-06-18', PROTOCOL];
 const CLIENT_VERSIONS = ['2024-11-05', ...VERSIONS];
@@ -78,9 +82,10 @@ async function jsonResponse(response) {
 }
 
 export class MCPBridge {
-  constructor({ url, localConfig, catalogFile, env = process.env, credentialStore = createCredentialStore({ env }), fetchImpl = fetch, signal, notify = () => {}, maxWaitSeconds, fileRoots }) {
+  constructor({ url, localConfig, catalogFile, env = process.env, credentialStore = createCredentialStore({ env }), fetchImpl = fetch, signal, notify = () => {}, maxWaitSeconds, fileRoots, soundRetryDelayMs = 500 }) {
     this.url = normalizeEndpoint(url);
     this.localConfig = localConfig;
+    this.deployment = describeDeployment({ local: Boolean(localConfig), url: this.url });
     this.catalogFile = catalogFile;
     this.env = env;
     this.credentialStore = credentialStore;
@@ -89,15 +94,17 @@ export class MCPBridge {
     this.notify = notify;
     this.maxWaitSeconds = parseMaxWaitSeconds(maxWaitSeconds, env);
     this.allowedRoots = parseAllowedRoots(fileRoots, env);
+    this.soundRetryDelayMs = soundRetryDelayMs;
+    this.soundSearchCache = new Map();
     this.tools = [];
     this.state = { status: 'unchecked', message: 'Connection has not been checked.' };
     this.nextID = 0;
     this.key = null;
-    this.library = new SceneLibrary();
+    this.library = new SceneLibrary(undefined, { mode: this.deployment.kind });
   }
 
   status() {
-    return { ...this.state, transport: 'connected', mode: this.localConfig ? 'local' : 'server', endpoint: this.url,
+    return { ...this.state, transport: 'connected', mode: this.localConfig ? 'local' : 'server', deployment: this.deployment, endpoint: this.url,
       requestConcurrency: requestLimits,
       maxWaitSeconds: this.maxWaitSeconds,
       credentialSource: this.credentialSource ?? 'unchecked',
@@ -113,7 +120,11 @@ export class MCPBridge {
     if (!this.catalogFile) return;
     try {
       const cached = JSON.parse(await privateFile(this.catalogFile));
-      if (cached.url === this.url) {
+      const expectedMode = this.localConfig ? 'local' : 'server';
+      const modeMatches = cached.mode === expectedMode
+        || (cached.mode === undefined && !this.localConfig
+          && !/machinal-local|Independent local profile|No credit tool exists/i.test(cached.instructions ?? ''));
+      if (cached.url === this.url && modeMatches) {
         this.tools = validTools(cached.tools);
         if (typeof cached.instructions === 'string') this.instructions = cached.instructions;
       }
@@ -188,7 +199,8 @@ export class MCPBridge {
       if (!this.key) { this.failure({ status: 401 }); return this.status(); }
       const initialized = await this.rpc('initialize', { protocolVersion: PROTOCOL, capabilities: {}, clientInfo: { name: 'machinal-mcp-adapter', version: VERSION } }, { timeout: 3000 });
       const upstreamName = initialized.serverInfo?.name?.toLowerCase();
-      const validUpstream = upstreamName === 'machinal' || (Boolean(this.localConfig) && upstreamName === 'machinal-local');
+      const expectedUpstream = this.localConfig ? 'machinal-local' : 'machinal';
+      const validUpstream = upstreamName === expectedUpstream;
       if (!validUpstream || !VERSIONS.includes(initialized.protocolVersion)) throw { protocolError: true };
       this.protocol = initialized.protocolVersion;
       await this.rpc('notifications/initialized', {}, { notification: true, timeout: 3000 });
@@ -207,7 +219,13 @@ export class MCPBridge {
       this.state = { status: 'connected', message: 'Connected to the configured service.' };
       if (this.catalogFile) {
         try {
-          await cacheCatalog(this.catalogFile, { url: this.url, tools, instructions: this.instructions });
+          await cacheCatalog(this.catalogFile, {
+            url: this.url,
+            mode: this.localConfig ? 'local' : 'server',
+            deployment: this.deployment.kind,
+            tools,
+            instructions: this.instructions,
+          });
         } catch { /* Losing the non-secret catalog cache must not break a live connection. */ }
       }
       if (changed) this.notify({ jsonrpc: '2.0', method: 'notifications/tools/list_changed' });
@@ -216,13 +234,23 @@ export class MCPBridge {
   }
 
   async handle(method, params = {}, signal) {
-    if (method === 'initialize') return {
-      protocolVersion: CLIENT_VERSIONS.includes(params.protocolVersion) ? params.protocolVersion : PROTOCOL,
-      serverInfo: { name: 'machinal', version: VERSION }, capabilities: { tools: { listChanged: true }, resources: {} },
-      instructions: ['Machinal MCP adapter. Call connection_status to distinguish login required, account restrictions or network problems. Never request keys in chat. Reconnect only retries free discovery, never jobs. Recover existing job IDs before retrying any ambiguous submission. User approval is still required for media access, generation, rendering and downloads.',
-         this.localConfig ? 'Independent local profile: no Machinal account, subscription or credits. AI usage is billed directly to the owner\'s provider key; local rendering uses their hardware. Use storage=volume for local media; there is no configured S3 bucket. Never fabricate a hosted credit balance.' : '', this.instructions,
-         (await this.library.bytes('guides/client-bootstrap.md')).toString('utf8'), LIBRARY_INSTRUCTIONS].filter(Boolean).join('\n\n'),
-    };
+    if (method === 'initialize') {
+      const adapterBanner = this.localConfig
+        ? 'Machinal MCP adapter — Independent Local Profile (Docker / self-hosted on this machine). No Machinal cloud account, login, S3 bucket or Machinal credits apply. Call connection_status to diagnose local device-token or container issues. Never request keys in chat. Reconnect only retries free discovery, never jobs. Recover existing job IDs before retrying any ambiguous submission. User approval is still required for media access, provider-billed generation, rendering and downloads.'
+        : `Machinal MCP adapter — ${this.deployment.kind === 'cloud' ? 'Machinal Cloud Profile (hosted server)' : 'Custom Hosted Server Profile'}. Call connection_status to distinguish login required, account restrictions or network problems. Never request keys in chat. Reconnect only retries free discovery, never jobs. Recover existing job IDs before retrying any ambiguous submission. User approval is still required for media access, generation, rendering and downloads.`;
+      const profileGuide = this.localConfig ? 'guides/client-bootstrap-local.md' : 'guides/client-bootstrap-cloud.md';
+      return {
+        protocolVersion: CLIENT_VERSIONS.includes(params.protocolVersion) ? params.protocolVersion : PROTOCOL,
+        serverInfo: { name: 'machinal', version: VERSION }, capabilities: { tools: { listChanged: true }, resources: {} },
+        instructions: [
+          adapterBanner,
+          this.instructions,
+          (await this.library.bytes(profileGuide)).toString('utf8'),
+          (await this.library.bytes('guides/client-bootstrap-core.md')).toString('utf8'),
+          libraryInstructions(this.deployment.kind),
+        ].filter(Boolean).join('\n\n'),
+      };
+    }
     if (method === 'ping') return {};
     if (method === 'tools/list') {
       if (this.state.status === 'unchecked') await this.connect();
@@ -286,12 +314,19 @@ export class MCPBridge {
             };
             result = { ...result, content: [{ type: 'text', text: JSON.stringify(updated) }], structuredContent: updated };
           }
+        } else if (params.name === 'search_sound_effects') {
+          result = await this.callSoundSearch(callParams, signal);
         } else {
           result = await this.rpc(method, callParams, { signal });
         }
         if ([401, 402, 403, 429].includes(result.structuredContent?.statusCode)) this.failure({ status: result.structuredContent.statusCode });
+        result = preserveMultimodalStructuredContent(result);
         return prepared.postProcess ? await prepared.postProcess(result) : result;
       } catch (error) {
+        if (params.name === 'search_sound_effects' && TRANSIENT_GATEWAY_STATUSES.has(error?.status)) {
+          return toolResult({ statusCode: error.status,
+            message: 'Sound-effect catalog search returned a transient gateway error after one bounded retry. The MCP connection remains available; retry shortly or narrow the query.' }, true);
+        }
         this.failure(error);
         return toolResult({ ...this.status(), submissionState: 'unknown',
           warning: 'No automatic retry was made. The service may have accepted the operation before the connection was lost. Recover its existing job/idempotency key before resubmitting.' }, true);
@@ -347,6 +382,92 @@ export class MCPBridge {
     }
     return result;
   }
+
+  // Strictly read-only free catalog search: bounded session cache + at most one retry on 502/503/504 gateway hiccups.
+  async callSoundSearch(callParams, signal) {
+    const key = canonicalJSON(callParams.arguments ?? {});
+    const now = Date.now();
+    const cached = this.soundSearchCache.get(key);
+    if (cached && now - cached.storedAt < SOUND_CACHE_TTL_MS) {
+      return structuredClone(cached.result);
+    }
+    if (cached) this.soundSearchCache.delete(key);
+
+    const attempt = async () => this.rpc('tools/call', callParams, { signal });
+    let result;
+    try {
+      result = await attempt();
+      if (TRANSIENT_GATEWAY_STATUSES.has(result?.structuredContent?.statusCode)) {
+        await abortableDelay(this.soundRetryDelayMs, signal);
+        result = await attempt();
+      }
+    } catch (error) {
+      if (!TRANSIENT_GATEWAY_STATUSES.has(error?.status)) throw error;
+      await abortableDelay(this.soundRetryDelayMs, signal);
+      result = await attempt();
+    }
+    if (!result?.isError && result?.structuredContent?.statusCode === 200) {
+      this.soundSearchCache.set(key, { storedAt: Date.now(), result: structuredClone(result) });
+      if (this.soundSearchCache.size > SOUND_CACHE_MAX_ENTRIES) {
+        this.soundSearchCache.delete(this.soundSearchCache.keys().next().value);
+      }
+    }
+    return result;
+  }
+}
+
+function canonicalJSON(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalJSON).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonicalJSON(value[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function abortableDelay(ms, signal) {
+  if (!ms || ms <= 0) {
+    signal?.throwIfAborted();
+    return Promise.resolve();
+  }
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) { reject(signal.reason); return; }
+    const onAbort = () => { clearTimeout(timer); reject(signal.reason); };
+    const timer = setTimeout(() => { signal?.removeEventListener('abort', onAbort); resolve(); }, ms);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+function stripInlineImagePayloads(value) {
+  if (Array.isArray(value)) return value.map(stripInlineImagePayloads);
+  if (!value || typeof value !== 'object') return value;
+  const out = {};
+  for (const [key, item] of Object.entries(value)) {
+    if (['data', 'base64', 'imageBase64', 'pngBase64', 'jpegBase64'].includes(key) && typeof item === 'string' && item.length > 256) continue;
+    out[key] = stripInlineImagePayloads(item);
+  }
+  return out;
+}
+
+function preserveMultimodalStructuredContent(result) {
+  if (!result || typeof result !== 'object' || !result.structuredContent || typeof result.structuredContent !== 'object') return result;
+  if (!Array.isArray(result.content) || !result.content.some(part => part?.type === 'image')) return result;
+  const alreadyHasStructuredJson = result.content.some(part => {
+    if (part?.type !== 'text' || typeof part.text !== 'string') return false;
+    const trimmed = part.text.trim();
+    if (!trimmed.startsWith('{')) return false;
+    try {
+      const parsed = JSON.parse(trimmed);
+      return Boolean(parsed && typeof parsed === 'object' && ('statusCode' in parsed || 'data' in parsed));
+    } catch {
+      return false;
+    }
+  });
+  if (alreadyHasStructuredJson) return result;
+  const sanitized = stripInlineImagePayloads(result.structuredContent);
+  return {
+    ...result,
+    content: [...result.content, { type: 'text', text: JSON.stringify(sanitized) }],
+  };
 }
 
 function validTools(tools) {

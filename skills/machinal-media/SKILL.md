@@ -5,6 +5,8 @@ description: Safely browse machinal media with consent, upload client sources to
 
 # Media consent and delivery
 
+**Cloud vs Local storage boundary:** Check `connection_status.deployment.kind`. On **Machinal Cloud / hosted server (`cloud` | `custom-server`)**, storage supports `s3`, `volume`, and `all` with signed S3 redirects for cloud files. In **independent local Docker mode (`local` / `machinal-local`)**, storage is `volume` ONLY (S3 is unsupported/not configured) and delivery links are loopback `same-machine` links unless `PUBLIC_API_URL` is configured.
+
 For inspected server-mounted sources, pin the returned `sourceVersion` during import to reject changed files; use actual returned project filenames afterwards.
 
 Processing and delivery are separate: keep generation, text preparation, scene compilation and rendering in Directional. Do not create Python/FFmpeg render pipelines or HTTP bridges. Use ordinary host transfer tools only for approved uploads and final MP4 delivery. Preserve the approved destination unless the user changes it; clarify an ambiguous 'no download' request rather than silently cancelling final delivery. Author YAML recipes. Prefer bounded server waits and resolved YAML/sourceJobId reuse.

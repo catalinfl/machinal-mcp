@@ -5,7 +5,7 @@ description: Handle machinal post-usage credits, approximate estimates, low bala
 
 # Credit-aware editing
 
-First inspect `get_credits`: `data.mode=local` with `machinalCreditsRequired=false` is the independent local profile, not a failed/empty wallet. It needs no Machinal account, subscription or credits. Do not apply hosted-wallet thresholds or credit tariffs there. AI usage is billed directly to the user's own provider key; local rendering uses their hardware. Reuse existing provider-spending/source permission and retain idempotent recovery. The wallet rules below apply to hosted/server mode only.
+**Cloud vs Local boundary:** Check `connection_status.deployment.kind` (`local` vs `cloud` vs `custom-server`) before checking credits. In the **independent local Docker profile (`local` / `machinal-local`)**, no Machinal account, subscription or credits exist — `get_credits` is absent or returns `data.mode=local` with `machinalCreditsRequired=false` (not a failed/empty wallet). Do not apply hosted-wallet thresholds or credit tariffs in Local mode. AI usage is billed directly to the user's own provider key; local rendering uses their hardware. Reuse existing provider-spending/source permission and retain idempotent recovery. The wallet rules below apply to Machinal Cloud / hosted server mode only.
 
 Use the deployed `mcpPricing.speechMinimumCredits` / `transcriptionMinimumCredits`: each new voice or caption/transcription provider request has a minimum of 1 credit when verified consumption is positive. Higher usage keeps its calculated charge. Explicit zero-cost usage stays zero; unknown usage stays pending. Reusing resolved assets/captions or cached transcripts makes no new provider charge. This is not a fixed one-credit quote for every job.
 

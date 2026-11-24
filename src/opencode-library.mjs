@@ -1,4 +1,4 @@
-import { SceneLibrary, LIBRARY_TOOLS, LIBRARY_TOPICS, LIBRARY_INSTRUCTIONS } from './scene-library.mjs';
+import { SceneLibrary, LIBRARY_TOOLS, LIBRARY_TOPICS, libraryInstructions } from './scene-library.mjs';
 
 const discovered = new Map();
 export function hasSceneCandidates(sessionID) { return discovered.has(sessionID); }
@@ -9,8 +9,8 @@ function recordDiscovery(sessionID, data) {
   if (discovered.size > 128) discovered.delete(discovered.keys().next().value);
 }
 
-export async function installSceneLibrary(ctx, servers = []) {
-  const library = new SceneLibrary();
+export async function installSceneLibrary(ctx, servers = [], { mode = 'cloud' } = {}) {
+  const library = new SceneLibrary(undefined, { mode });
   const names = [...servers];
   await ctx.tool.transform(editor => {
     for (const server of names) {
@@ -48,7 +48,7 @@ export async function installSceneLibrary(ctx, servers = []) {
     }
   });
   await ctx.session.hook('context', event => {
-    event.system.push({ type: 'text', text: LIBRARY_INSTRUCTIONS
-      + ' In OpenCode use machinal_library for all authoring guides, skills, cinema, profiles and templates, and machinal_hyperframes_source for original file reads. If those native tools are not registered, use get_library_reference/get_hyperframes_source on the installed stdio adapter; this is not a credential error. get_editing_reference is routed locally for authoring topics; scene-runtime, schema, credits and execution remain live service contracts. These native local tools remain available when the remote MCP is disconnected.' });
+    event.system.push({ type: 'text', text: libraryInstructions(mode)
+      + ` In OpenCode use machinal_library for all authoring guides, skills, cinema, profiles and templates, and machinal_hyperframes_source for original file reads. If those native tools are not registered, use get_library_reference/get_hyperframes_source on the installed stdio bridge; this is not a credential error. get_editing_reference is routed locally for authoring topics; scene-runtime, schema${mode === 'local' ? '' : ', credits'} and execution remain live service contracts. These native offline tools remain available when the remote MCP is disconnected.` });
   });
 }

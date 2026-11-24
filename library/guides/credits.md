@@ -1,6 +1,8 @@
 # machinal credit-aware editing
 
-Independent local profile: `get_credits` returns `data.mode=local` and `machinalCreditsRequired=false`, not a wallet. No Machinal account, subscription, credits or PocketBase are required. AI calls use the owner's provider key and can incur direct charges; local rendering uses local hardware. Preserve spending/source approval and idempotent recovery. All wallet/tariff rules below apply only to hosted/server mode.
+> **Cloud vs Local scope:** This guide's Machinal wallet and tariff rules apply **ONLY to Machinal Cloud / Hosted Server (`connection_status.deployment.kind: cloud | custom-server`)**.
+>
+> **Independent local Docker profile (`deployment.kind: local` / `machinal-local`):** No Machinal account, subscription, credits or PocketBase exist; `get_credits` is either omitted from the local catalog or returns `data.mode=local` and `machinalCreditsRequired=false`. Never treat an absent or `mode=local` credit tool as an empty/failed wallet, and never apply hosted-wallet thresholds (such as 30-credit warnings) or Machinal render tariffs in Local mode. AI calls use the owner's provider key directly and can incur direct provider charges; local rendering uses their hardware. Preserve spending/source approval and idempotent recovery. All wallet/tariff rules below apply only to Cloud / hosted server mode.
 
 Use get_credits for live account values. The tool is account-scoped by the current API key; do not provide a user/owner ID, credentials or a PocketBase token. Reading credits does not submit billable generation/rendering or initiate a purchase. The existing ledger may apply the normal monthly renewal on access.
 

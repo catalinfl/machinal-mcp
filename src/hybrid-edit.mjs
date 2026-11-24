@@ -1,11 +1,16 @@
 const actions = ['camera', 'layers', 'spatial'];
 const aspects = ['landscape', 'portrait', 'classic'];
 const resolutions = ['1080p', '720p'];
+const transitionFields = {
+  preset: { type: 'string', minLength: 1, maxLength: 128, description: 'Chosen catalog transition preset ID (e.g. wipe-left, slide-left, split-panels, cross-dissolve).' },
+  duration: { type: 'number', minimum: 0.1, maximum: 86400, description: 'Outgoing transition duration in seconds; adds a source handle without shifting the next cue.' },
+};
 const beatFields = {
   id: { type: 'string', minLength: 1, maxLength: 128, description: 'Stable clip ID.' },
   action: { type: 'string', enum: actions, description: 'camera = a still with native timeline treatment; layers = independent 2D action; spatial = genuine 3D action.' },
-  duration: { type: 'number', minimum: 0.1, maximum: 86400, description: 'Measured beat seconds until the next cue. An outgoing dissolve adds a source handle, not time to this cue.' },
-  dissolve: { type: 'number', minimum: 0.1, description: 'Optional outgoing native cross-dissolve in seconds. Omit for a cut.' },
+  duration: { type: 'number', minimum: 0.1, maximum: 86400, description: 'Measured beat seconds until the next cue. An outgoing dissolve/transition adds a source handle, not time to this cue.' },
+  dissolve: { type: 'number', minimum: 0.1, description: 'Optional outgoing native cross-dissolve in seconds. Omit for a cut. Mutually exclusive with transition.' },
+  transition: { type: 'object', additionalProperties: false, required: ['preset', 'duration'], properties: transitionFields, description: 'Optional outgoing native transition with any catalog preset (e.g. wipe-left, slide-left, fade-black). Mutually exclusive with dissolve.' },
   look: { type: 'string', minLength: 1, maxLength: 128, description: 'Camera beat: chosen catalog look ID. Defaults to creator-natural.' },
   motion: { type: 'string', minLength: 1, maxLength: 128, description: 'Camera beat: chosen catalog motion ID, e.g. ken-burns or none. Defaults to drift.' },
   assetId: { type: 'string', minLength: 1, maxLength: 256, description: 'Actual approved project image or matching pinned scene asset ID. Omit when still to be bound; never invent one.' },
@@ -53,12 +58,27 @@ export function planHybridEdit(input) {
         throw new Error(`${field} must be a catalog ID on a camera beat.`);
     }
     ids.add(beat.id);
+    if (beat.dissolve !== undefined && beat.transition !== undefined) {
+      throw new Error(`Beat ${beat.id} cannot specify both dissolve and transition.`);
+    }
     const span = microseconds(beat.duration, `${beat.id}.duration`);
-    const handle = beat.dissolve === undefined ? 0 : microseconds(beat.dissolve, `${beat.id}.dissolve`);
+    let handle = 0;
+    let transitionPreset;
+    let customTransition = false;
+    if (beat.transition !== undefined) {
+      knownFields(beat.transition, transitionFields, `${beat.id}.transition`);
+      if (!identifier(beat.transition.preset, 128)) throw new Error(`${beat.id}.transition.preset must be a catalog transition ID.`);
+      handle = microseconds(beat.transition.duration, `${beat.id}.transition.duration`);
+      transitionPreset = beat.transition.preset.trim();
+      customTransition = true;
+    } else if (beat.dissolve !== undefined) {
+      handle = microseconds(beat.dissolve, `${beat.id}.dissolve`);
+      transitionPreset = 'cross-dissolve';
+    }
     const source = span + handle;
     if (beat.action !== 'camera' && (source > 60e6 || !beat.assetId && source < 1e6))
       throw new Error(`Scene ${beat.id} exceeds source limits including its outgoing handle (60s maximum; 1s minimum for a new scene).`);
-    return { ...beat, span, handle, source };
+    return { ...beat, span, handle, source, transitionPreset, customTransition };
   });
 
   const short = resolution === '720p' ? 720 : 1080;
@@ -68,7 +88,7 @@ export function planHybridEdit(input) {
   const transitions = [], newScenes = [], missingAssetFor = [], pinnedScenes = [];
   let start = 0, newSceneFrames = 0;
   for (const [i, shot] of shots.entries()) {
-    const { id, assetId, action, source, span, handle } = shot;
+    const { id, assetId, action, source, span, handle, transitionPreset, customTransition } = shot;
     const duration = source / 1e6;
     if (start + source > 86400e6) throw new Error('Timeline exceeds 24 hours.');
     if (handle) {
@@ -76,8 +96,8 @@ export function planHybridEdit(input) {
       if (!next) throw new Error('The last beat has no outgoing junction.');
       const reserve = action === 'camera' && next.action === 'camera' ? 0 : 100000;
       if (handle > next.span || 2 * handle > Math.min(source, next.source) - reserve)
-        throw new Error(`Dissolve after ${id} exceeds available handles; shorten it without shifting the cue.`);
-      transitions.push({ id: `hybrid-dissolve-${i + 1}`, trackId: track.id, leftClipId: id, rightClipId: next.id, preset: 'cross-dissolve', duration: handle / 1e6 });
+        throw new Error(`${customTransition ? 'Transition' : 'Dissolve'} after ${id} exceeds available handles; shorten it without shifting the cue.`);
+      transitions.push({ id: `${customTransition ? 'hybrid-transition' : 'hybrid-dissolve'}-${i + 1}`, trackId: track.id, leftClipId: id, rightClipId: next.id, preset: transitionPreset, duration: handle / 1e6 });
     }
     const clip = { id, ...(assetId ? { assetId } : {}), start: start / 1e6, inPoint: 0, outPoint: duration };
     if (!assetId) missingAssetFor.push(id);

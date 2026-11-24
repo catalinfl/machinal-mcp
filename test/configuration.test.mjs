@@ -126,6 +126,36 @@ test('Linux OpenCode setup registers the companion without storing a key in clie
   const cwd = await workspace(t);
   const plan = await planConfiguration({ ...connection, cwd, home: cwd, env: {}, platform: 'linux' });
   assert.equal(plan.automaticAuth, true);
+  assert.equal(plan.openCodeCompanion, true);
   assert.match(plan.content, /opencode-plugin|@machinal\/mcp/);
   assert.doesNotMatch(plan.content, /mach_[a-f\d]{64}/);
+});
+
+test('OpenCode local setup registers the full companion harness with localConfigs and clears localConfigs when switching back to cloud', async t => {
+  const cwd = await workspace(t);
+  const localConfig = join(cwd, 'providers.env');
+  const localPlan = await planConfiguration({
+    client: 'opencode', scope: 'project', cwd, home: cwd, env: {},
+    url: 'http://127.0.0.1:8080/mcp', name: 'machinal', transport: 'stdio',
+    script: join(cwd, 'bin', 'machinal-stdio.mjs'), localConfig, platform: 'win32',
+  });
+  assert.equal(localPlan.automaticAuth, false);
+  assert.equal(localPlan.openCodeCompanion, true);
+  const localParsed = JSON.parse(localPlan.content);
+  assert.equal(localParsed.plugins.length, 1);
+  assert.equal(localParsed.plugins[0].options.servers.machinal, 'http://127.0.0.1:8080/mcp');
+  assert.equal(localParsed.plugins[0].options.localConfigs.machinal, localConfig);
+  assert.ok(localParsed.plugins[0].options.commands.machinal.includes('--local-config'));
+  await saveConfiguration(localPlan);
+
+  const cloudPlan = await planConfiguration({
+    client: 'opencode', scope: 'project', cwd, home: cwd, env: {},
+    url: 'https://api.machinal.app/mcp', name: 'machinal', transport: 'stdio',
+    script: join(cwd, 'bin', 'machinal-stdio.mjs'), platform: 'win32',
+  });
+  assert.equal(cloudPlan.automaticAuth, true);
+  assert.equal(cloudPlan.openCodeCompanion, true);
+  const cloudParsed = JSON.parse(cloudPlan.content);
+  assert.equal(cloudParsed.plugins[0].options.servers.machinal, 'https://api.machinal.app/mcp');
+  assert.equal(cloudParsed.plugins[0].options.localConfigs, undefined);
 });

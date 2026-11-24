@@ -2,6 +2,13 @@
 
 Read this guide before browsing existing media, transferring files, choosing a download directory or delivering a render. It describes tools, not new YAML fields. Reading it does not access customer files or authorize any operation.
 
+## Cloud vs Local storage boundary
+
+Check `connection_status.deployment.kind` (`local` vs `cloud` vs `custom-server`):
+
+- **Machinal Cloud / Hosted Server (`cloud` | `custom-server`):** Supports `storage: "s3" | "volume" | "all"`. Cloud final videos and cloud library files use opaque links that redirect directly to signed S3 URLs; volume-only uploads use `storage: "volume"`.
+- **Independent Local Docker (`local` / `machinal-local`):** Project **volume only (`storage: "volume"`)**; S3 is unsupported/not configured. Never pass `storage: "s3"` or expect S3 redirects/cloud publication. Delivery links are loopback `same-machine` volume links unless `PUBLIC_API_URL` is configured.
+
 ## Choose the right data path
 
 | User input/output | Required path |

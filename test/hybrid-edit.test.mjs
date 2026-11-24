@@ -66,3 +66,30 @@ test('stdio and OpenCode expose the same offline plan without reading media, cre
   assert.deepEqual(JSON.parse(local.content), (await run({ beats })).structuredContent);
   assert.equal((await run({ beats: [] })).isError, true);
 });
+
+test('plan_hybrid_edit supports custom catalog transitions with exact handle math and rejects dissolve+transition conflict', () => {
+  const plan = planHybridEdit({
+    aspect: 'portrait',
+    beats: [
+      { id: 'hero', action: 'layers', duration: 4, transition: { preset: 'wipe-left', duration: 0.3 } },
+      { id: 'poster', action: 'camera', duration: 6, transition: { preset: 'slide-left', duration: 0.4 }, assetId: 'img-1' },
+      { id: 'finale', action: 'spatial', duration: 5 },
+    ],
+  });
+  assert.equal(plan.duration, 15);
+  const { tracks: [{ clips }], transitions } = plan.documentFields;
+  assert.deepEqual(transitions, [
+    { id: 'hybrid-transition-1', trackId: 'hybrid-visuals', leftClipId: 'hero', rightClipId: 'poster', preset: 'wipe-left', duration: 0.3 },
+    { id: 'hybrid-transition-2', trackId: 'hybrid-visuals', leftClipId: 'poster', rightClipId: 'finale', preset: 'slide-left', duration: 0.4 },
+  ]);
+  assert.equal(clips[0].outPoint, 4.3);
+  assert.equal(clips[1].start, 4);
+  assert.equal(clips[1].outPoint, 6.4);
+  assert.equal(clips[2].start, 10);
+  assert.throws(() => planHybridEdit({
+    beats: [
+      { id: 'both', action: 'camera', duration: 4, dissolve: 0.3, transition: { preset: 'wipe-left', duration: 0.3 } },
+      { id: 'next', action: 'camera', duration: 4 },
+    ],
+  }), /cannot specify both dissolve and transition/);
+});

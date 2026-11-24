@@ -6,6 +6,7 @@ import { readKey, offerKeyStorage } from './keys.mjs';
 import { checkConnection } from './connection.mjs';
 import { cacheCatalog, MCPBridge } from './bridge.mjs';
 import { endpointFiles, installRuntime } from './runtime.mjs';
+import { resolveDeploymentMode } from './deployment.mjs';
 import { prepareIndependentLocal } from './local-setup.mjs';
 import { backupSummary } from './presentation.mjs';
 import { compactCreditSummaryLines, creditSummaryLines } from './credits.mjs';
@@ -53,12 +54,12 @@ export async function setupStdio(values, context) {
   const local = endpoint.mode === 'local';
   if (!local && (values['docker-dir'] || values['start-docker'] || values['configure-local'])) throw new InstallerError('Docker/provider setup options require --mode local. Server mode never configures providers or Docker.');
   if (local && (values['session-key'] || values['defer-login'])) throw new InstallerError('Local mode uses an automatically generated device token, not a Machinal login.');
-  const files = endpointFiles(endpoint.url, context);
+  const files = endpointFiles(endpoint.url, context, { local });
   const script = await installRuntime(context);
   const options = { client, scope, cwd, home, env, url: endpoint.url, name: values.name ?? 'machinal', transport: 'stdio', script,
     catalogFile: files.catalogFile, ...(local ? { localConfig: files.localConfig } : {}) };
   const plan = await planConfiguration(options);
-  const related = client === 'opencode' && plan.automaticAuth ? await planOpenCodeUpgrade(plan, options) : [];
+  const related = client === 'opencode' && (plan.openCodeCompanion ?? plan.automaticAuth) ? await planOpenCodeUpgrade(plan, options) : [];
   if (related.length) {
     log(`Synchronizing Machinal companion/runtime ${VERSION} in ${related.length + 1} OpenCode configurations (global, project, ancestors and recorded installs).`);
     if (context.verbose) for (const entry of related) log(`Will synchronize: ${entry.file}`);
@@ -101,7 +102,13 @@ export async function setupStdio(values, context) {
     } else log('Login required. Installing the MCP adapter without credentials; it will remain available for connection diagnostics.');
   }
   if (result?.tools) {
-    await cacheCatalog(files.catalogFile, { url: endpoint.url, tools: result.tools, instructions: result.instructions });
+    await cacheCatalog(files.catalogFile, {
+      url: endpoint.url,
+      mode: local ? 'local' : 'server',
+      deployment: resolveDeploymentMode({ local, url: endpoint.url }),
+      tools: result.tools,
+      instructions: result.instructions,
+    });
   }
   const upgrades = related.length ? await saveOpenCodeUpgrade(plan, related) : [];
   const saved = upgrades.at(-1) ?? await saveConfiguration(plan);

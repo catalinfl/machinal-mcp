@@ -273,3 +273,46 @@ test('production_quickstart returns single-call offline workflow, local file sho
   assert.equal(unknown.isError, true);
   assert.equal(unknown.structuredContent.statusCode, 400);
 });
+
+test('SceneLibrary deduplicates shared guides, expands film-styles search, and avoids blocks-prefix discovery pollution', async () => {
+  const library = new SceneLibrary();
+  // Shared guide dedup: text + fonts share text-audio.md
+  const textRef = await library.reference({ topic: 'text' });
+  assert.ok(textRef.guide.length > 500);
+  const fontsRef = await library.reference({ topic: 'fonts' });
+  assert.equal(fontsRef.guide, undefined);
+  assert.equal(fontsRef.guideAlreadySent, true);
+  assert.equal(fontsRef.guideUri, 'machinal://reference/text-audio');
+  const explicitFonts = await library.reference({ topic: 'fonts', includeGuide: true });
+  assert.ok(explicitFonts.guide.length > 500);
+
+  // Film-styles search handles brutalist/neobrutalist/editorial/collage/whenToUse queries
+  for (const [query, expectedId] of [
+    ['neobrutalist', 'kino-montage'],
+    ['brutalist poster', 'kino-montage'],
+    ['editorial dossier', 'halftone-dossier'],
+    ['colaj documentar', 'kino-montage'],
+    ['zines', 'risograph'],
+  ]) {
+    const found = await library.reference({ topic: 'film-styles', query });
+    assert.ok(found.entries.some(entry => entry.id === expectedId), `${query} should match ${expectedId}`);
+  }
+
+  // Component discovery must not treat the hyperframes-blocks- folder prefix as a name hit for "blocks"
+  const buildingBlocks = await library.reference({
+    topic: 'component-discovery',
+    query: '3d architectural concrete building blocks rising',
+    profiles: ['documentary'],
+    aspect: 'portrait',
+    limit: 5,
+  });
+  assert.ok(!buildingBlocks.entries.some(entry => entry.id === 'hyperframes-blocks-ai-chat-reveal'),
+    'hyperframes-blocks-* prefix must not match unrelated "blocks" queries');
+
+  // Local mode quickstart omits get_credits and credits topic
+  const localLibrary = new SceneLibrary(undefined, { mode: 'local' });
+  const localQuick = await localLibrary.quickstart({ includeBriefGuide: false });
+  assert.equal(localQuick.deploymentMode, 'local');
+  assert.equal(localQuick.liveBootstrapBatch.includes('get_credits'), false);
+  assert.equal(localQuick.onDemandTopics.credits, undefined);
+});

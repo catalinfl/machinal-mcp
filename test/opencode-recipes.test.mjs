@@ -244,4 +244,11 @@ test('original structured beat contract survives file submission and subsequent 
   assert.deepEqual(f.calls.at(-1).input.productionBaseline, contract);
   assert.equal(f.calls.at(-1).input.projectId, 'owned');
   assert.equal(f.calls.at(-1).input.productionBaselineFile, undefined);
+
+  // Setting compositionVersion: 'auto' in productionContractFile auto-computes the exact CRLF-normalized SHA-256.
+  const { compositionVersionHash } = await import('../src/stdio-files.mjs');
+  const autoFile = join(f.directory, 'auto-contract.json');
+  await writeFile(autoFile, JSON.stringify({ version: 1, compositionVersion: 'auto', beats: [{ id: 'opening' }] }));
+  await tools.get('custom-server_compile_recipe').execute({ projectId: 'owned', composition: recipe, productionContractFile: autoFile }, f.context);
+  assert.equal(f.calls.at(-1).input.productionContract.compositionVersion, compositionVersionHash(recipe));
 });

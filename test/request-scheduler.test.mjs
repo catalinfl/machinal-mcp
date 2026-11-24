@@ -53,6 +53,8 @@ test('classification separates waits from read-only hints and treats unknown cal
   assert.equal(requestClass('tools/call', { name: 'render_video' }, tools), 'work');
   assert.equal(requestLimits[requestClass('tools/call', { name: 'compile_scene' }, tools)], 2);
   assert.equal(requestLimits[requestClass('tools/call', { name: 'inspect_scene' }, tools)], 1);
+  assert.equal(requestClass('tools/call', { name: 'search_sound_effects' }, [...tools, { name: 'search_sound_effects', annotations: { readOnlyHint: true } }]), 'sound');
+  assert.equal(requestLimits.sound, 1);
   assert.equal(requestClass('ping'), 'control');
   assert.equal(requestClass('resources/read'), 'read');
 });

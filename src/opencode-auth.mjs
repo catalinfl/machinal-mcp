@@ -1,5 +1,6 @@
 import { createCredentialStore, WINDOWS_CREDENTIAL } from './credential-store.mjs';
-import { checkConnection, normalizeEndpoint, validateAPIKey } from './connection.mjs';
+import { checkConnection, isLoopbackEndpoint, normalizeEndpoint, validateAPIKey } from './connection.mjs';
+import { localCredentials } from './bridge.mjs';
 import { API_KEYS_URL, MEMBERSHIP_URL } from './presentation.mjs';
 import { promptWindowsKey } from './windows-key-prompt.mjs';
 import { installOpenCodeMedia } from './opencode-media.mjs';
@@ -24,20 +25,44 @@ function trustedServers(options) {
   return servers;
 }
 
-function matches(server, endpoint, approvedCommand) {
+function trustedLocalConfigs(options, servers, commands) {
+  const configs = new Map();
+  for (const [name, endpoint] of servers) {
+    let file = typeof options?.localConfigs?.[name] === 'string' ? options.localConfigs[name].trim() : '';
+    if (!file && Array.isArray(commands.get(name))) {
+      const args = commands.get(name);
+      const index = args.indexOf('--local-config');
+      if (index >= 0 && typeof args[index + 1] === 'string') file = args[index + 1].trim();
+    }
+    if (file && isLoopbackEndpoint(endpoint)) configs.set(name, file);
+  }
+  return configs;
+}
+
+function matches(server, endpoint, approvedCommand, localConfig) {
   if (server?.type === 'local') {
     const args = server.command ?? [];
     const index = args.indexOf('--url');
-    return Array.isArray(approvedCommand) && JSON.stringify(args) === JSON.stringify(approvedCommand)
-      && Object.keys(server.environment ?? {}).every((name) => ['MACHINAL_API_KEY', 'DIRECTION_API_KEY'].includes(name))
-      && args.includes('serve') && args.some((arg) => /(?:^|[/\\])machinal-(?:mcp|stdio)\.mjs$/.test(arg))
-      && index >= 0 && args[index + 1] === endpoint && !args.includes('--local-config');
+    if (!Array.isArray(approvedCommand) || JSON.stringify(args) !== JSON.stringify(approvedCommand)
+      || !args.includes('serve') || !args.some((arg) => /(?:^|[/\\])machinal-(?:mcp|stdio)\.mjs$/.test(arg))
+      || index < 0 || args[index + 1] !== endpoint) return false;
+    if (localConfig) {
+      const localIndex = args.indexOf('--local-config');
+      return isLoopbackEndpoint(endpoint) && Object.keys(server.environment ?? {}).length === 0
+        && localIndex >= 0 && args[localIndex + 1] === localConfig;
+    }
+    return Object.keys(server.environment ?? {}).every((name) => ['MACHINAL_API_KEY', 'DIRECTION_API_KEY'].includes(name))
+      && !args.includes('--local-config');
   }
-  if (server?.type !== 'remote' || server.oauth !== false) return false;
+  if (localConfig || server?.type !== 'remote' || server.oauth !== false) return false;
   try { return normalizeEndpoint(server.url) === endpoint; } catch { return false; }
 }
 
-function connectionFailure(error) {
+function connectionFailure(error, isLocal = false) {
+  if (isLocal && error.status === 401) return {
+    code: 'local-profile-rejected', nextAction: 'check-setup',
+    error: 'The local device token was rejected. Rerun machinal setup --mode local; do not create a Machinal cloud API key.',
+  };
   if (error.status === 401) return {
     code: 'key-rejected', nextAction: 'replace',
     error: 'The machinal key was rejected. Offer replace for secure entry; do not repeatedly reconnect with the same rejected key. The previous saved key was not deleted.',
@@ -63,6 +88,11 @@ export async function installOpenCodeAuth(ctx, {
 } = {}) {
   const servers = trustedServers(ctx.options ?? {});
   const commands = new Map(Object.entries(ctx.options?.commands ?? {}));
+  const localConfigs = trustedLocalConfigs(ctx.options, servers, commands);
+  const hostedServers = [...servers.keys()].filter((name) => !localConfigs.has(name));
+  const hasHostedServers = hostedServers.length > 0;
+  const allLocal = servers.size > 0 && !hasHostedServers;
+  const mode = allLocal ? 'local' : 'cloud';
   const runtime = [...servers.keys()].some(name => isManagedRuntimeCommand(commands.get(name), { env }))
     ? await prepareRuntime({ env }) : null;
   const registrations = new Map();
@@ -70,7 +100,7 @@ export async function installOpenCodeAuth(ctx, {
     ...(credentialStore?.description ?? { name: 'Windows Credential Manager', ...WINDOWS_CREDENTIAL }),
     supported: Boolean(credentialStore), status: credentialStore ? 'unchecked' : 'unsupported',
   };
-  const state = { key: null, source: 'none', warning: null, paused: null, sessionOnly: false };
+  const state = { key: null, source: allLocal ? 'local-profile' : 'none', warning: null, paused: null, sessionOnly: false };
   const lifetime = new AbortController();
   let queue = Promise.resolve();
   const serial = (operation) => {
@@ -80,7 +110,7 @@ export async function installOpenCodeAuth(ctx, {
   };
 
   async function loadKey() {
-    if (state.sessionOnly) return;
+    if (allLocal || state.sessionOnly) return;
     let candidate;
     let source = 'none';
     state.warning = null;
@@ -107,17 +137,23 @@ export async function installOpenCodeAuth(ctx, {
   await loadKey();
   await ctx.mcp.transform((editor) => {
     const canonical = servers.get('machinal');
-    if (canonical && matches(editor.get('machinal'), canonical, commands.get('machinal')) && matches(editor.get('directional'), canonical, commands.get('directional'))) {
+    if (canonical && matches(editor.get('machinal'), canonical, commands.get('machinal'), localConfigs.get('machinal'))
+      && matches(editor.get('directional'), canonical, commands.get('directional'), localConfigs.get('directional'))) {
       editor.remove('directional');
     }
     for (const [name, endpoint] of servers) {
       const config = editor.get(name);
-      registrations.set(name, { name, endpoint, configuration: !config ? 'missing' : matches(config, endpoint, commands.get(name)) ? 'matched' : 'mismatch' });
-      if (!matches(config, endpoint, commands.get(name))) continue;
+      const localConfig = localConfigs.get(name);
+      const matched = matches(config, endpoint, commands.get(name), localConfig);
+      registrations.set(name, {
+        name, endpoint, configuration: !config ? 'missing' : matched ? 'matched' : 'mismatch',
+        ...(localConfig ? { mode: 'local' } : {}),
+      });
+      if (!matched) continue;
       editor.update(name, (server) => {
         if (server.type === 'local') {
           if (runtime && isManagedRuntimeCommand(server.command, { env })) server.command = [server.command[0], runtime, ...server.command.slice(2)];
-          server.environment = { ...server.environment, MACHINAL_API_KEY: state.key ?? '' };
+          if (!localConfig) server.environment = { ...server.environment, MACHINAL_API_KEY: state.key ?? '' };
           if (state.paused === name) server.disabled = true;
           return;
         }
@@ -135,11 +171,14 @@ export async function installOpenCodeAuth(ctx, {
       connectionWarning = 'OpenCode could not list current MCP connection states. No connection success was assumed; inspect the MCP panel or run opencode mcp list.';
     }
     return {
-      version: VERSION, source: state.source, hasKey: Boolean(state.key), warning: state.warning,
-      credentialStore: { ...credential }, registrations: [...registrations.values()],
+      version: VERSION,
+      ...(allLocal ? { mode: 'local' } : {}),
+      source: state.source, hasKey: allLocal ? true : Boolean(state.key), warning: state.warning,
+      ...(allLocal ? {} : { credentialStore: { ...credential } }),
+      registrations: [...registrations.values()],
       servers: (listed?.data ?? []).filter((server) => servers.has(server.name)).map((server) => ({ name: server.name, status: server.status.status })),
       ...(connectionWarning ? { connectionWarning } : {}),
-      apiKeysURL: API_KEYS_URL,
+      ...(allLocal ? {} : { apiKeysURL: API_KEYS_URL }),
     };
   }
 
@@ -167,6 +206,24 @@ export async function installOpenCodeAuth(ctx, {
       ...await status(), code: 'server-configuration', nextAction: 'check-setup',
       error: `The registered MCP is missing or its configuration does not match the approved endpoint/runtime command. Check for conflicting Machinal plugin versions in global/project/ancestor configurations; run machinal setup with installer ${VERSION} to synchronize them. This is a configuration mismatch, not a rejected API key. No key was sent. Never automatically trust a redirected endpoint.`,
     };
+    const localConfig = localConfigs.get(name);
+    if (localConfig) {
+      if (input.action === 'replace') {
+        return {
+          ...await status(), code: 'local-profile-managed', nextAction: 'check-setup',
+          error: 'Independent local mode uses an automatically generated device token managed by machinal setup --mode local (no Machinal cloud account key). Rerun machinal setup --mode local to repair or refresh the local profile.',
+        };
+      }
+      let localKey;
+      try { localKey = await localCredentials(localConfig, endpoint); } catch {
+        return {
+          ...await status(), code: 'local-profile-invalid', nextAction: 'check-setup',
+          error: 'The saved local device profile could not be read or does not match the loopback endpoint. Rerun machinal setup --mode local; a Machinal cloud API key is not needed.',
+        };
+      }
+      await verify(endpoint, localKey, { local: true });
+      return reconnect(name);
+    }
     if (input.action === 'replace') {
       if (platform !== 'win32') return {
         ...await status(), code: 'terminal-key-required', nextAction: 'set-key',
@@ -208,13 +265,16 @@ export async function installOpenCodeAuth(ctx, {
   await ctx.tool.transform((editor) => {
     editor.add({
       name: 'machinal_connection',
-      description: `Discover and recover machinal MCP even when remote tools are unavailable. status lists registered MCP names, actual connection states and credential diagnostics without secrets. On connection/authentication failure, use reconnect to reread ${credential.path ?? WINDOWS_CREDENTIAL.target}, verify and reconnect without restarting OpenCode. Only offer replace after a missing/invalid/rejected key: Windows uses secure native entry; Linux directs the user to machinal set-key in their terminal. Network/account errors do not need new keys. Never put API keys in tool inputs or chat.`,
+      description: allLocal
+        ? 'Discover and recover the local Machinal Docker MCP connection even when tools are unavailable. status lists registered MCP names and connection states without secrets. reconnect verifies the loopback local device profile and refreshes MCP in OpenCode. Local mode uses an automatically generated device token and your OpenRouter key (no Machinal cloud key).'
+        : `Discover and recover machinal MCP even when remote tools are unavailable. status lists registered MCP names, actual connection states and credential diagnostics without secrets. On connection/authentication failure, use reconnect to reread ${credential.path ?? WINDOWS_CREDENTIAL.target}, verify and reconnect without restarting OpenCode. Only offer replace after a missing/invalid/rejected key: Windows uses secure native entry; Linux directs the user to machinal set-key in their terminal. Network/account errors do not need new keys. Never put API keys in tool inputs or chat.`,
       input: { type: 'object', properties: { action: { type: 'string', enum: ['status', 'reconnect', 'replace'] }, server: { type: 'string' } }, required: ['action'], additionalProperties: false },
       options: { codemode: false },
       async execute(input, context) {
         const result = await serial(async () => {
           try { return await connection(input, context); } catch (error) {
-            return { ...await status(), ...connectionFailure(error) };
+            const target = input.server ?? servers.keys().next().value;
+            return { ...await status(), ...connectionFailure(error, localConfigs.has(target)) };
           }
         });
         return { content: JSON.stringify(result) };
@@ -223,9 +283,17 @@ export async function installOpenCodeAuth(ctx, {
   });
 
   await ctx.session.hook('context', (event) => {
+    if (allLocal) {
+      event.system.push({ type: 'text', text: [
+        'For machinal work, proactively discover the existing MCP before claiming tools or connections are missing. Use directly exposed tools first; otherwise search the tool catalog in Code Mode once for the missing machinal tool. Reuse actual discovered namespaces/signatures, never invented tool names or repeated discovery per step.',
+        `The local machinal_connection tool remains available when the local Docker MCP is down. Use status to inspect approved registrations: ${JSON.stringify([...servers].map(([name, endpoint]) => ({ name, endpoint, mode: 'local' })))}. On connection failure, call machinal_connection(action:reconnect,server:<registered name>) once before asking the user to check Docker. Do not automatically repeat ambiguous paid provider submissions; recover their jobs/idempotency first.`,
+        'Independent Local Docker profile: no Machinal cloud account, API key, credits, or S3 bucket apply. Local rendering uses the user’s hardware; AI provider calls (image/TTS/captions) use the user’s configured OpenRouter key. Use storage=volume for all media/downloads. Never ask for a Machinal API key or call get_credits.',
+      ].join('\n\n') });
+      return;
+    }
     event.system.push({ type: 'text', text: [
       'For machinal work, proactively discover the existing MCP before claiming tools or authentication are missing. Use directly exposed tools first; otherwise search the tool catalog in Code Mode once for the missing machinal tool. Tools omitted from the initial list are not proof of disconnection. Reuse actual discovered namespaces/signatures, never invented tool names or repeated discovery per step.',
-      `The local machinal_connection tool remains available when the remote MCP is down. Use status to discover approved MCP names, actual connection states and credential diagnostics. Approved registrations: ${JSON.stringify([...servers].map(([name, endpoint]) => ({ name, endpoint })))}. Do not assume a server name or trust other endpoints. If discovery fails or a connection/authentication call fails, immediately call machinal_connection(action:reconnect,server:<registered name>) once, without asking the user to find or paste a key. Reconnect rereads the saved credential and refreshes MCP in the current OpenCode service; then rediscover tools and retry only safe read-only calls. Do not automatically repeat ambiguous paid submissions; recover their jobs/idempotency first.`,
+      `The local machinal_connection tool remains available when the remote MCP is down. Use status to discover approved MCP names, actual connection states and credential diagnostics. Approved registrations: ${JSON.stringify([...servers].map(([name, endpoint]) => ({ name, endpoint, ...(localConfigs.has(name) ? { mode: 'local' } : {}) })))}. Do not assume a server name or trust other endpoints. If discovery fails or a connection/authentication call fails, immediately call machinal_connection(action:reconnect,server:<registered name>) once, without asking the user to find or paste a key. Reconnect rereads the saved credential and refreshes MCP in the current OpenCode service; then rediscover tools and retry only safe read-only calls. Do not automatically repeat ambiguous paid submissions; recover their jobs/idempotency first.`,
       `machinal uses ONE application API key, automatically loaded into memory from ${credential.path ? `a private Linux credentials file: ${credential.path} (plaintext, mode 0600; directory 0700)` : `Windows Credential Manager: service ${WINDOWS_CREDENTIAL.service}, account ${WINDOWS_CREDENTIAL.account}, Windows target ${WINDOWS_CREDENTIAL.target}`}. The local integration, not the model or shell, reads its secret. Do not search credential files, dump the vault, run cmdkey to extract secrets, or print environment values. No separate OpenCode/AI-provider keys or launcher/restart are needed with this integration. Respect an explicitly selected session/environment key.`,
       `After this one recovery attempt, follow the tool's code/nextAction. Only offer replace when the key is missing, invalid or rejected; secure entry links to ${API_KEYS_URL}, verifies before optional saving and reconnects. An unreadable vault is not an absent key. Network, rate-limit or subscription/access errors do not require a new key. Never request a key in chat, disable host approvals, change a trusted endpoint automatically or delete the old key before verification.`,
     ].join('\n\n') });
@@ -248,25 +316,33 @@ export async function installOpenCodeAuth(ctx, {
     if (!endpoint) throw new TransferError('Choose a machinal server approved in the integration settings.');
     await ctx.mcp.list();
     if (registrations.get(name)?.configuration !== 'matched') throw new TransferError('The current MCP configuration does not match the approved endpoint. No credentials were sent.');
+    const localConfig = localConfigs.get(name);
+    if (localConfig) {
+      let localKey;
+      try { localKey = await localCredentials(localConfig, endpoint); } catch {
+        throw new TransferError('The saved local device profile could not be read. Rerun machinal setup --mode local.');
+      }
+      return { endpoint, key: localKey, local: true };
+    }
     if (!state.key) throw new TransferError('No usable machinal key is loaded. Use machinal_connection reconnect; never put a key in download arguments.');
     return { endpoint, key: state.key };
   };
   await installOpenCodeMedia(ctx, { signal: lifetime.signal, getConnection, getSettings: () => readSettings({ env }) });
   await installOpenCodeUploads(ctx, { signal: lifetime.signal, getConnection });
-  await installSceneLibrary(ctx, servers.keys());
-  await installDirectTools(ctx, servers.keys());
-  await installWorkflowStartup(ctx, servers.keys());
+  await installSceneLibrary(ctx, servers.keys(), { mode });
+  await installDirectTools(ctx, servers.keys(), { mode, localServers: new Set(localConfigs.keys()) });
+  await installWorkflowStartup(ctx, servers.keys(), { mode });
   await installRecipeFiles(ctx, servers.keys());
   await installCheckpoints(ctx, servers.keys());
-  await installOpenCodeRouting(ctx, { servers: [...servers.keys()], signal: lifetime.signal, getConnection });
+  if (hostedServers.length) await installOpenCodeRouting(ctx, { servers: hostedServers, signal: lifetime.signal, getConnection });
 
-  const timer = setInterval(() => {
+  const timer = allLocal ? null : setInterval(() => {
     void serial(async () => {
       const previous = state.key;
       await loadKey();
       if (state.key !== previous) await ctx.mcp.reload();
     }).catch(() => {});
   }, intervalMs);
-  timer.unref?.();
-  return () => { lifetime.abort(); clearInterval(timer); };
+  timer?.unref?.();
+  return () => { lifetime.abort(); if (timer) clearInterval(timer); };
 }

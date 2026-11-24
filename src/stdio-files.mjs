@@ -12,6 +12,16 @@ const PAID_CHECKPOINT_TOOLS = ['render_video', 'render_preview', 'generate_asset
 const VERSION_PATTERN = /^sha256:[a-f0-9]{64}$/;
 const PROJECT_ID_PATTERN = /^[a-z\d_-]{1,64}$/i;
 
+export function compositionVersionHash(composition) {
+  return `sha256:${createHash('sha256').update(String(composition).replaceAll('\r\n', '\n'), 'utf8').digest('hex')}`;
+}
+
+export function hydrateProductionContractVersion(contract, composition) {
+  if (!contract || typeof contract !== 'object' || Array.isArray(contract) || typeof composition !== 'string') return contract;
+  if (contract.compositionVersion !== 'auto') return contract;
+  return { ...contract, compositionVersion: compositionVersionHash(composition) };
+}
+
 export function parseAllowedRoots(fileRoots, env = process.env) {
   const raw = Array.isArray(fileRoots)
     ? fileRoots
@@ -229,7 +239,7 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120 } = {}) {
       ...(tool.name === 'compile_recipe' ? {
         productionContractFile: {
           type: 'string',
-          description: 'Absolute client-local .json file containing the structured production contract instead of inline productionContract.',
+          description: 'Absolute client-local .json file containing the structured production contract instead of inline productionContract. Set compositionVersion to "auto" to have the stdio bridge compute the exact normalized SHA-256 from the submitted recipe automatically.',
         },
         productionBaselineFile: {
           type: 'string',
@@ -239,7 +249,7 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120 } = {}) {
     };
     return {
       ...tool,
-      description: `${tool.description} Local adapter: prefer compositionFile, captionBaselineRecipeFile and checkpointFile over repeating large YAML inline. Existing consent, validation, idempotency and spending rules still apply.`,
+      description: `${tool.description} Client stdio bridge: prefer compositionFile, captionBaselineRecipeFile and checkpointFile over repeating large YAML inline. Existing consent, validation, idempotency and spending rules still apply.`,
       inputSchema: schema,
     };
   }
@@ -259,7 +269,7 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120 } = {}) {
     };
     return {
       ...tool,
-      description: `${tool.description} Local adapter: pass recipeFile and checkpointFile to save resolved YAML and hashes directly to local files without copying large YAML through chat context.`,
+      description: `${tool.description} Client stdio bridge: pass recipeFile and checkpointFile to save resolved YAML and hashes directly to local files without copying large YAML through chat context.`,
       inputSchema: schema,
     };
   }
@@ -270,12 +280,12 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120 } = {}) {
       schema.properties.timeoutSeconds = {
         ...schema.properties.timeoutSeconds,
         maximum: maxWaitSeconds,
-        description: `Maximum completion wait per call, 1-${maxWaitSeconds} seconds (default ${Math.min(120, maxWaitSeconds)}). Larger values are capped by the local adapter to prevent MCP client transport timeouts; call wait_for_job again for the SAME jobId while still running.`,
+        description: `Maximum completion wait per call, 1-${maxWaitSeconds} seconds (default ${Math.min(120, maxWaitSeconds)}). Larger values are capped by the client stdio bridge to prevent MCP client transport timeouts; call wait_for_job again for the SAME jobId while still running.`,
       };
     }
     return {
       ...tool,
-      description: `${tool.description} Local adapter caps each call to at most ${maxWaitSeconds}s to stay below client transport timeouts; if still running, call wait_for_job again for the SAME jobId.`,
+      description: `${tool.description} Client stdio bridge caps each call to at most ${maxWaitSeconds}s to stay below client transport timeouts; if still running, call wait_for_job again for the SAME jobId.`,
       inputSchema: schema,
     };
   }
@@ -315,6 +325,10 @@ export async function prepareStdioToolCall(name, rawArgs = {}, { library, allowe
   ].some(value => value !== undefined);
 
   if (!hasLocalFileArgs) {
+    if (name === 'compile_recipe' && rawArgs.productionContract && typeof rawArgs.composition === 'string') {
+      const hydrated = hydrateProductionContractVersion(rawArgs.productionContract, rawArgs.composition);
+      if (hydrated !== rawArgs.productionContract) return { args: { ...rawArgs, productionContract: hydrated } };
+    }
     return { args: rawArgs };
   }
 
@@ -383,6 +397,10 @@ export async function prepareStdioToolCall(name, rawArgs = {}, { library, allowe
       throw new Error('Choose compositionFile, composition, recipeRef or sourceJobId, not multiple recipe sources.');
     }
     args.composition = await readRecipeFile(compositionFile, ioOptions);
+  }
+
+  if (name === 'compile_recipe' && args.productionContract && typeof args.composition === 'string') {
+    args.productionContract = hydrateProductionContractVersion(args.productionContract, args.composition);
   }
 
   if (checkpointFile !== undefined) {

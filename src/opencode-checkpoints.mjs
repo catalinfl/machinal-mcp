@@ -1,6 +1,7 @@
 import { lstat, realpath } from 'node:fs/promises';
 import { basename, dirname, isAbsolute, join } from 'node:path';
 import { filePermission, readBoundedUTF8, readProductionContract, resultJSON, saveUTF8 } from './opencode-recipes.mjs';
+import { hydrateProductionContractVersion } from './stdio-files.mjs';
 
 const preflightTools = ['validate_recipe', 'compile_recipe'];
 const freeTools = [...preflightTools, 'get_job_result'];
@@ -62,6 +63,9 @@ export async function installCheckpoints(ctx, servers) {
             if (productionContractFile !== undefined) {
               if (name !== 'compile_recipe' || args.productionContract !== undefined) throw new Error('Use one production contract on compile_recipe only.');
               args.productionContract = await readProductionContract(ctx, context, productionContractFile);
+            }
+            if (name === 'compile_recipe' && args.productionContract && typeof args.composition === 'string') {
+              args.productionContract = hydrateProductionContractVersion(args.productionContract, args.composition);
             }
             if (productionBaselineFile !== undefined) {
               if (name !== 'compile_recipe' || args.productionBaseline !== undefined) throw new Error('Use one production baseline on compile_recipe only.');

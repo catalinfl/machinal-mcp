@@ -66,7 +66,11 @@ async function projectSource(input, connection, signal, request, getSettings) {
   return {
     directory, filename: input.filename ?? filename,
     async delivery() {
-      const descriptor = await api(`${root}/media/delivery-links`, { file: filename, storage: input.storage ?? 's3' });
+      if (connection.local && input.storage === 's3') {
+        throw new TransferError('S3 is unavailable in independent local mode. Use storage=volume or omit storage.');
+      }
+      const storage = input.storage ?? (connection.local ? 'volume' : 's3');
+      const descriptor = await api(`${root}/media/delivery-links`, { file: filename, storage });
       const origin = new URL(connection.endpoint).origin;
       const url = transferURL(descriptor.url, origin);
       if (url.origin !== origin || !/^\/deliveries\/[a-z\d_-]{32,}$/i.test(url.pathname) || url.search) {

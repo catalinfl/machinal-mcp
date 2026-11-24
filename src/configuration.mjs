@@ -4,7 +4,7 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { InstallerError } from './errors.mjs';
 import { bridgeEntry, parseJSONConfiguration, serverEntry, updateJSON, updateTOML } from './formats.mjs';
-import { configureOpenCodeAuth, removeOpenCodeAuthServer, upgradeOpenCodeAuth } from './opencode-configuration.mjs';
+import { configureOpenCodeAuth, upgradeOpenCodeAuth } from './opencode-configuration.mjs';
 import { sameManagedRuntime } from './runtime.mjs';
 import { parse } from 'jsonc-parser';
 
@@ -84,13 +84,13 @@ export async function planConfiguration(options) {
   const updated = options.client === 'codex'
     ? updateTOML(previous.original ?? '', options.name, entry)
     : updateJSON(previous.original ?? '', options.client, options.name, entry);
-  const automaticAuth = options.client === 'opencode' && !options.localConfig && ['win32', 'linux'].includes(options.platform ?? process.platform);
+  const openCodeCompanion = options.client === 'opencode' && (Boolean(options.localConfig) || ['win32', 'linux'].includes(options.platform ?? process.platform));
+  const automaticAuth = openCodeCompanion && !options.localConfig;
   if (runtimeUpgrade) updated.conflict = false;
-  if (automaticAuth) updated.content = configureOpenCodeAuth(updated.content, options.name, options.url, options.transport === 'stdio' ? entry.command : undefined, options);
-  if (automaticAuth && options.transport === 'stdio') updated.content = upgradeOpenCodeAuth(updated.content, options);
-  if (options.client === 'opencode' && options.localConfig) updated.content = removeOpenCodeAuthServer(updated.content, options.name);
+  if (openCodeCompanion) updated.content = configureOpenCodeAuth(updated.content, options.name, options.url, options.transport === 'stdio' ? entry.command : undefined, options);
+  if (openCodeCompanion && options.transport === 'stdio') updated.content = upgradeOpenCodeAuth(updated.content, options);
   if (options.client === 'opencode') parseJSONConfiguration(updated.content, 'opencode');
-  return { file, ...previous, ...updated, automaticAuth };
+  return { file, ...previous, ...updated, automaticAuth, openCodeCompanion };
 }
 
 export async function planTextFile(file, content, { maxBytes = MAX_CONFIG_BYTES } = {}) {

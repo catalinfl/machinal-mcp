@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "sha256:d97118a4415c523ba9113bef81f210088e44ce346a2f911adc7150d1cb2123f4",
+  "version": "sha256:7aadd1dc1bbc72713bbfb4ab1e18762e08537e5aada6bcf97e1a31ec9e8610cc",
   "files": {
     "animation-skills/machinal-choreography.md": {
       "bytes": 3449,
@@ -462,17 +462,29 @@
       "bytes": 18765,
       "sha256": "f40624a10149fd5cd3c12499eb40ee4f281df6865163a8c58d17b07e742e1f43"
     },
+    "guides/client-bootstrap-cloud.md": {
+      "bytes": 1585,
+      "sha256": "54cd17f68f1fe6be70f8db877c4cd727a44ec1acb47e04605726f8b7a133d1c0"
+    },
+    "guides/client-bootstrap-core.md": {
+      "bytes": 9239,
+      "sha256": "fa836a10da2f584dedd60a46f5c0dd624b2c11ddc60900842b53aec21795db73"
+    },
+    "guides/client-bootstrap-local.md": {
+      "bytes": 1700,
+      "sha256": "0c1a02653fb3356daeefa199aae91bca82c1581629536ef41039c193d73e400a"
+    },
     "guides/client-bootstrap.md": {
-      "bytes": 10060,
-      "sha256": "1ececd2942b5b9f105c91f6b79736adcd0fa6f9575d939cb966d13d96ba32308"
+      "bytes": 1006,
+      "sha256": "e103beb426ce68fc38bab280961caf0a7f755b6513c3358fc1703021033d4d2f"
     },
     "guides/commands.md": {
       "bytes": 4194,
       "sha256": "e0ac5fdfaeb95a2cc843a089b5f53b4d627112c9df29da14eeab07551e1ba029"
     },
     "guides/credits.md": {
-      "bytes": 7536,
-      "sha256": "53136334c89cec09900f149ffb8d6eca28fdfe4e81e3b0b17935582080cf2d6f"
+      "bytes": 8020,
+      "sha256": "a1e24dba05b2516306571c49a4bc94926cba0d0c4655b867bc4b26f11a52419d"
     },
     "guides/editing.md": {
       "bytes": 10100,
@@ -503,8 +515,8 @@
       "sha256": "ee3be39bed241c2470b55a19fffa601ce6b366b35b6d7c35215a7ffce740794d"
     },
     "guides/media.md": {
-      "bytes": 22116,
-      "sha256": "592b54bcbf7ecf996514a59e91ddc23ff966ccd7f9311cb636c97b2ff8dd50bc"
+      "bytes": 22801,
+      "sha256": "528f28e317574a3ff079c1c7ac181f9c9196d6367a810d79fb74deab16cf9f22"
     },
     "guides/production.md": {
       "bytes": 31421,
@@ -13443,8 +13455,8 @@
       "sha256": "3353702529f239ae568e2aa8770dcf4c1e9fb205946d2abbaf37dedf0645f310"
     },
     "skills/machinal-credits.md": {
-      "bytes": 5024,
-      "sha256": "0f9f605da4812a06b557253c6a39de037fec1c3a252c741abc8e285aa82cfb8e"
+      "bytes": 5233,
+      "sha256": "0540f14708907b0ec47b51bcea361eeddb3facc2c98670168fbeaf9a652e10f2"
     },
     "skills/machinal-editing.md": {
       "bytes": 16623,
@@ -13487,8 +13499,8 @@
       "sha256": "374a52fb42b1905fef6f6aa4d0563219a3a17387663bace19ea39a7443395d61"
     },
     "skills/machinal-media.md": {
-      "bytes": 7194,
-      "sha256": "d2d2600afb8da2694050af0d4418673fd32b4c43b1883db98a2f9d7302aba0e7"
+      "bytes": 7646,
+      "sha256": "ec32ee7abb1962ea66492e6173db301bd13f8f96af5f284deef04a947dd4eb36"
     },
     "skills/machinal-motion.md": {
       "bytes": 3499,
