@@ -85,7 +85,7 @@ export async function setupStdio(values, context) {
     credentials = { key: profile.key, source: 'local' };
     const verify = () => (context.checkConnection ?? checkConnection)(endpoint.url, profile.key, { local: true });
     try { result = await verify(); } catch (error) {
-      if (error.code !== 'network') throw error;
+      if (error.code !== 'network' || profile.started) throw error;
       await profile.start();
       result = await verify();
     }

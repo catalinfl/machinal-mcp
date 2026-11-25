@@ -275,6 +275,32 @@ test('interactive local mode skips Local API URL prompt, asks only for OpenRoute
   await assert.rejects(run(['setup', '--client', 'claude', '--mode', 'local', '--no-skills', '--yes'], failingNonInteractive), /OpenRouter/);
 });
 
+test('fresh local setup does not prompt a second time to start Docker when verification still fails', async (t) => {
+  const cwd = await workspace(t);
+  const studio = join(cwd, 'machinal-studio');
+  for (const file of ['api/Dockerfile', 'services/scene-renderer/Dockerfile', 'compose.editengine.yaml']) {
+    await mkdir(dirname(join(studio, file)), { recursive: true });
+    await writeFile(join(studio, file), '# fixture');
+  }
+  const confirms = [];
+  const provider = `sk-or-v1-${'d'.repeat(64)}`;
+  const ctx = context(cwd, {
+    interactive: true,
+    ui: {
+      select: async (question) => question.choices.some((c) => c.value === 'global') ? 'project' : 'local',
+      input: async (question) => assert.fail(`Local mode must not prompt for ${question.message}`),
+      password: async () => provider,
+      confirm: async (question) => { confirms.push(question.message); return true; },
+    },
+    verifyOpenRouterKey: async () => ({ status: 'valid' }),
+    docker: async (args) => args[0] === 'context' ? 'npipe:////./pipe/docker_engine' : '',
+    checkConnection: async () => { throw Object.assign(new Error('Unreachable'), { code: 'network' }); },
+  });
+  await assert.rejects(run(['setup', '--client', 'antigravity', '--no-skills', '--no-launch'], ctx), /Unreachable/);
+  assert.equal(confirms.length, 1);
+  assert.match(confirms[0], /Install\/start local API/);
+});
+
 test('server setup never accepts Docker flags or provider setup, and unknown transport is rejected', async (t) => {
   const cwd = await workspace(t);
   for (const flags of [['--start-docker'], ['--configure-local'], ['--transport', 'bogus']]) {

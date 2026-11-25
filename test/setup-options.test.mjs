@@ -17,19 +17,15 @@ test('the interactive wizard offers only Server Machinal (cloud) and Local witho
   assert.equal(prompts[0].default, 'server');
 });
 
-test('switching from a hosted environment default to local does not reuse the hosted URL', async () => {
+test('local mode always uses the default machinal-studio URL without prompting or reusing environment overrides', async () => {
   const ui = {
     select: async () => 'local',
-    input: async () => assert.fail('Default Local mode must not prompt for a URL'),
+    input: async (question) => assert.fail(`Local mode must never prompt for ${question.message}`),
   };
-  assert.deepEqual(await chooseEndpoint({}, { env: { MACHINAL_API_ORIGIN: 'https://hosted.example' }, interactive: true, ui }), { mode: 'local', url: DEFAULT_LOCAL_URL });
-  let defaultURL;
-  const legacyUI = {
-    select: async () => 'local',
-    input: async (question) => { defaultURL = question.default; return 'http://localhost:9090'; },
-  };
-  assert.deepEqual(await chooseEndpoint({}, { env: { MACHINAL_API_ORIGIN: 'https://hosted.example' }, interactive: true, ui: legacyUI, promptLocalURL: true }), { mode: 'local', url: 'http://localhost:9090/mcp' });
-  assert.equal(defaultURL, DEFAULT_LOCAL_URL);
+  for (const env of [{}, { MACHINAL_API_ORIGIN: 'https://hosted.example' }, { MACHINAL_API_ORIGIN: 'http://localhost:9090' }]) {
+    assert.deepEqual(await chooseEndpoint({}, { env, interactive: true, ui }), { mode: 'local', url: DEFAULT_LOCAL_URL });
+    assert.deepEqual(await chooseEndpoint({ mode: 'local' }, { env, interactive: true, ui }), { mode: 'local', url: DEFAULT_LOCAL_URL });
+  }
 });
 
 test('Machinal Server uses its official endpoint without an address prompt or stale environment override', async () => {
@@ -71,16 +67,16 @@ test('mode flags work unattended, infer existing --url usage, and reject contrad
   }
 });
 
-test('interactive URLs are validated without exiting or echoing credentials', async () => {
+test('interactive custom URLs are validated without exiting or echoing credentials', async () => {
   let validated = false;
   const ui = { input: async (question) => {
     validated = true;
     assert.match(question.validate('http://bad.example'), /HTTPS/);
-    assert.match(question.validate('https://api.example'), /loopback/);
-    assert.equal(question.validate(DEFAULT_LOCAL_URL), true);
-    return DEFAULT_LOCAL_URL;
+    assert.match(question.validate('https://user:secret@api.example'), /credentials/);
+    assert.equal(question.validate('https://api.example'), true);
+    return 'https://api.example';
   } };
-  await chooseEndpoint({ mode: 'local' }, { env: {}, interactive: true, ui, promptLocalURL: true });
+  assert.deepEqual(await chooseEndpoint({ mode: 'custom' }, { env: {}, interactive: true, ui }), { mode: 'custom', url: 'https://api.example/mcp' });
   assert.equal(validated, true);
 });
 

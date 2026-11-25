@@ -107,7 +107,7 @@ export async function setup(values, context) {
   if (scope === 'project' && dirname(resolve(cwd)) === resolve(cwd)) {
     log('Warning: project setup is running at a drive/filesystem root. Its settings may apply to all descendant projects. Prefer running setup inside your project folder.');
   }
-  const endpoint = await chooseEndpoint(values, { ...context, promptLocalURL: true });
+  const endpoint = await chooseEndpoint(values, context);
   const { mode, url } = endpoint;
   if (mode !== 'local' && (values['start-docker'] || values['docker-dir'])) throw new InstallerError('--start-docker and --docker-dir require --mode local. Server mode never manages Docker.');
   const skillOptions = await chooseSkillOptions(values, context);

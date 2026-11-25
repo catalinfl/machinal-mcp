@@ -120,9 +120,8 @@ test('unknown options, malformed config, and unsafe URLs never echo secrets from
   assert.ok(!`${result.stdout}${result.stderr}`.includes(API_KEY));
 });
 
-test('interactive setup asks about local mode, installs a chosen style, shows credits and launches without saving the hidden key', async (t) => {
+test('interactive setup asks about local mode without prompting for a URL, installs a chosen style, shows credits and launches without saving the hidden key', async (t) => {
   const cwd = await workspace(t);
-  const endpoint = await serve(t, mcpHandler());
   const logs = [];
   let sawMode = false;
   let enteredKey = false;
@@ -135,12 +134,17 @@ test('interactive setup asks about local mode, installs a chosen style, shows cr
       if (choices.includes('local')) { sawMode = true; return 'local'; }
       return 'cinematic';
     },
-    input: async () => endpoint,
+    input: async (question) => assert.fail(`Local mode must not prompt for ${question.message}`),
     confirm: async () => true,
     password: async (question) => { assert.equal(question.mask, '*'); enteredKey = true; return API_KEY; },
   };
   const code = await run(['setup'], {
     cwd, env: {}, interactive: true, ui, log: (message) => logs.push(message), credentialStore: null,
+    checkConnection: async (endpoint, key) => {
+      assert.equal(endpoint, 'http://127.0.0.1:8080/mcp');
+      assert.equal(key, API_KEY);
+      return { toolCount: 3, credits: parseCreditSummary(CREDIT_SUMMARY) };
+    },
     launch: async (client, key) => {
       assert.equal(client, 'opencode');
       assert.equal(key, API_KEY);
@@ -150,6 +154,7 @@ test('interactive setup asks about local mode, installs a chosen style, shows cr
   });
   assert.equal(code, 0);
   assert.ok(sawMode && enteredKey && launched);
+  assert.match(await readFile(join(cwd, 'opencode.jsonc'), 'utf8'), /http:\/\/127\.0\.0\.1:8080\/mcp/);
   assert.match(logs.join('\n'), /API credits: 900 available/);
   assert.match(logs.join('\n'), /Authentication and billing still apply/);
   assert.ok(!logs.join('\n').includes(API_KEY));

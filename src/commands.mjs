@@ -87,7 +87,7 @@ export async function manageLocal(action, values, context) {
   let result;
   const verify = () => (context.checkConnection ?? checkConnection)(endpoint, profile.key, { local: true });
   try { result = await verify(); } catch (error) {
-    if (error.code !== 'network') throw error;
+    if (error.code !== 'network' || profile.started) throw error;
     await profile.start();
     result = await verify();
   }

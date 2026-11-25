@@ -224,11 +224,11 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
     if (!values['configure-local']) {
       const keyState = await checkOpenRouter(existing.values.OPENROUTER_API_KEY ?? '', context);
       if (keyState.status === 'valid') {
-        return { key, localConfig, start: () => startLocal(composeFile, context, values) };
+        return { key, localConfig, started: false, start: () => startLocal(composeFile, context, values) };
       }
       if (keyState.status === 'rate_limited' || keyState.status === 'unavailable') {
         log(`Warning: ${keyState.message}`);
-        return { key, localConfig, start: () => startLocal(composeFile, context, values) };
+        return { key, localConfig, started: false, start: () => startLocal(composeFile, context, values) };
       }
       log(`Saved OpenRouter API key is not valid (${keyState.message})`);
       const replacementKey = await obtainVerifiedOpenRouterKey(context);
@@ -253,12 +253,14 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
       log('Updated OpenRouter API key in local profile.');
       const synced = await syncOpenRouterKeyToBackend(endpoint, replacementKey, context);
       if (synced) log('Synced OpenRouter API key to the running local backend.');
+      let restarted = false;
       if (synced && modelsChanged && (values['start-docker'] || (interactive && await ui.confirm({
         message: 'Restart the local API container to apply repaired OpenRouter model defaults? Existing data volumes are preserved.', default: true,
       })))) {
         await startLocal(composeFile, context, { ...values, 'start-docker': true });
+        restarted = true;
       }
-      return { key, localConfig, start: () => startLocal(composeFile, context, values) };
+      return { key, localConfig, started: restarted, start: () => startLocal(composeFile, context, values) };
     }
   }
   let checkout = await findCheckout(cwd, values['docker-dir']);
@@ -303,7 +305,7 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
   await startLocal(composeFile, context, { ...values, 'start-docker': true });
   await syncOpenRouterKeyToBackend(endpoint, configuration.OPENROUTER_API_KEY, context);
   await saveSettings({ localCheckout: checkout }, context);
-  return { key, localConfig, start: () => startLocal(composeFile, context, values) };
+  return { key, localConfig, started: true, start: () => startLocal(composeFile, context, values) };
 }
 
 async function startLocal(composeFile, context, values) {

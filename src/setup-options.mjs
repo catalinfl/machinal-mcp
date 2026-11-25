@@ -18,7 +18,7 @@ export async function chooseClient(value, { interactive, ui }) {
   ] });
 }
 
-export async function chooseEndpoint(values, { env, interactive, ui, promptLocalURL = false }) {
+export async function chooseEndpoint(values, { env, interactive, ui }) {
   let mode = values.mode === 'hosted' ? 'server' : values.mode;
   if (mode && !['local', 'server', 'custom'].includes(mode)) throw new InstallerError('Choose --mode server (Machinal Server), local or custom (--mode hosted is an alias for server).');
   const customDefault = env.MACHINAL_API_ORIGIN || env.DIRECTION_API_ORIGIN;
@@ -33,26 +33,29 @@ export async function chooseEndpoint(values, { env, interactive, ui, promptLocal
   // An explicit legacy --url remains a custom deployment, never branded as the official service.
   if (mode === 'server' && values.url && normalizeEndpoint(values.url) !== MACHINAL_SERVER_URL) mode = 'custom';
   if (mode === 'server') return { mode, url: MACHINAL_SERVER_URL };
+  if (mode === 'local') {
+    if (!values.url) return { mode, url: DEFAULT_LOCAL_URL };
+    const url = normalizeEndpoint(values.url);
+    if (!isLoopbackEndpoint(url)) {
+      throw new InstallerError('Local mode requires a loopback API URL. Use --mode server for a deployed HTTPS API.');
+    }
+    return { mode, url };
+  }
   let rawURL = values.url || customDefault;
-  if (mode === 'local' && !values.url && (!rawURL || !isLoopbackEndpoint(normalizeEndpoint(rawURL)))) rawURL = DEFAULT_LOCAL_URL;
-  if (interactive && !values.url && (mode !== 'local' || promptLocalURL)) {
+  if (interactive && !values.url) {
     rawURL = await ui.input({
-      message: mode === 'local' ? 'Local API URL' : 'Custom server API URL (not the website)',
+      message: 'Custom server API URL (not the website)',
       ...(rawURL ? { default: rawURL } : {}), required: true,
       validate: (value) => {
         try {
-          const url = normalizeEndpoint(value);
-          return mode !== 'local' || isLoopbackEndpoint(url) || 'Local mode needs a loopback URL. Choose Custom server for your own remote API.';
+          normalizeEndpoint(value);
+          return true;
         } catch (error) { return error.message; }
       },
     });
   }
   if (!rawURL) throw new InstallerError('Custom server requires --url with your API origin. Use --mode server for Machinal Server without a URL.');
-  const url = normalizeEndpoint(rawURL);
-  if (mode === 'local' && !isLoopbackEndpoint(url)) {
-    throw new InstallerError('Local mode requires a loopback API URL. Use --mode server for a deployed HTTPS API.');
-  }
-  return { mode, url };
+  return { mode, url: normalizeEndpoint(rawURL) };
 }
 
 export async function chooseSkillOptions(values, { interactive, ui }) {
