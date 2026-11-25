@@ -18,6 +18,7 @@ const DEFAULT_MAX_WAIT_SECONDS = 120;
 const SOUND_CACHE_TTL_MS = 5 * 60 * 1000;
 const SOUND_CACHE_MAX_ENTRIES = 64;
 const TRANSIENT_GATEWAY_STATUSES = new Set([502, 503, 504]);
+const PRODUCTION_GATED_TOOLS = new Set(['create_project', 'compile_scene', 'generate_assets', 'render_video', 'render_preview']);
 const PROTOCOL = '2025-11-25';
 const VERSIONS = ['2025-03-26', '2025-06-18', PROTOCOL];
 const CLIENT_VERSIONS = ['2024-11-05', ...VERSIONS];
@@ -82,7 +83,7 @@ async function jsonResponse(response) {
 }
 
 export class MCPBridge {
-  constructor({ url, localConfig, catalogFile, env = process.env, credentialStore = createCredentialStore({ env }), fetchImpl = fetch, signal, notify = () => {}, maxWaitSeconds, fileRoots, soundRetryDelayMs = 500 }) {
+  constructor({ url, localConfig, catalogFile, env = process.env, credentialStore = createCredentialStore({ env }), fetchImpl = fetch, signal, notify = () => {}, maxWaitSeconds, fileRoots, soundRetryDelayMs = 500, requireQuickstart = true }) {
     this.url = normalizeEndpoint(url);
     this.localConfig = localConfig;
     this.deployment = describeDeployment({ local: Boolean(localConfig), url: this.url });
@@ -95,6 +96,8 @@ export class MCPBridge {
     this.maxWaitSeconds = parseMaxWaitSeconds(maxWaitSeconds, env);
     this.allowedRoots = parseAllowedRoots(fileRoots, env);
     this.soundRetryDelayMs = soundRetryDelayMs;
+    this.requireQuickstart = requireQuickstart;
+    this.quickstartCompleted = false;
     this.soundSearchCache = new Map();
     this.tools = [];
     this.state = { status: 'unchecked', message: 'Connection has not been checked.' };
@@ -104,6 +107,9 @@ export class MCPBridge {
   }
 
   status() {
+    const readyAction = this.localConfig
+      ? 'Ready (independent local Docker mode). For any new or edited video, call production_quickstart first alongside get_workflow_preferences, get_recipe_schema, get_capabilities and list_speech_models. Zero Machinal credits does NOT skip the collaborative brief or authorize userApproved:true — ask all missing brief choices (platform/aspect+resolution such as TikTok 9:16 vs YouTube 16:9, duration, visual materials/images vs procedural, narration/language/TTS model, captions, sound effects) in one native question form before creating projects, compiling scenes, generating assets or rendering.'
+      : 'Ready. For any new or edited video, call production_quickstart first alongside get_workflow_preferences, get_recipe_schema, get_capabilities, get_credits and list_speech_models, then ask all missing brief choices in one native question form before creating projects, compiling scenes, generating assets or rendering.';
     return { ...this.state, transport: 'connected', mode: this.localConfig ? 'local' : 'server', deployment: this.deployment, endpoint: this.url,
       requestConcurrency: requestLimits,
       maxWaitSeconds: this.maxWaitSeconds,
@@ -113,7 +119,7 @@ export class MCPBridge {
       toolCount: this.tools.length, nextAction: this.localConfig && this.state.status !== 'connected'
         ? 'Check the saved independent local profile and Docker services. Rerun setup --mode local if its generated device token is invalid; a Machinal login is not needed.' : this.state.status === 'login_required'
         ? `Run machinal set-key --url ${this.url} in a terminal, or provide MACHINAL_API_KEY in the client environment. Never paste it in chat.`
-        : this.state.status === 'connected' ? 'Ready.' : 'Check the configured API/container and network, then reconnect. Do not replace keys for network or account-access errors.' };
+        : this.state.status === 'connected' ? readyAction : 'Check the configured API/container and network, then reconnect. Do not replace keys for network or account-access errors.' };
   }
 
   async loadCatalog() {
@@ -265,7 +271,7 @@ export class MCPBridge {
           }
           return { ...tool, inputSchema: schema };
         }
-        return decorateStdioTool(tool, { maxWaitSeconds: this.maxWaitSeconds });
+        return decorateStdioTool(tool, { maxWaitSeconds: this.maxWaitSeconds, local: Boolean(this.localConfig) });
       });
       return { tools: [STATUS_TOOL, ...LIBRARY_TOOLS, ...tools] };
     }
@@ -274,7 +280,25 @@ export class MCPBridge {
       return toolResult(this.status());
     }
     if (method === 'tools/call') {
-      if (this.library.handles(params.name, params.arguments)) return this.library.call(params.name, params.arguments);
+      if (this.library.handles(params.name, params.arguments)) {
+        const isQuickstart = params.name === 'production_quickstart'
+          || ((params.name === 'get_library_reference' || params.name === 'get_editing_reference') && params.arguments?.topic === 'quickstart');
+        const result = await this.library.call(params.name, params.arguments);
+        if (isQuickstart && !result.isError) this.quickstartCompleted = true;
+        return result;
+      }
+      if (this.requireQuickstart && PRODUCTION_GATED_TOOLS.has(params.name) && !this.quickstartCompleted) {
+        const liveBatch = this.localConfig
+          ? 'get_workflow_preferences, get_recipe_schema, get_capabilities, list_speech_models'
+          : 'get_workflow_preferences, get_recipe_schema, get_capabilities, get_credits, list_speech_models';
+        return toolResult({
+          status: 'blocked',
+          submissionState: 'not-submitted',
+          nextTool: 'production_quickstart',
+          deploymentMode: this.deployment.kind,
+          error: `Production bootstrap required before ${params.name}. Call production_quickstart first (in parallel with ${liveBatch}) in its own turn — do not batch it with ${params.name}. Read the returned briefGuide and ask ALL missing brief decisions in ONE native question form (destination/platform + aspect & resolution such as TikTok 9:16 vs YouTube 16:9, duration, visual materials/AI-generated images vs existing media vs procedural, narration/language/TTS model, captions, and sound effects) before proceeding. A short prompt with only topic, style, or 2D/3D preference is INCOMPLETE. Local zero-credit Docker mode requires the exact same brief and explicit user approval as cloud mode; never self-approve userApproved:true. No action was executed.`,
+        }, true);
+      }
       if (this.state.status !== 'connected') await this.connect();
       if (this.state.status !== 'connected') return toolResult(this.status(), true);
       if (!this.tools.some((tool) => tool.name === params.name)) return toolResult({ message: 'Unknown tool. Refresh the Machinal catalog.' }, true);

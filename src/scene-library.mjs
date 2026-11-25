@@ -280,6 +280,17 @@ export class SceneLibrary {
     const liveBootstrapBatch = local
       ? ['get_workflow_preferences', 'get_recipe_schema', 'get_capabilities', 'list_speech_models']
       : ['get_workflow_preferences', 'get_recipe_schema', 'get_capabilities', 'get_credits', 'list_speech_models'];
+    const mandatoryBriefQuestions = [
+      'Platform / destination, aspect ratio AND output resolution (e.g. TikTok/Reels 9:16 1080x1920 vs YouTube/web 16:9 1920x1080)',
+      'Approximate duration (e.g. ~30s, ~60s, 2–3 min)',
+      'Visual materials & presentation (AI-generated images via BYOK/provider vs existing photos/footage vs pure procedural 2D/3D — asking for "2D only" still leaves generated/existing 2D imagery vs pure vector/DOM unanswered)',
+      'Audio, spoken language, TTS speech model (from list_speech_models: e.g. Kokoro, Gemini 3.8 Flash-Lite, Gemini 3.8 Flash) and captions/subtitles',
+      'Sound effects as its own separate question (discrete CC0 SFX vs none)',
+      'Explicit user approval for the covered scope (never self-approve userApproved:true, even on local zero-credit Docker mode)',
+    ];
+    const incompleteBriefRule = local
+      ? 'STRICT LOCAL PARITY: Zero Machinal credits and local hardware rendering do NOT skip the brief and do NOT authorize userApproved:true. A short prompt naming only the subject, visual style, or 2D/3D constraint is INCOMPLETE. You MUST ask all missing items in mandatoryBriefQuestions using ONE native question form (ask_question/question) and wait for the user reply before calling create_project, compile_scene, generate_assets or render_video, unless the user explicitly answered them or delegated with "you decide".'
+      : 'A short prompt naming only the subject, visual style, or 2D/3D constraint is INCOMPLETE. You MUST ask all missing items in mandatoryBriefQuestions using ONE native question form (ask_question/question) and wait for the user reply before calling create_project, compile_scene, generate_assets or render_video, unless the user explicitly answered them or delegated with "you decide".';
     const stageChecklist = purpose === 'edit'
       ? [
           local
@@ -294,7 +305,9 @@ export class SceneLibrary {
           local
             ? '1. Batch free bootstrap calls in ONE turn: production_quickstart + get_workflow_preferences + get_recipe_schema + get_capabilities + list_speech_models. (Local Docker mode: BYOK provider key, local hardware rendering, storage=volume only; do NOT call get_credits.)'
             : '1. Batch free bootstrap calls in ONE turn: production_quickstart + get_workflow_preferences + get_recipe_schema + get_capabilities + get_credits + list_speech_models.',
-          '2. Ask ONLY missing brief decisions (duration, aspect+resolution, visuals/scenes, TTS model, and a separate sound-effects question) in ONE native question form; reuse existing approvals.',
+          local
+            ? '2. STOP if ANY brief decision is missing (platform/destination + aspect & resolution such as TikTok 9:16 vs YouTube 16:9, duration, visuals/AI-generated images vs procedural, narration/language/TTS model, captions, and a separate sound-effects question) and ask them ALL in ONE native question form. Zero Machinal credits does NOT skip the brief or authorize self-approving userApproved:true; reuse existing explicit approvals.'
+            : '2. STOP if ANY brief decision is missing (platform/destination + aspect & resolution such as TikTok 9:16 vs YouTube 16:9, duration, visuals/AI-generated images vs procedural, narration/language/TTS model, captions, and a separate sound-effects question) and ask them ALL in ONE native question form; reuse existing explicit approvals.',
           '3. For narration, submit timing-first pass (speech.generate + requested captions.generate ONLY), wait with wait_for_job(timeoutSeconds<=120), then save resolved YAML via get_job_result(recipeFile, checkpointFile).',
           '4. For image-led cinematic/documentary edits call plan_hybrid_edit (supports dissolve or custom transition presets); run component-discovery per animated beat; compile scenes up to 2 concurrently with compile_scene(componentFile | templateId).',
           '5. Patch the local .edit.yaml file (never rewrite full YAML in tool arguments), run validate_recipe + compile_recipe with compositionFile + captionBaselineRecipeFile/captionBaselineFile + checkpointFile.',
@@ -326,6 +339,8 @@ export class SceneLibrary {
       deployment,
       purpose,
       liveBootstrapBatch,
+      mandatoryBriefQuestions,
+      incompleteBriefRule,
       stageChecklist,
       localFileShortcuts,
       yamlRules,

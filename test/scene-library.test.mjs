@@ -309,10 +309,16 @@ test('SceneLibrary deduplicates shared guides, expands film-styles search, and a
   assert.ok(!buildingBlocks.entries.some(entry => entry.id === 'hyperframes-blocks-ai-chat-reveal'),
     'hyperframes-blocks-* prefix must not match unrelated "blocks" queries');
 
-  // Local mode quickstart omits get_credits and credits topic
+  // Local mode quickstart omits get_credits and credits topic while enforcing full brief parity
   const localLibrary = new SceneLibrary(undefined, { mode: 'local' });
   const localQuick = await localLibrary.quickstart({ includeBriefGuide: false });
   assert.equal(localQuick.deploymentMode, 'local');
   assert.equal(localQuick.liveBootstrapBatch.includes('get_credits'), false);
   assert.equal(localQuick.onDemandTopics.credits, undefined);
+  assert.ok(Array.isArray(localQuick.mandatoryBriefQuestions) && localQuick.mandatoryBriefQuestions.length >= 5);
+  assert.ok(localQuick.mandatoryBriefQuestions.some(q => /TikTok\/Reels 9:16/.test(q)));
+  assert.ok(localQuick.mandatoryBriefQuestions.some(q => /TTS speech model/.test(q)));
+  assert.ok(localQuick.mandatoryBriefQuestions.some(q => /Sound effects/.test(q)));
+  assert.match(localQuick.incompleteBriefRule, /STRICT LOCAL PARITY/);
+  assert.match(localQuick.incompleteBriefRule, /userApproved:true/);
 });

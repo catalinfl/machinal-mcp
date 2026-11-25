@@ -168,6 +168,7 @@ test('a failed submitted operation is never retried automatically and reports am
     request.socket.destroy();
   });
   const bridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null });
+  await bridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'edit', includeBriefGuide: false } });
   const result = await bridge.handle('tools/call', { name: 'render_video', arguments: { userApproved: true, idempotencyKey: 'keep-me' } });
   assert.equal(calls, 1);
   assert.equal(result.isError, true);
@@ -293,6 +294,7 @@ test('stdio bridge supports local recipe, checkpoint, contract and Svelte compon
   const upstreamCalls = [];
   const bridge = new MCPBridge({ url, env: {}, credentialStore: null, fileRoots: [cwd] });
   bridge.state = { status: 'connected' };
+  await bridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'edit', includeBriefGuide: false } });
   bridge.tools = [
     { name: 'get_job_result', description: 'result', inputSchema: { type: 'object', required: ['projectId', 'jobId'], properties: { projectId: { type: 'string' }, jobId: { type: 'string' } } } },
     { name: 'validate_recipe', description: 'validate', inputSchema: { type: 'object', required: ['projectId', 'composition'], properties: { projectId: { type: 'string' }, composition: { type: 'string' } } } },
@@ -625,4 +627,73 @@ test('compile_recipe hydrates productionContract.compositionVersion when set to 
     arguments: { projectId: 'owned', composition: recipe, productionContract: { version: 1, compositionVersion: explicit, beats: [{ id: 'b1' }] } },
   });
   assert.equal(upstreamCalls.at(-1).arguments.productionContract.compositionVersion, explicit);
+});
+
+test('stdio bridge blocks production tools until production_quickstart completes and enforces local brief parity', async (t) => {
+  const cwd = await workspace(t);
+  const upstreamCalls = [];
+  const endpoint = await serve(t, async (request, response) => {
+    const body = await requestBody(request);
+    if (body.method === 'initialize') return reply(response, body, { protocolVersion: '2025-11-25', serverInfo: { name: 'machinal-local' } });
+    if (body.method === 'notifications/initialized') return response.writeHead(202).end();
+    if (body.method === 'tools/list') {
+      return reply(response, body, {
+        tools: [
+          { name: 'list_projects' },
+          { name: 'get_recipe_schema' },
+          { name: 'create_project', description: 'Create project.', inputSchema: { type: 'object', properties: { name: { type: 'string' } } } },
+          { name: 'compile_scene', description: 'Compile scene.', inputSchema: { type: 'object', required: ['projectId', 'component'], properties: { projectId: { type: 'string' }, component: { type: 'string' }, userApproved: { type: 'boolean', description: 'Approval.' } } } },
+          { name: 'generate_assets', description: 'Generate assets.', inputSchema: { type: 'object', properties: { projectId: { type: 'string' }, userApproved: { type: 'boolean', description: 'Approval.' } } } },
+          { name: 'render_video', description: 'Render video.', inputSchema: { type: 'object', properties: { projectId: { type: 'string' }, userApproved: { type: 'boolean', description: 'Approval.' } } } },
+          { name: 'render_preview', description: 'Render preview.', inputSchema: { type: 'object', properties: { projectId: { type: 'string' }, userApproved: { type: 'boolean', description: 'Approval.' } } } },
+        ],
+      });
+    }
+    upstreamCalls.push(body.params.name);
+    return reply(response, body, { content: [{ type: 'text', text: '{"statusCode":200,"data":{"ok":true}}' }], structuredContent: { statusCode: 200, data: { ok: true } } });
+  });
+  const localConfig = join(cwd, 'providers.env');
+  await writeFile(localConfig, `MACHINAL_LOCAL_URL='${endpoint}'\nMACHINAL_LOCAL_TOKEN='local_${'a'.repeat(64)}'\n`);
+  const bridge = new MCPBridge({ url: endpoint, localConfig, env: {}, credentialStore: null });
+  const status = await bridge.connect();
+  assert.equal(status.status, 'connected');
+  assert.match(status.nextAction, /production_quickstart/);
+  assert.match(status.nextAction, /Zero Machinal credits does NOT skip the collaborative brief/i);
+  assert.match(status.nextAction, /TikTok 9:16 vs YouTube 16:9/);
+
+  const listed = new Map((await bridge.handle('tools/list')).tools.map(tool => [tool.name, tool]));
+  for (const name of ['create_project', 'compile_scene', 'generate_assets', 'render_video', 'render_preview']) {
+    assert.match(listed.get(name).description, /production_quickstart/);
+    assert.match(listed.get(name).description, /Local zero-credit Docker mode requires the EXACT same collaborative brief/);
+  }
+  assert.match(listed.get('compile_scene').inputSchema.properties.userApproved.description, /Never set userApproved:true/);
+  assert.match(listed.get('render_video').inputSchema.properties.userApproved.description, /Never self-approve userApproved:true/);
+
+  // Every production tool is blocked before production_quickstart with zero upstream calls.
+  for (const name of ['create_project', 'compile_scene', 'generate_assets', 'render_video', 'render_preview']) {
+    const blocked = await bridge.handle('tools/call', { name, arguments: { projectId: 'p1', name: 'demo', component: '<p/>', userApproved: true } });
+    assert.equal(blocked.isError, true);
+    assert.equal(blocked.structuredContent.status, 'blocked');
+    assert.equal(blocked.structuredContent.submissionState, 'not-submitted');
+    assert.equal(blocked.structuredContent.nextTool, 'production_quickstart');
+    assert.equal(blocked.structuredContent.deploymentMode, 'local');
+    assert.match(blocked.structuredContent.error, /TikTok 9:16 vs YouTube 16:9/);
+    assert.match(blocked.structuredContent.error, /Local zero-credit Docker mode requires the exact same brief/);
+  }
+  assert.deepEqual(upstreamCalls, []);
+
+  // Batching production_quickstart and create_project in the same parallel turn still blocks create_project.
+  const [quickRes, racedProject] = await Promise.all([
+    bridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'create' } }),
+    bridge.handle('tools/call', { name: 'create_project', arguments: { name: 'raced' } }),
+  ]);
+  assert.equal(quickRes.structuredContent.statusCode, 200);
+  assert.equal(racedProject.isError, true);
+  assert.equal(racedProject.structuredContent.status, 'blocked');
+  assert.deepEqual(upstreamCalls, []);
+
+  // Once production_quickstart has completed, subsequent production calls proceed normally.
+  const created = await bridge.handle('tools/call', { name: 'create_project', arguments: { name: 'approved-after-brief' } });
+  assert.equal(created.isError, undefined);
+  assert.deepEqual(upstreamCalls, ['create_project']);
 });

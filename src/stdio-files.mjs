@@ -182,11 +182,28 @@ function replaceResultPayload(result, updated) {
   };
 }
 
-export function decorateStdioTool(tool, { maxWaitSeconds = 120 } = {}) {
+export function decorateStdioTool(tool, { maxWaitSeconds = 120, local = false } = {}) {
+  const briefGateNotice = local
+    ? 'Requires production_quickstart in this session first. Local zero-credit Docker mode requires the EXACT same collaborative brief (platform/destination + aspect & resolution such as TikTok 9:16 vs YouTube 16:9, duration, visual materials/AI-generated images vs existing media vs procedural, narration/language/TTS model, captions, sound effects) and explicit user approval as cloud mode; never self-approve userApproved:true.'
+    : 'Requires production_quickstart in this session first and completing the collaborative brief for all missing decisions (platform/destination + aspect & resolution, duration, visual materials/images vs procedural, narration/language/TTS model, captions, sound effects) with explicit user approval; never self-approve userApproved:true.';
+
+  if (tool.name === 'create_project') {
+    return {
+      ...tool,
+      description: `${tool.description} ${briefGateNotice}`,
+    };
+  }
+
   if (tool.name === 'compile_scene') {
     const schema = templateCompileSchema(structuredClone(tool.inputSchema ?? { type: 'object' }));
     schema.properties = {
       ...schema.properties,
+      ...(schema.properties?.userApproved ? {
+        userApproved: {
+          ...schema.properties.userApproved,
+          description: `${schema.properties.userApproved.description ?? ''} Never set userApproved:true without the user's explicit brief/scope approval, even in local zero-credit Docker mode.`.trim(),
+        },
+      } : {}),
       componentFile: {
         type: 'string',
         description: 'Absolute client-local .svelte source (UTF-8, 1–64000 bytes). Read locally instead of repeating Svelte inline in component.',
@@ -194,7 +211,7 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120 } = {}) {
     };
     return {
       ...tool,
-      description: `${tool.description} Supply component, componentFile (local .svelte path) or templateId. ${templateCompileHelp}`,
+      description: `${tool.description} ${briefGateNotice} Supply component, componentFile (local .svelte path) or templateId. ${templateCompileHelp}`,
       inputSchema: schema,
     };
   }
@@ -208,6 +225,12 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120 } = {}) {
     );
     schema.properties = {
       ...schema.properties,
+      ...(paid && schema.properties?.userApproved ? {
+        userApproved: {
+          ...schema.properties.userApproved,
+          description: `${schema.properties.userApproved.description ?? ''} Never self-approve userApproved:true without explicit user approval of the brief/scope, even in local zero-credit Docker mode.`.trim(),
+        },
+      } : {}),
       ...(schema.properties?.projectId ? {
         projectId: {
           ...schema.properties.projectId,
@@ -249,7 +272,7 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120 } = {}) {
     };
     return {
       ...tool,
-      description: `${tool.description} Client stdio bridge: prefer compositionFile, captionBaselineRecipeFile and checkpointFile over repeating large YAML inline. Existing consent, validation, idempotency and spending rules still apply.`,
+      description: `${tool.description}${paid ? ` ${briefGateNotice}` : ''} Client stdio bridge: prefer compositionFile, captionBaselineRecipeFile and checkpointFile over repeating large YAML inline. Existing consent, validation, idempotency and spending rules still apply.`,
       inputSchema: schema,
     };
   }
