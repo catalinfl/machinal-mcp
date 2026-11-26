@@ -167,7 +167,7 @@ test('a failed submitted operation is never retried automatically and reports am
     calls++;
     request.socket.destroy();
   });
-  const bridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null });
+  const bridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null, requireBrief: false });
   await bridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'edit', includeBriefGuide: false } });
   const result = await bridge.handle('tools/call', { name: 'render_video', arguments: { userApproved: true, idempotencyKey: 'keep-me' } });
   assert.equal(calls, 1);
@@ -295,6 +295,22 @@ test('stdio bridge supports local recipe, checkpoint, contract and Svelte compon
   const bridge = new MCPBridge({ url, env: {}, credentialStore: null, fileRoots: [cwd] });
   bridge.state = { status: 'connected' };
   await bridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'edit', includeBriefGuide: false } });
+  const editBrief = await bridge.handle('tools/call', {
+    name: 'confirm_brief',
+    arguments: {
+      purpose: 'edit',
+      projectId: 'owned',
+      askedUser: false,
+      format: { aspect: 'portrait', resolution: '1080p', source: 'existing_project' },
+      duration: { target: 'existing', source: 'existing_project' },
+      visuals: { materials: 'existing scenes', source: 'existing_project' },
+      narration: { enabled: false, source: 'existing_project' },
+      captions: { enabled: true, source: 'existing_project' },
+      soundEffects: { enabled: false, source: 'existing_project' },
+      userApproval: { approved: true, scope: 'recompile scene and render edit', userQuote: 'update scene 1 and render' },
+    },
+  });
+  assert.equal(editBrief.isError, undefined);
   bridge.tools = [
     { name: 'get_job_result', description: 'result', inputSchema: { type: 'object', required: ['projectId', 'jobId'], properties: { projectId: { type: 'string' }, jobId: { type: 'string' } } } },
     { name: 'validate_recipe', description: 'validate', inputSchema: { type: 'object', required: ['projectId', 'composition'], properties: { projectId: { type: 'string' }, composition: { type: 'string' } } } },
@@ -688,12 +704,220 @@ test('stdio bridge blocks production tools until production_quickstart completes
     bridge.handle('tools/call', { name: 'create_project', arguments: { name: 'raced' } }),
   ]);
   assert.equal(quickRes.structuredContent.statusCode, 200);
+  assert.match(quickRes.structuredContent.data.STOP_BEFORE_BUILDING, /ask_question/);
+  assert.ok(Buffer.byteLength(quickRes.content[0].text) < 16000, 'default production_quickstart (even with local OpenRouter alert) must stay compact so clients never spill it to disk');
   assert.equal(racedProject.isError, true);
   assert.equal(racedProject.structuredContent.status, 'blocked');
   assert.deepEqual(upstreamCalls, []);
 
-  // Once production_quickstart has completed, subsequent production calls proceed normally.
+  // Even AFTER production_quickstart, every production tool stays blocked until confirm_brief succeeds!
+  for (const name of ['create_project', 'compile_scene', 'generate_assets', 'render_video', 'render_preview']) {
+    const blocked = await bridge.handle('tools/call', { name, arguments: { projectId: 'p1', name: 'skipped-brief', component: '<p/>', userApproved: true } });
+    assert.equal(blocked.isError, true);
+    assert.equal(blocked.structuredContent.status, 'blocked');
+    assert.equal(blocked.structuredContent.nextTool, 'confirm_brief');
+  }
+  assert.deepEqual(upstreamCalls, []);
+
+  // Incomplete or placeholder confirm_brief is rejected with needs_user_input and does not unlock production.
+  const badBrief = await bridge.handle('tools/call', {
+    name: 'confirm_brief',
+    arguments: {
+      purpose: 'create',
+      askedUser: false,
+      format: { aspect: 'portrait', resolution: '1080p', source: 'not_asked_yet' },
+      duration: { target: '30s', source: 'user_prompt', userQuote: 'default' },
+      visuals: { materials: '2D procedural', source: 'user_prompt', userQuote: 'totul 2d' },
+      narration: { enabled: true, language: 'en', speechModel: 'undecided', source: 'user_prompt', userQuote: 'in engleza' },
+      captions: { enabled: true, source: 'not_asked_yet' },
+      soundEffects: { enabled: false, source: 'not_asked_yet' },
+      userApproval: { approved: false, scope: 'render', userQuote: 'none' },
+    },
+  });
+  assert.equal(badBrief.isError, true);
+  assert.equal(badBrief.structuredContent.status, 'needs_user_input');
+  assert.ok(badBrief.structuredContent.missingDecisions.length >= 5);
+  const stillBlocked = await bridge.handle('tools/call', { name: 'create_project', arguments: { name: 'still-blocked' } });
+  assert.equal(stillBlocked.isError, true);
+  assert.equal(stillBlocked.structuredContent.nextTool, 'confirm_brief');
+
+  // Once the user replies and confirm_brief succeeds, create_project unlocks ONCE and binds to that projectId.
+  const validBriefArgs = {
+    purpose: 'create',
+    askedUser: true,
+    format: { platform: 'TikTok', aspect: '9:16', resolution: '1080p', source: 'user_reply', userQuote: 'Vertical 9:16 1080p' },
+    duration: { target: '~30s', source: 'user_reply', userQuote: 'around 30 seconds' },
+    visuals: { materials: '2D neobrutalist Svelte scenes', source: 'user_prompt', userQuote: 'neobrutalist, 2d only' },
+    narration: { enabled: true, language: 'en', speechModel: 'hexgrad/kokoro-82m', voice: 'af_bella', source: 'user_reply', userQuote: 'Kokoro English' },
+    captions: { enabled: true, source: 'user_reply', userQuote: 'yes with captions' },
+    soundEffects: { enabled: false, source: 'user_reply', userQuote: 'no sound effects' },
+    userApproval: { approved: true, scope: 'TTS speech, scene rendering, final MP4 render', userQuote: 'approved, go ahead' },
+  };
+  const confirmed = await bridge.handle('tools/call', { name: 'confirm_brief', arguments: validBriefArgs });
+  assert.equal(confirmed.isError, undefined);
+  assert.equal(confirmed.structuredContent.status, 'confirmed');
+
+  // Calling create_project succeeds and consumes the pending brief.
   const created = await bridge.handle('tools/call', { name: 'create_project', arguments: { name: 'approved-after-brief' } });
   assert.equal(created.isError, undefined);
   assert.deepEqual(upstreamCalls, ['create_project']);
+});
+
+test('stdio bridge binds create_project brief per project, re-gates a second video, blocks wrong speech model, and auto-probes audio metadata to block truncated narration before render_video', async (t) => {
+  const upstreamCalls = [];
+  let createdCount = 0;
+  const endpoint = await serve(t, async (request, response) => {
+    const body = await requestBody(request);
+    if (body.method === 'initialize') return reply(response, body, { protocolVersion: '2025-11-25', serverInfo: { name: 'machinal' } });
+    if (body.method === 'notifications/initialized') return response.writeHead(202).end();
+    if (body.method === 'tools/list') {
+      return reply(response, body, {
+        tools: [
+          { name: 'list_projects' },
+          { name: 'get_recipe_schema' },
+          { name: 'create_project', inputSchema: { type: 'object', properties: { name: { type: 'string' } } } },
+          { name: 'generate_assets', inputSchema: { type: 'object', properties: { projectId: { type: 'string' }, composition: { type: 'string' }, userApproved: { type: 'boolean' }, idempotencyKey: { type: 'string' } } } },
+          { name: 'get_asset_metadata', inputSchema: { type: 'object', properties: { projectId: { type: 'string' }, files: { type: 'array' }, userApproved: { type: 'boolean' } } } },
+          { name: 'render_video', inputSchema: { type: 'object', properties: { projectId: { type: 'string' }, composition: { type: 'string' }, userApproved: { type: 'boolean' }, idempotencyKey: { type: 'string' } } } },
+        ],
+      });
+    }
+    upstreamCalls.push(body.params.name);
+    if (body.params.name === 'create_project') {
+      createdCount++;
+      return reply(response, body, {
+        content: [{ type: 'text', text: JSON.stringify({ statusCode: 201, data: { id: `p_${createdCount}` } }) }],
+        structuredContent: { statusCode: 201, data: { id: `p_${createdCount}` } },
+      });
+    }
+    if (body.params.name === 'get_asset_metadata') {
+      return reply(response, body, {
+        content: [{ type: 'text', text: JSON.stringify({ statusCode: 200, data: [{ id: 'vo_audio', file: 'voice_if_you_3199dffd.mp3', kind: 'audio', duration: 23.904, hasAudio: true }] }) }],
+        structuredContent: { statusCode: 200, data: [{ id: 'vo_audio', file: 'voice_if_you_3199dffd.mp3', kind: 'audio', duration: 23.904, hasAudio: true }] },
+      });
+    }
+    return reply(response, body, {
+      content: [{ type: 'text', text: JSON.stringify({ statusCode: 202, data: { id: 'job-ok', status: 'queued' } }) }],
+      structuredContent: { statusCode: 202, data: { id: 'job-ok', status: 'queued' } },
+    });
+  });
+
+  const bridge = new MCPBridge({ url: endpoint, env: { MACHINAL_API_KEY: API_KEY }, credentialStore: null });
+  await bridge.connect();
+  await bridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'create' } });
+  await bridge.handle('tools/call', {
+    name: 'confirm_brief',
+    arguments: {
+      purpose: 'create',
+      askedUser: true,
+      format: { aspect: 'portrait', resolution: '1080p', source: 'user_reply', userQuote: '9:16 1080p' },
+      duration: { target: '25s', source: 'user_reply', userQuote: 'about 25s' },
+      visuals: { materials: '2D Svelte', source: 'user_reply', userQuote: '2D scenes' },
+      narration: { enabled: true, language: 'en', speechModel: 'google/gemini-3.8-flash-tts', source: 'user_reply', userQuote: 'Gemini Flash TTS' },
+      captions: { enabled: false, source: 'user_reply', userQuote: 'no captions' },
+      soundEffects: { enabled: false, source: 'user_reply', userQuote: 'no SFX' },
+      userApproval: { approved: true, scope: 'render video', userQuote: 'approved' },
+    },
+  });
+
+  // Video 1 project creation consumes the pending brief and binds it to p_1.
+  const p1 = await bridge.handle('tools/call', { name: 'create_project', arguments: { name: 'video-1' } });
+  assert.equal(p1.structuredContent.data.id, 'p_1');
+
+  // Starting a SECOND video without a new confirm_brief is blocked!
+  const p2Blocked = await bridge.handle('tools/call', { name: 'create_project', arguments: { name: 'video-2' } });
+  assert.equal(p2Blocked.isError, true);
+  assert.equal(p2Blocked.structuredContent.nextTool, 'confirm_brief');
+
+  // Submitting generate_assets with a DIFFERENT speech model than the user confirmed is blocked locally.
+  const wrongModel = await bridge.handle('tools/call', {
+    name: 'generate_assets',
+    arguments: {
+      projectId: 'p_1',
+      idempotencyKey: 'k-speech',
+      userApproved: true,
+      composition: [
+        'document:',
+        '  version: 2',
+        '  mode: assemble',
+        '  before:',
+        '    - id: vo',
+        '      type: speech.generate',
+        '      model: hexgrad/kokoro-82m',
+        '      text: "Hello"',
+        '  placements:',
+        '    - { job: vo, track: { type: audio, role: narration }, start: 0s }',
+        '  output: { aspect: portrait, resolution: 1080p, fps: 30, format: mp4 }',
+        'bindings: {}',
+        'assets: []',
+      ].join('\n'),
+    },
+  });
+  assert.equal(wrongModel.isError, true);
+  assert.equal(wrongModel.structuredContent.submissionState, 'not-submitted');
+  assert.match(wrongModel.structuredContent.message, /google\/gemini-3\.8-flash-tts/);
+
+  // Attempting render_video on p_1 with guessed outPoint: 20 (omitting duration from assets:) triggers auto-probe and HARD-BLOCKS before render_video!
+  const truncatedRender = await bridge.handle('tools/call', {
+    name: 'render_video',
+    arguments: {
+      projectId: 'p_1',
+      idempotencyKey: 'render-trunc',
+      userApproved: true,
+      composition: [
+        'document:',
+        '  version: 2',
+        '  mode: assemble',
+        '  output: { aspect: portrait, resolution: 1080p, fps: 30, format: mp4 }',
+        '  tracks:',
+        '    - id: main',
+        '      type: video',
+        '      clips:',
+        '        - { id: c1, assetId: s1, start: 0, inPoint: 0, outPoint: 25.25 }',
+        '    - id: narration',
+        '      type: audio',
+        '      clips:',
+        '        - { id: vo_clip, assetId: vo_audio, start: 0, inPoint: 0, outPoint: 20, volume: 100 }',
+        'bindings: {}',
+        'assets:',
+        '  - { id: s1, kind: video, file: s1.scene.json }',
+        '  - { id: vo_audio, kind: audio, file: voice_if_you_3199dffd.mp3 }',
+      ].join('\n'),
+    },
+  });
+  assert.equal(truncatedRender.isError, true);
+  assert.equal(truncatedRender.structuredContent.submissionState, 'not-submitted');
+  assert.match(truncatedRender.structuredContent.message, /cutting off the last 3\.90s.*23\.904s/);
+  assert.deepEqual(upstreamCalls, ['create_project', 'get_asset_metadata'], 'render_video must NEVER be submitted upstream when narration is truncated');
+
+  // Once outPoint matches full 23.904s, render_video submits cleanly (and reuses cached duration without re-probing).
+  const fullRender = await bridge.handle('tools/call', {
+    name: 'render_video',
+    arguments: {
+      projectId: 'p_1',
+      idempotencyKey: 'render-full',
+      userApproved: true,
+      composition: [
+        'document:',
+        '  version: 2',
+        '  mode: assemble',
+        '  output: { aspect: portrait, resolution: 1080p, fps: 30, format: mp4 }',
+        '  tracks:',
+        '    - id: main',
+        '      type: video',
+        '      clips:',
+        '        - { id: c1, assetId: s1, start: 0, inPoint: 0, outPoint: 25.25 }',
+        '    - id: narration',
+        '      type: audio',
+        '      clips:',
+        '        - { id: vo_clip, assetId: vo_audio, start: 0, inPoint: 0, outPoint: 23.904, volume: 100 }',
+        'bindings: {}',
+        'assets:',
+        '  - { id: s1, kind: video, file: s1.scene.json }',
+        '  - { id: vo_audio, kind: audio, file: voice_if_you_3199dffd.mp3 }',
+      ].join('\n'),
+    },
+  });
+  assert.equal(fullRender.isError, undefined);
+  assert.deepEqual(upstreamCalls, ['create_project', 'get_asset_metadata', 'render_video']);
 });

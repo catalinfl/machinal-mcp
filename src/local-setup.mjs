@@ -9,8 +9,18 @@ import { localCredentials } from './bridge.mjs';
 import { planTextFile, saveConfiguration } from './configuration.mjs';
 import { MACHINAL_STUDIO_URL } from './presentation.mjs';
 import { readSettings, saveSettings } from './settings.mjs';
+import {
+  checkBackendOpenRouterStatus,
+  inspectLocalOpenRouter,
+  OPENROUTER_KEYS_URL,
+  openRouterSetupInstructions,
+  providerKey,
+  syncOpenRouterKeyToBackend,
+  verifyOpenRouterKey,
+} from './openrouter.mjs';
 
-const OPENROUTER_KEY_CHECK_URL = 'https://openrouter.ai/api/v1/key';
+export { checkBackendOpenRouterStatus, inspectLocalOpenRouter, OPENROUTER_KEYS_URL, openRouterSetupInstructions, syncOpenRouterKeyToBackend, verifyOpenRouterKey };
+
 const DEFAULT_OPENROUTER_STT_MODEL = 'openai/whisper-large-v3';
 export const DEFAULT_OPENROUTER_MODELS = Object.freeze({
   OPENROUTER_MODEL: 'deepseek/deepseek-v4.1-flash',
@@ -28,12 +38,6 @@ async function fileExists(file) {
   }
 }
 
-function providerKey(value) {
-  const key = value?.trim();
-  if (!/^sk-or-v1-[a-f\d]{64}$/i.test(key ?? '')) throw new InstallerError('Enter a complete OpenRouter key (sk-or-v1-…) through hidden entry or OPENROUTER_API_KEY, never command arguments.');
-  return key;
-}
-
 function modelIdentifier(name, value) {
   const normalized = value?.trim() ?? '';
   if (normalized && !/^[\w~./:@+-]{1,200}$/.test(normalized)) {
@@ -47,33 +51,6 @@ function qualifiedModel(value) {
   return /^[\w~.-]+\/[\w~./:@+-]{1,180}$/.test(normalized) ? normalized : '';
 }
 
-export async function verifyOpenRouterKey(apiKey, { fetchImpl = fetch, timeout = 15_000 } = {}) {
-  let key;
-  try { key = providerKey(apiKey); } catch (error) {
-    return { status: 'invalid', message: error.message };
-  }
-  let response;
-  try {
-    response = await fetchImpl(OPENROUTER_KEY_CHECK_URL, {
-      method: 'GET',
-      redirect: 'error',
-      signal: AbortSignal.timeout(timeout),
-      headers: { Authorization: `Bearer ${key}` },
-    });
-  } catch {
-    return { status: 'unavailable', message: 'Could not reach OpenRouter to verify the API key. Check your internet connection.' };
-  }
-  await response.body?.cancel();
-  if (response.status === 200) return { status: 'valid' };
-  if (response.status === 401 || response.status === 403) {
-    return { status: 'invalid', httpStatus: response.status, message: 'OpenRouter rejected this API key. Enter an active key from https://openrouter.ai/keys.' };
-  }
-  if (response.status === 429) {
-    return { status: 'rate_limited', httpStatus: 429, message: 'OpenRouter rate-limited key verification (429). Wait a moment and retry.' };
-  }
-  return { status: 'unavailable', httpStatus: response.status, message: `OpenRouter could not verify the API key (HTTP ${response.status}).` };
-}
-
 function checkOpenRouter(key, context = {}) {
   if (context.verifyOpenRouterKey) return context.verifyOpenRouterKey(key);
   return verifyOpenRouterKey(key, { fetchImpl: context.fetchImpl });
@@ -85,27 +62,23 @@ export async function checkSavedOpenRouterKey(localConfig, context = {}) {
   return checkOpenRouter(saved.OPENROUTER_API_KEY ?? '', context);
 }
 
-async function syncOpenRouterKeyToBackend(endpoint, apiKey, context = {}) {
-  if (!isLoopbackEndpoint(endpoint)) return false;
+async function ensureBackendOpenRouterSynced(endpoint, apiKey, context = {}) {
+  if (!apiKey || !isLoopbackEndpoint(endpoint)) return false;
   if (context.checkConnection && !context.fetchImpl) return false;
-  const fetchImpl = context.fetchImpl ?? fetch;
-  try {
-    const response = await fetchImpl(new URL('/settings/openrouter', endpoint).href, {
-      method: 'POST',
-      redirect: 'error',
-      signal: AbortSignal.timeout(15_000),
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey }),
-    });
-    await response.body?.cancel();
-    return response.ok;
-  } catch {
-    return false;
+  const backend = await checkBackendOpenRouterStatus(endpoint, { fetchImpl: context.fetchImpl ?? fetch });
+  if (!backend.known || backend.configured) return true;
+  const synced = await syncOpenRouterKeyToBackend(endpoint, apiKey, context);
+  if (synced) {
+    context.log?.('Synced saved OpenRouter API key to the running local backend.');
+    return true;
   }
+  context.log?.(`Warning: Local backend reports OpenRouter is not configured and could not sync automatically. ${openRouterSetupInstructions(endpoint).summary}`);
+  return false;
 }
 
-async function obtainVerifiedOpenRouterKey(context) {
+async function obtainVerifiedOpenRouterKey(context, endpoint) {
   const { env = {}, interactive, ui, log = () => {} } = context;
+  const setup = openRouterSetupInstructions(endpoint);
   const envKey = env.OPENROUTER_API_KEY?.trim();
   if (envKey) {
     const normalized = providerKey(envKey);
@@ -113,16 +86,17 @@ async function obtainVerifiedOpenRouterKey(context) {
     if (check.status === 'valid') return normalized;
     if (check.status === 'rate_limited' || check.status === 'unavailable') {
       log(`Warning: ${check.message}`);
+      log(`How to configure or update your OpenRouter key later: ${setup.summary}`);
       return normalized;
     }
-    if (!interactive) throw new InstallerError(check.message);
+    if (!interactive) throw new InstallerError(`${check.message} ${setup.summary}`);
     log(`OPENROUTER_API_KEY in the environment did not pass verification (${check.message})`);
   }
   if (!interactive) return providerKey('');
   let validatedKey = null;
   let validatedState = null;
   const entered = await ui.password({
-    message: 'Your OpenRouter API key (hidden; charged directly by OpenRouter)',
+    message: `Your OpenRouter API key from ${OPENROUTER_KEYS_URL} (hidden; charged directly by OpenRouter)`,
     mask: '*',
     validate: async (value) => {
       let normalized;
@@ -136,8 +110,11 @@ async function obtainVerifiedOpenRouterKey(context) {
   });
   const normalized = providerKey(entered);
   const state = validatedKey === normalized ? validatedState : await checkOpenRouter(normalized, context);
-  if (state.status === 'invalid') throw new InstallerError(state.message);
-  if (state.status !== 'valid') log(`Warning: ${state.message}`);
+  if (state.status === 'invalid') throw new InstallerError(`${state.message} ${setup.summary}`);
+  if (state.status !== 'valid') {
+    log(`Warning: ${state.message}`);
+    log(`How to update your OpenRouter key if needed: ${setup.summary}`);
+  }
   return normalized;
 }
 
@@ -159,8 +136,77 @@ function formatEnv(settings) {
   return Object.entries(settings).map(([name, value]) => `${name}='${value}'`).join('\n') + '\n';
 }
 
-async function providers(context) {
-  const key = await obtainVerifiedOpenRouterKey(context);
+export async function setLocalOpenRouterKey(providedKey, endpoint, localConfig, context) {
+  const { env = {}, interactive, ui, log = () => {} } = context;
+  if (new URL(endpoint).protocol !== 'http:' || !isLoopbackEndpoint(endpoint)) {
+    throw new InstallerError('OpenRouter local configuration requires a loopback HTTP endpoint (e.g. http://127.0.0.1:8080/mcp).');
+  }
+  const setup = openRouterSetupInstructions(endpoint);
+  let candidate = providedKey?.trim();
+  if (!candidate) {
+    const envKey = env.OPENROUTER_API_KEY?.trim();
+    if (envKey && !interactive) {
+      candidate = envKey;
+    } else if (interactive) {
+      log(`Create or copy an active OpenRouter key at ${OPENROUTER_KEYS_URL}`);
+      candidate = await ui.password({
+        message: `Your OpenRouter API key from ${OPENROUTER_KEYS_URL} (hidden; charged directly by OpenRouter)`,
+        mask: '*',
+        validate: async (value) => {
+          let normalized;
+          try { normalized = providerKey(value); } catch (error) { return error.message; }
+          const check = await checkOpenRouter(normalized, context);
+          if (check.status === 'invalid') return check.message;
+          return true;
+        },
+      });
+    } else {
+      throw new InstallerError(`Provide an OpenRouter key via \`machinal key openrouter <sk-or-v1-...>\`, run \`machinal key openrouter\` interactively, or set OPENROUTER_API_KEY. Get a key at ${OPENROUTER_KEYS_URL}.`);
+    }
+  }
+  const key = providerKey(candidate);
+  const check = await checkOpenRouter(key, context);
+  if (check.status === 'invalid') throw new InstallerError(`${check.message} ${setup.summary}`);
+  if (check.status !== 'valid') log(`Warning: ${check.message}`);
+
+  let existingValues = {};
+  let localToken = null;
+  if (await fileExists(localConfig)) {
+    existingValues = parseEnv(await readFile(localConfig, 'utf8'));
+    try { localToken = await localCredentials(localConfig, endpoint); } catch { /* Preserve or generate fresh loopback device token below. */ }
+  }
+  localToken ??= /^local_[a-f\d]{64}$/.test(existingValues.MACHINAL_LOCAL_TOKEN ?? '')
+    ? existingValues.MACHINAL_LOCAL_TOKEN
+    : `local_${randomBytes(32).toString('hex')}`;
+  const sceneToken = existingValues.SCENE_SERVICE_TOKEN || randomBytes(32).toString('hex');
+  const models = providerModels(env, existingValues);
+  const settings = {
+    OPENROUTER_API_KEY: key,
+    ...models,
+    HOST: '0.0.0.0',
+    MACHINAL_LOCAL_URL: endpoint,
+    MACHINAL_MODE: 'local',
+    MACHINAL_LOCAL_CONTAINER: '1',
+    MACHINAL_LOCAL_TOKEN: localToken,
+    SCENE_SERVICE_TOKEN: sceneToken,
+    SCENE_SERVICE_URL: existingValues.SCENE_SERVICE_URL || 'http://scene-renderer:8091',
+    DATA_DIR: existingValues.DATA_DIR || '/data',
+  };
+  await mkdir(dirname(localConfig), { recursive: true, mode: 0o700 });
+  const plan = await planTextFile(localConfig, formatEnv(settings));
+  await saveConfiguration({ ...plan, mode: 0o600 });
+  const synced = await syncOpenRouterKeyToBackend(endpoint, key, context);
+  if (synced) {
+    log('OpenRouter API key verified, saved to local profile, and synced to the running local backend.');
+  } else {
+    log(`OpenRouter API key verified and saved to local profile (${localConfig}).`);
+    log('If the local backend is not running yet, start it with `machinal local install`; otherwise verify with `machinal local status`.');
+  }
+  return 0;
+}
+
+async function providers(context, endpoint) {
+  const key = await obtainVerifiedOpenRouterKey(context, endpoint);
   return { OPENROUTER_API_KEY: key, ...providerModels(context.env) };
 }
 
@@ -224,14 +270,23 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
     if (!values['configure-local']) {
       const keyState = await checkOpenRouter(existing.values.OPENROUTER_API_KEY ?? '', context);
       if (keyState.status === 'valid') {
-        return { key, localConfig, started: false, start: () => startLocal(composeFile, context, values) };
+        return {
+          key, localConfig, started: false,
+          start: () => startLocal(composeFile, context, values),
+          syncOpenRouter: () => ensureBackendOpenRouterSynced(endpoint, existing.values.OPENROUTER_API_KEY, context),
+        };
       }
       if (keyState.status === 'rate_limited' || keyState.status === 'unavailable') {
         log(`Warning: ${keyState.message}`);
-        return { key, localConfig, started: false, start: () => startLocal(composeFile, context, values) };
+        log(`How to update your OpenRouter API key: ${openRouterSetupInstructions(endpoint).summary}`);
+        return {
+          key, localConfig, started: false,
+          start: () => startLocal(composeFile, context, values),
+          syncOpenRouter: () => ensureBackendOpenRouterSynced(endpoint, existing.values.OPENROUTER_API_KEY, context),
+        };
       }
       log(`Saved OpenRouter API key is not valid (${keyState.message})`);
-      const replacementKey = await obtainVerifiedOpenRouterKey(context);
+      const replacementKey = await obtainVerifiedOpenRouterKey(context, endpoint);
       const sceneToken = existing.values.SCENE_SERVICE_TOKEN ?? randomBytes(32).toString('hex');
       const models = providerModels(context.env, existing.values);
       const modelsChanged = Object.entries(models).some(([name, value]) => existing.values[name] !== value)
@@ -260,7 +315,11 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
         await startLocal(composeFile, context, { ...values, 'start-docker': true });
         restarted = true;
       }
-      return { key, localConfig, started: restarted, start: () => startLocal(composeFile, context, values) };
+      return {
+        key, localConfig, started: restarted,
+        start: () => startLocal(composeFile, context, values),
+        syncOpenRouter: () => ensureBackendOpenRouterSynced(endpoint, replacementKey, context),
+      };
     }
   }
   let checkout = await findCheckout(cwd, values['docker-dir']);
@@ -271,7 +330,7 @@ export async function prepareIndependentLocal(values, endpoint, localConfig, con
     if (path?.trim()) checkout = await findCheckout(cwd, path.trim());
   }
   if (!checkout) throw new InstallerError(`Local Machinal Studio was not detected. Clone ${MACHINAL_STUDIO_URL}, then rerun setup with --docker-dir PATH. Independent local mode needs Docker/Compose and no Machinal account/API key.`);
-  const configuration = await providers(context);
+  const configuration = await providers(context, endpoint);
   const approved = values['start-docker'] || (interactive && await ui.confirm({
     message: `Install/start local API + renderer? Downloads dependencies, uses disk/CPU and saves provider secrets in ${directory}. OpenRouter bills your key.`, default: false,
   }));

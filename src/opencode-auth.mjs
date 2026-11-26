@@ -15,6 +15,7 @@ import { installRuntime, isManagedRuntimeCommand } from './runtime.mjs';
 import { VERSION } from './version.mjs';
 import { readSettings } from './settings.mjs';
 import { installSceneLibrary } from './opencode-library.mjs';
+import { formatOpenRouterAlert, inspectLocalOpenRouter } from './openrouter.mjs';
 
 function trustedServers(options) {
   const servers = new Map();
@@ -84,7 +85,7 @@ function connectionFailure(error, isLocal = false) {
 export async function installOpenCodeAuth(ctx, {
   env = process.env, platform = process.platform, credentialStore = createCredentialStore({ env, platform }),
   verify = checkConnection, prompt = promptWindowsKey, intervalMs = 2000,
-  prepareRuntime = installRuntime,
+  prepareRuntime = installRuntime, inspectOpenRouter = inspectLocalOpenRouter,
 } = {}) {
   const servers = trustedServers(ctx.options ?? {});
   const commands = new Map(Object.entries(ctx.options?.commands ?? {}));
@@ -164,17 +165,28 @@ export async function installOpenCodeAuth(ctx, {
     }
   });
 
-  async function status() {
+  async function checkLocalOpenRouter(serverName) {
+    if (!localConfigs.size) return null;
+    const target = serverName && localConfigs.has(serverName) ? serverName : localConfigs.keys().next().value;
+    if (!target) return null;
+    return inspectOpenRouter({ localConfig: localConfigs.get(target), endpoint: servers.get(target) });
+  }
+
+  async function status(serverName) {
     let listed;
     let connectionWarning;
     try { listed = await ctx.mcp.list(); } catch {
       connectionWarning = 'OpenCode could not list current MCP connection states. No connection success was assumed; inspect the MCP panel or run opencode mcp list.';
     }
+    const openRouter = localConfigs.size ? await checkLocalOpenRouter(serverName) : null;
+    const openRouterWarning = formatOpenRouterAlert(openRouter);
     return {
       version: VERSION,
       ...(allLocal ? { mode: 'local' } : {}),
       source: state.source, hasKey: allLocal ? true : Boolean(state.key), warning: state.warning,
       ...(allLocal ? {} : { credentialStore: { ...credential } }),
+      ...(openRouter ? { openRouter } : {}),
+      ...(openRouterWarning ? { openRouterWarning } : {}),
       registrations: [...registrations.values()],
       servers: (listed?.data ?? []).filter((server) => servers.has(server.name)).map((server) => ({ name: server.name, status: server.status.status })),
       ...(connectionWarning ? { connectionWarning } : {}),
@@ -186,11 +198,11 @@ export async function installOpenCodeAuth(ctx, {
     state.paused = name;
     try { await ctx.mcp.reload(); } finally { state.paused = null; }
     await ctx.mcp.reload();
-    return status();
+    return status(name);
   }
 
   async function connection(input, context) {
-    if (input.action === 'status') return status();
+    if (input.action === 'status') return status(input.server);
     if (!input.server && servers.size > 1) return {
       ...await status(), code: 'server-required', nextAction: 'select-server',
       error: 'Multiple machinal MCP servers are registered. Use the intended name from registrations as server; do not guess an endpoint or send the saved key to another server.',
@@ -287,7 +299,7 @@ export async function installOpenCodeAuth(ctx, {
       event.system.push({ type: 'text', text: [
         'For machinal work, proactively discover the existing MCP before claiming tools or connections are missing. Use directly exposed tools first; otherwise search the tool catalog in Code Mode once for the missing machinal tool. Reuse actual discovered namespaces/signatures, never invented tool names or repeated discovery per step.',
         `The local machinal_connection tool remains available when the local Docker MCP is down. Use status to inspect approved registrations: ${JSON.stringify([...servers].map(([name, endpoint]) => ({ name, endpoint, mode: 'local' })))}. On connection failure, call machinal_connection(action:reconnect,server:<registered name>) once before asking the user to check Docker. Do not automatically repeat ambiguous paid provider submissions; recover their jobs/idempotency first.`,
-        'Independent Local Docker profile: no Machinal cloud account, API key, credits, or S3 bucket apply. Local rendering uses the user’s hardware; AI provider calls (image/TTS/captions) use the user’s configured OpenRouter key. Use storage=volume for all media/downloads. Never ask for a Machinal API key or call get_credits.',
+        'Independent Local Docker profile: no Machinal cloud account, API key, credits, or S3 bucket apply. Local rendering uses the user’s hardware; AI provider calls (image/TTS/captions) use the user’s configured OpenRouter key. Use storage=volume for all media/downloads. Never ask for a Machinal API key or call get_credits. At the start of every local run, inspect the openRouter status returned by machinal_prepare_video, machinal_quickstart, or machinal_connection: if openRouter.ready is false (missing, invalid, unreachable, or not configured on the local backend), inform the user IMMEDIATELY at the beginning before proceeding and show how to set it (`machinal key openrouter` or `machinal key openrouter <sk-or-v1-...>` from https://openrouter.ai/keys, or local Machinal Studio Settings -> OpenRouter). To switch quickly between local and cloud in MCP, call `switch_mode(mode="cloud" | "local" | "toggle")` (cloud uses `machinal key api <mach_...>`).',
       ].join('\n\n') });
       return;
     }
@@ -327,11 +339,12 @@ export async function installOpenCodeAuth(ctx, {
     if (!state.key) throw new TransferError('No usable machinal key is loaded. Use machinal_connection reconnect; never put a key in download arguments.');
     return { endpoint, key: state.key };
   };
+  const getLocalOpenRouterStatus = localConfigs.size ? () => checkLocalOpenRouter() : undefined;
   await installOpenCodeMedia(ctx, { signal: lifetime.signal, getConnection, getSettings: () => readSettings({ env }) });
   await installOpenCodeUploads(ctx, { signal: lifetime.signal, getConnection });
-  await installSceneLibrary(ctx, servers.keys(), { mode });
+  await installSceneLibrary(ctx, servers.keys(), { mode, getLocalOpenRouterStatus });
   await installDirectTools(ctx, servers.keys(), { mode, localServers: new Set(localConfigs.keys()) });
-  await installWorkflowStartup(ctx, servers.keys(), { mode });
+  await installWorkflowStartup(ctx, servers.keys(), { mode, getLocalOpenRouterStatus });
   await installRecipeFiles(ctx, servers.keys());
   await installCheckpoints(ctx, servers.keys());
   if (hostedServers.length) await installOpenCodeRouting(ctx, { servers: hostedServers, signal: lifetime.signal, getConnection });

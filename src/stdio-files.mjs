@@ -2,6 +2,17 @@ import { createHash } from 'node:crypto';
 import { lstat, open, realpath, unlink } from 'node:fs/promises';
 import { basename, delimiter, dirname, isAbsolute, join, relative } from 'node:path';
 import { resolveTemplateCompile, templateCompileHelp, templateCompileSchema } from './template-compile.mjs';
+import {
+  detectStaticInspectResult,
+  SCENE_RUNTIME_CONTRACT_SUMMARY,
+  validateSceneComponent,
+} from './scene-validation.mjs';
+import {
+  PATCH_RECIPE_SUMMARY,
+  RECIPE_CONTRACT_SUMMARY,
+  validatePatchRecipeOperations,
+  validateRecipeComposition,
+} from './recipe-validation.mjs';
 
 export const MAX_RECIPE_BYTES = 2 * 1024 * 1024;
 export const MAX_COMPONENT_BYTES = 64_000;
@@ -184,8 +195,8 @@ function replaceResultPayload(result, updated) {
 
 export function decorateStdioTool(tool, { maxWaitSeconds = 120, local = false } = {}) {
   const briefGateNotice = local
-    ? 'Requires production_quickstart in this session first. Local zero-credit Docker mode requires the EXACT same collaborative brief (platform/destination + aspect & resolution such as TikTok 9:16 vs YouTube 16:9, duration, visual materials/AI-generated images vs existing media vs procedural, narration/language/TTS model, captions, sound effects) and explicit user approval as cloud mode; never self-approve userApproved:true.'
-    : 'Requires production_quickstart in this session first and completing the collaborative brief for all missing decisions (platform/destination + aspect & resolution, duration, visual materials/images vs procedural, narration/language/TTS model, captions, sound effects) with explicit user approval; never self-approve userApproved:true.';
+    ? 'Requires production_quickstart AND confirm_brief in this session first. Local zero-credit Docker mode requires the EXACT same collaborative brief (platform/destination + aspect & resolution such as TikTok 9:16 vs YouTube 16:9, duration, visual materials/AI-generated images vs existing media vs procedural, narration/language/TTS model, captions, sound effects) and explicit user approval as cloud mode; ask via ask_question/question first and never self-approve userApproved:true.'
+    : 'Requires production_quickstart AND confirm_brief in this session first after asking all missing decisions via ask_question/question (platform/destination + aspect & resolution, duration, visual materials/images vs procedural, narration/language/TTS model, captions, sound effects) with explicit user approval; never self-approve userApproved:true.';
 
   if (tool.name === 'create_project') {
     return {
@@ -204,14 +215,20 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120, local = false } 
           description: `${schema.properties.userApproved.description ?? ''} Never set userApproved:true without the user's explicit brief/scope approval, even in local zero-credit Docker mode.`.trim(),
         },
       } : {}),
+      ...(schema.properties?.component ? {
+        component: {
+          ...schema.properties.component,
+          description: `${schema.properties.component.description ?? ''} ${SCENE_RUNTIME_CONTRACT_SUMMARY}`.trim(),
+        },
+      } : {}),
       componentFile: {
         type: 'string',
-        description: 'Absolute client-local .svelte source (UTF-8, 1–64000 bytes). Read locally instead of repeating Svelte inline in component.',
+        description: `Absolute client-local .svelte source (UTF-8, 1–64000 bytes). Read locally instead of repeating Svelte inline in component. ${SCENE_RUNTIME_CONTRACT_SUMMARY}`,
       },
     };
     return {
       ...tool,
-      description: `${tool.description} ${briefGateNotice} Supply component, componentFile (local .svelte path) or templateId. ${templateCompileHelp}`,
+      description: `${tool.description} ${briefGateNotice} ${SCENE_RUNTIME_CONTRACT_SUMMARY} Supply component, componentFile (local .svelte path) or templateId. ${templateCompileHelp}`,
       inputSchema: schema,
     };
   }
@@ -272,8 +289,43 @@ export function decorateStdioTool(tool, { maxWaitSeconds = 120, local = false } 
     };
     return {
       ...tool,
-      description: `${tool.description}${paid ? ` ${briefGateNotice}` : ''} Client stdio bridge: prefer compositionFile, captionBaselineRecipeFile and checkpointFile over repeating large YAML inline. Existing consent, validation, idempotency and spending rules still apply.`,
+      description: `${tool.description}${paid ? ` ${briefGateNotice}` : ''}${tool.name === 'generate_assets' ? ` ${RECIPE_CONTRACT_SUMMARY} Pass composition or compositionFile (NOT yaml), plus idempotencyKey and projectId, then call wait_for_job immediately for the returned jobId.` : ''}${tool.name === 'render_video' ? ' CRITICAL AUDIO RULE: Every narration audio clip MUST cover the full measured asset duration (never guess or truncate outPoint; the bridge checks exact audio duration and blocks truncated narration or video shorter than narration before submitting).' : ''} Client stdio bridge: prefer compositionFile, captionBaselineRecipeFile and checkpointFile over repeating large YAML inline. Existing consent, validation, idempotency and spending rules still apply.`,
       inputSchema: schema,
+    };
+  }
+
+  if (tool.name === 'patch_recipe') {
+    return {
+      ...tool,
+      description: `${tool.description} ${PATCH_RECIPE_SUMMARY}`,
+    };
+  }
+
+  if (tool.name === 'import_sound_effect') {
+    return {
+      ...tool,
+      description: `${tool.description} Parameter note: pass \`id\` (exact sound ID from search_sound_effects, NOT soundId), \`sourceVersion\`, \`projectId\`, and \`userApproved: true\`.`,
+    };
+  }
+
+  if (tool.name === 'get_asset_metadata') {
+    return {
+      ...tool,
+      description: `${tool.description} Parameter note: pass \`files: [{ id, file }]\` (array of objects, NOT a single \`file\` string), \`projectId\`, and \`userApproved: true\`.`,
+    };
+  }
+
+  if (tool.name === 'search_sound_effects') {
+    return {
+      ...tool,
+      description: `${tool.description} Parameter note: \`userApproved: true\` is required alongside \`query\` (default \`license: "cc0"\`).`,
+    };
+  }
+
+  if (tool.name === 'get_project') {
+    return {
+      ...tool,
+      description: `${tool.description} Pass \`fullResult: true\` when you need the complete timeline, captions, and assets; default returns a compact summary only.`,
     };
   }
 
@@ -329,7 +381,22 @@ export async function prepareStdioToolCall(name, rawArgs = {}, { library, allowe
       if (!source.trim()) throw new Error('Svelte source must contain 1–64000 UTF-8 bytes and must not be blank.');
       args.component = source;
     }
+    if (typeof args.component === 'string') {
+      validateSceneComponent(args.component, { images: args.images, videos: args.videos, models: args.models });
+    }
     return { args };
+  }
+
+  if (name === 'inspect_scene') {
+    return { args: rawArgs, postProcess: detectStaticInspectResult };
+  }
+
+  if (name === 'patch_recipe') {
+    if (typeof rawArgs.composition === 'string') {
+      validateRecipeComposition(rawArgs.composition, { tool: name });
+    }
+    validatePatchRecipeOperations(rawArgs.operations);
+    return { args: rawArgs };
   }
 
   if (!RECIPE_TOOLS.includes(name) && name !== 'get_job_result') {
@@ -348,6 +415,9 @@ export async function prepareStdioToolCall(name, rawArgs = {}, { library, allowe
   ].some(value => value !== undefined);
 
   if (!hasLocalFileArgs) {
+    if (RECIPE_TOOLS.includes(name) && typeof rawArgs.composition === 'string') {
+      validateRecipeComposition(rawArgs.composition, { tool: name });
+    }
     if (name === 'compile_recipe' && rawArgs.productionContract && typeof rawArgs.composition === 'string') {
       const hydrated = hydrateProductionContractVersion(rawArgs.productionContract, rawArgs.composition);
       if (hydrated !== rawArgs.productionContract) return { args: { ...rawArgs, productionContract: hydrated } };
@@ -420,6 +490,10 @@ export async function prepareStdioToolCall(name, rawArgs = {}, { library, allowe
       throw new Error('Choose compositionFile, composition, recipeRef or sourceJobId, not multiple recipe sources.');
     }
     args.composition = await readRecipeFile(compositionFile, ioOptions);
+  }
+
+  if (RECIPE_TOOLS.includes(name) && typeof args.composition === 'string') {
+    validateRecipeComposition(args.composition, { tool: name });
   }
 
   if (name === 'compile_recipe' && args.productionContract && typeof args.composition === 'string') {

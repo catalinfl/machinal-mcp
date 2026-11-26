@@ -95,6 +95,34 @@ export async function offerKeyStorage(credentials, context, { sessionOnly = fals
   }
 }
 
+export async function setApiKey(providedKey, values, context) {
+  const { credentialStore, interactive, log, env } = context;
+  if (!credentialStore) {
+    throw new InstallerError('Saved-key management is supported on Windows and Linux. Use MACHINAL_API_KEY or hidden entry on this platform.');
+  }
+  const endpoint = values.url === undefined ? null : normalizeEndpoint(values.url);
+  let rawKey = providedKey;
+  if (rawKey === undefined) {
+    if (!interactive) {
+      throw new InstallerError(`Provide the API key via \`machinal key api <mach_...>\` or run \`machinal key api\` in an interactive terminal. Create a key at ${API_KEYS_URL}.`);
+    }
+    rawKey = await promptKey(context);
+  }
+  const key = validateAPIKey(rawKey);
+  if (endpoint) {
+    log(`Checking Machinal API key against ${endpoint} (no paid operations)...`);
+    await (context.checkConnection ?? checkConnection)(endpoint, key);
+  }
+  await credentialStore.write(key);
+  log(endpoint
+    ? `Machinal API key verified and saved in ${storageName(context)}.`
+    : `Machinal API key saved in ${storageName(context)}.`);
+  if (env.MACHINAL_API_KEY || env.DIRECTION_API_KEY) {
+    log('Note: MACHINAL_API_KEY is set in the environment and takes precedence over the saved key until unset.');
+  }
+  return 0;
+}
+
 export async function manageKey(action, values, context) {
   if (!['set', 'delete'].includes(action)) throw new InstallerError('Use key set or key delete.');
   const { credentialStore, interactive, ui, log, env } = context;

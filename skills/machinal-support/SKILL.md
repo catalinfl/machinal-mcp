@@ -34,6 +34,17 @@ There is **one machinal application API key per Windows user**, not a separate O
 
 This is an OS credential, **not a project file**. The integration reads its secret through the native credential API into memory, supplying it only to the MCP name and endpoint approved during setup. Saved credentials take precedence over incidental environment values; explicit session/environment selections remain binding. Do not search `.env` files, dump environment values, extract secrets with `cmdkey`/PowerShell, inspect credential files or pass keys through chat/tool inputs/command arguments. A missing environment variable does not mean a saved key is missing.
 
+## Local OpenRouter API key & quick mode switching
+
+- **Which key to set when:**
+  - **Local mode (Docker / BYOK OpenRouter):** run `machinal key openrouter` (hidden prompt) or `machinal key openrouter <sk-or-v1-...>` (key from <https://openrouter.ai/keys>). This verifies the key, saves it to the local profile, and syncs it to the running local backend.
+  - **Cloud mode (Machinal Server):** run `machinal key api <mach_...>` (or `machinal key api` / `machinal set-key` for hidden prompt; key from <https://machinal.app/api-keys>).
+- **Switching quickly between Local and Cloud in MCP:**
+  - Call the MCP tool `switch_mode` with `mode: "local"`, `mode: "cloud"`, or `mode: "toggle"` (or run `machinal mode local|cloud|toggle|status` in terminal). It reconnects live, emits `notifications/tools/list_changed`, persists the mode across restarts, and immediately reports OpenRouter or Machinal API key readiness.
+- In independent local Docker mode (`mode: "local"`), `connection_status`, `production_quickstart`, `machinal_connection`, `machinal_prepare_video`, `machinal local status`, and `machinal doctor` inspect local OpenRouter readiness (`openRouter.status`: `valid`, `configured`, `missing`, `invalid`, `backend_unconfigured`, `unavailable`, or `rate_limited`).
+- If `openRouter.ready === false`, **tell the user immediately at the start of the run** (before starting production or AI generation) why OpenRouter cannot connect and how to set it (`machinal key openrouter` or `machinal key openrouter <sk-or-v1-...>`, or local Machinal Studio Settings -> OpenRouter at `http://127.0.0.1:8080`, then verify with `machinal local status` or `connection_status(action: "reconnect")`).
+- Do not ask a local user to create a Machinal cloud API key. Pure procedural 2D/3D renders without AI images, TTS narration, or captions can still render locally without OpenRouter.
+
 ## Recovery decisions
 
 - **`key-rejected` / HTTP 401, or `no-usable-key`:** after the recovery attempt, offer `replace` through the secure native window. It links to <https://machinal.app/api-keys>, verifies before changing the old credential and reconnects. Saving requires the user's separate approval; cancellation/rejection preserves the previous saved key. Do not open replacement automatically or request a key in chat.

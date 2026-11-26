@@ -90,6 +90,7 @@ export async function setupStdio(values, context) {
       result = await verify();
     }
     if (!result.local) throw new InstallerError('The endpoint is not the independent local profile. No client configuration was written; use Server for an authenticated deployment.');
+    await profile.syncOpenRouter?.();
   } else {
     credentials = await serverCredentials(values, context);
     if (credentials) {
@@ -117,7 +118,11 @@ export async function setupStdio(values, context) {
     if (upgraded.backup) log(`Backup: ${upgraded.backup}`);
   }
   const installed = skills ? await saveSkills(skills) : null;
-  await saveSettings({ connection: { mode: endpoint.mode, url: endpoint.url, ...(local ? { localConfig: files.localConfig } : {}) } }, context);
+  await saveSettings({
+    connection: { mode: endpoint.mode, url: endpoint.url, ...(local ? { localConfig: files.localConfig } : {}) },
+    activeModeOverride: null,
+    ...(local ? { lastLocalUrl: endpoint.url } : { lastCloudUrl: endpoint.url }),
+  }, context);
   const backups = backupSummary(saved, installed, skills?.root);
   if (backups) log(backups);
   if (!local && result && credentials) await offerKeyStorage(credentials, context, { sessionOnly: values['session-key'] });

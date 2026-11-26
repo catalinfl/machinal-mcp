@@ -8,11 +8,18 @@ export function settingsFile(context) {
   return join(stateDirectory(context), 'config.json');
 }
 
+function validConnectionEntry(entry) {
+  if (!entry || typeof entry !== 'object') return false;
+  if (!['server', 'custom', 'local'].includes(entry.mode)) return false;
+  try { return normalizeEndpoint(entry.url) === entry.url; } catch { return false; }
+}
+
 export async function readSettings(context) {
   const value = await readPrivateJSON(settingsFile(context));
   if (value === null) return { version: 1 };
-  if (value.version !== 1 || (value.connection && (!['server', 'custom', 'local'].includes(value.connection.mode)
-    || normalizeEndpoint(value.connection.url) !== value.connection.url))) {
+  if (value.version !== 1
+    || (value.connection && !validConnectionEntry(value.connection))
+    || (value.activeModeOverride != null && !validConnectionEntry(value.activeModeOverride))) {
     throw new InstallerError('The Machinal settings file is invalid. Check machinal place; existing settings were not replaced.');
   }
   return value;

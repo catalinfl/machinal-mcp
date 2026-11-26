@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": "sha256:ee30ffe0b411742bf2098177d90d2d035aa4db974fbaa85e32752c860cab9626",
+  "version": "sha256:e4d4e2094bf5331be97f5f71e38d7b24022871a292a20166b656330dd9d1fdb6",
   "files": {
     "animation-skills/machinal-choreography.md": {
       "bytes": 3449,
@@ -94,6 +94,10 @@
       "bytes": 1008,
       "sha256": "cb45b1b1e2ffcbca6a3325abeaa3cef9e92eed3fbff91ef3890ed180fd901398"
     },
+    "examples/narrated-2d-scenes-sfx.yaml": {
+      "bytes": 7240,
+      "sha256": "5f79abf728199123995d0c07f99c7def48a6e9d11028bf21ac50af07069b7656"
+    },
     "examples/narrated-documentary.yaml": {
       "bytes": 3836,
       "sha256": "9059ed250a29803e30bb9943db9c6bdd0fc533daabb1d58f393d64af8be967b6"
@@ -131,8 +135,8 @@
       "sha256": "a2bf1969dad9ec5bddf48f90dda10674546f7cb3ca8e4f6324a6c9a47261e5e2"
     },
     "examples.json": {
-      "bytes": 3614,
-      "sha256": "fdbf7309c592b253d1ec5c982c8efcf4ee5d97d55e6c4179295306fcc88c0d98"
+      "bytes": 3984,
+      "sha256": "bfea97c7008318a14693e192b70bcecb9b8be133da03bc79bba62a39a8d2adbf"
     },
     "film-library/core/lib.js": {
       "bytes": 2782,
@@ -463,16 +467,16 @@
       "sha256": "ac51058269cebc44888bc0193f74278fbe56f2e89b30f5d15b0b45d377a8312b"
     },
     "guides/client-bootstrap-cloud.md": {
-      "bytes": 1585,
-      "sha256": "54cd17f68f1fe6be70f8db877c4cd727a44ec1acb47e04605726f8b7a133d1c0"
+      "bytes": 3107,
+      "sha256": "5d9446fa5168db15677d6757adbae2b7c8d1a74f788f3a74f1792fd734bd02ad"
     },
     "guides/client-bootstrap-core.md": {
-      "bytes": 9731,
-      "sha256": "bd01ff9ac4ec99c65010880a8dead20941ef7662aa986f24127c766b865df6ad"
+      "bytes": 10653,
+      "sha256": "c5aedd9f4fca23bbd3c03275d36652e8a40739866b0acffab03626743ecc6192"
     },
     "guides/client-bootstrap-local.md": {
-      "bytes": 3057,
-      "sha256": "025823927b36c986f207fdfce1f861300de66871843cfd8004e42d45c21103cf"
+      "bytes": 5214,
+      "sha256": "17eb7db9b115623bf956b1d38d1362f250835d8f76f47e231263428dbd0106a0"
     },
     "guides/client-bootstrap.md": {
       "bytes": 1006,
@@ -495,8 +499,8 @@
       "sha256": "aa6ca80098f006c2369b401ead219ebc0db1e4dc5b25322e0506cdf3ead638a2"
     },
     "guides/examples.md": {
-      "bytes": 4898,
-      "sha256": "916830da21ae6a704e196a3f75d9428cc9a5716825d350212faab47437f4c406"
+      "bytes": 5195,
+      "sha256": "bc1271ac2457ad5411d240724f6f5ab9abe03a68e55b417a12b539c13cd3a28a"
     },
     "guides/film-styles.md": {
       "bytes": 9510,
@@ -555,8 +559,8 @@
       "sha256": "825799143a637bebbb0ee08a19b88fc1e440b4959f4e45e554d9c9d0f9e4af2f"
     },
     "guides/yaml.md": {
-      "bytes": 14746,
-      "sha256": "c78ec0924d00242eedc7dea501b0c6774f05792da446fea610187aa6f1ffd40d"
+      "bytes": 16230,
+      "sha256": "7fab8bd90b9bced2f574527ba08cfe47f239fb097b9ac02144ad6631351db08d"
     },
     "hyperframes-components.json": {
       "bytes": 1541573,
@@ -13507,16 +13511,16 @@
       "sha256": "a9d2b9e1bb72d5c7ba8927a7429683d7a283ad404ac23d8b07c64edacef28fef"
     },
     "skills/machinal-recipes.md": {
-      "bytes": 14349,
-      "sha256": "5468d84a5cde996cb55a0828fb6666097ca0906c87345c63b9be5dba365bea36"
+      "bytes": 15520,
+      "sha256": "57c43dff9a0aaca3dce16543a1bc963c8d35ded3bff79caad94ef0f27688b44c"
     },
     "skills/machinal-review.md": {
       "bytes": 5739,
       "sha256": "a64cbe37a3d79187d09755314e3bd4f83d846268116f689ff4cdf85c731d2218"
     },
     "skills/machinal-scenes.md": {
-      "bytes": 19716,
-      "sha256": "a86d6ff1f0525e3eb61f9abeb031bbce007cefa9a67c85299244b70c90d80f47"
+      "bytes": 20590,
+      "sha256": "d09ea3602c4831029a92cff469fde8bd370f247d5388843fb9b0dba8a89b3be0"
     },
     "skills/machinal-sound.md": {
       "bytes": 5152,
@@ -13527,8 +13531,8 @@
       "sha256": "58682d120ca4ff005eba1073ade64c5291bf42ad0583fd6634cbc1dc22e9647a"
     },
     "skills/machinal-support.md": {
-      "bytes": 7075,
-      "sha256": "e4c28616b7927baa30ab76aef056314c59fafdb4ee9bc149b34f6cef2d3644d4"
+      "bytes": 8946,
+      "sha256": "bfb15f48ea88c7c9dd5db9e14f730718f5fedcd944b9daeebdf9b3836badb085"
     },
     "skills/machinal-visual-review.md": {
       "bytes": 3542,

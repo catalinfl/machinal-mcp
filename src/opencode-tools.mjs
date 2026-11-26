@@ -1,4 +1,5 @@
 export const DIRECT_TOOLS = [
+  'connection_status', 'switch_mode',
   'list_projects', 'get_workflow_preferences', 'get_credits', 'get_capabilities',
   'get_recipe_schema', 'get_editing_reference', 'wait_for_job', 'get_job_result',
 ];

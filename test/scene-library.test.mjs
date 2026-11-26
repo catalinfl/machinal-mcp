@@ -264,6 +264,9 @@ test('production_quickstart returns single-call offline workflow, local file sho
   assert.equal(data.waitAndConcurrency.maxWaitSecondsDefault, 120);
   assert.equal(data.waitAndConcurrency.compileSceneConcurrency, 2);
   assert.match(data.briefGuide, /native question tool/);
+  assert.ok(Buffer.byteLength(response.content[0].text) < 12000, 'default production_quickstart must remain compact so clients never spill it to disk');
+  const fullBrief = await bridge.handle('tools/call', { name: 'production_quickstart', arguments: { purpose: 'create', includeBriefGuide: true } });
+  assert.ok(fullBrief.structuredContent.data.briefGuide.length > data.briefGuide.length);
   const viaRef = await bridge.handle('tools/call', { name: 'get_library_reference', arguments: { topic: 'quickstart', id: 'social', includeGuide: false } });
   assert.equal(viaRef.structuredContent.data.styleProfile.id, 'social');
   assert.equal(viaRef.structuredContent.data.briefGuide, undefined);

@@ -110,5 +110,12 @@
     "pendingGeneration": true,
     "requirements": 2,
     "syntheticMetadata": true
+  },
+  {
+    "id": "narrated-2d-scenes-sfx",
+    "description": "Complete portrait 9:16 multi-track production recipe: compiled Svelte 2D scenes, transitions, film-grain effect, preserved narration/captions, and separate non-overlapping narration, ambience and spot-SFX audio tracks",
+    "pendingGeneration": false,
+    "requirements": 0,
+    "syntheticMetadata": true
   }
 ]

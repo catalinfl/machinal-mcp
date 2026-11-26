@@ -2,7 +2,7 @@ import { parseArgs } from 'node:util';
 import { confirm, input, password, select } from '@inquirer/prompts';
 import { InstallerError } from './errors.mjs';
 import { createCredentialStore } from './credential-store.mjs';
-import { manageKey, offerKeyStorage, readKey } from './keys.mjs';
+import { manageKey, offerKeyStorage, readKey, setApiKey } from './keys.mjs';
 import { launchClient } from './launch.mjs';
 import { chooseClient, EDITING_STYLES } from './setup-options.mjs';
 import { setup } from './setup.mjs';
@@ -11,21 +11,27 @@ import { serveBridge, MCPBridge } from './bridge.mjs';
 import { VERSION } from './version.mjs';
 import { createLogger } from './presentation.mjs';
 import { createPromptUI } from './prompts.mjs';
-import { manageLocal, managePlace, showCredits } from './commands.mjs';
+import { manageLocal, manageMode, managePlace, showCredits } from './commands.mjs';
 import { readSettings } from './settings.mjs';
-import { MACHINAL_SERVER_URL } from './endpoints.mjs';
+import { DEFAULT_LOCAL_URL, MACHINAL_SERVER_URL } from './endpoints.mjs';
+import { setLocalOpenRouterKey } from './local-setup.mjs';
+import { endpointFiles } from './paths.mjs';
+import { normalizeEndpoint } from './connection.mjs';
 import { uninstall } from './uninstall.mjs';
 
 const HELP = `Machinal · connect your agent
 
   machinal setup
-  machinal set-key       Verify and save a key (hidden entry)
-  machinal getcredit     Show live credits; no spending
-  machinal place         Show processing, upload and download locations
+  machinal key openrouter [KEY]   Verify, save and sync OpenRouter key (Local mode)
+  machinal key api [KEY]          Verify and save Machinal API key (Cloud mode)
+  machinal mode [local|cloud|toggle|status]  Switch active mode between Local and Cloud
+  machinal set-key                Verify and save a Cloud key (hidden entry)
+  machinal getcredit              Show live credits; no spending
+  machinal place                  Show processing, upload and download locations
   machinal place --downloads /absolute/folder --uploads /absolute/folder
   machinal local status
   machinal local install --docker-dir PATH
-  machinal uninstall    Clean integrations, saved keys, runtime and global CLI
+  machinal uninstall              Clean integrations, saved keys, runtime and global CLI
 
 Global install: npm install -g @machinal/mcp · then use machinal <command>.
 Also available: launch <client>, doctor --url URL, key set, key delete.
@@ -128,9 +134,16 @@ export async function run(argv = process.argv.slice(2), runtime = {}) {
     if (positionals.length !== 1 || forwarded.length || !values.url || Object.keys(values).some((key) => !allowed.includes(key))) throw new InstallerError('serve/doctor require --url and accept only --local-config and --catalog-file.');
     const options = { url: values.url, localConfig: values['local-config'], catalogFile: values['catalog-file'] };
     if (command === 'serve') return serveBridge(options, runtime);
-    const bridge = new MCPBridge({ ...options, env: runtime.env ?? process.env, credentialStore: runtime.credentialStore === undefined ? createCredentialStore(runtime) : runtime.credentialStore });
-    console.log(JSON.stringify(await bridge.connect(), null, 2));
-    return bridge.state.status === 'connected' ? 0 : 1;
+    const bridge = new MCPBridge({
+      ...options,
+      env: runtime.env ?? process.env,
+      credentialStore: runtime.credentialStore === undefined ? createCredentialStore(runtime) : runtime.credentialStore,
+      ...(runtime.fetchImpl ? { fetchImpl: runtime.fetchImpl } : {}),
+      ...(runtime.verifyOpenRouterKey ? { verifyOpenRouterKey: runtime.verifyOpenRouterKey } : {}),
+    });
+    const status = await bridge.connect();
+    console.log(JSON.stringify(status, null, 2));
+    return status.status === 'connected' && (!bridge.localConfig || status.openRouter?.ready !== false) ? 0 : 1;
   }
   const context = {
     env: process.env, cwd: process.cwd(), launch: launchClient,
@@ -161,6 +174,12 @@ export async function run(argv = process.argv.slice(2), runtime = {}) {
     only(['url', 'verbose']);
     return showCredits(values, context);
   }
+  if (command === 'mode') {
+    const action = positionals[1] ?? 'status';
+    if (positionals.length > 2) throw new InstallerError('Use machinal mode [local|cloud|toggle|status] [--url URL].');
+    only(['url']);
+    return manageMode(action, values, context);
+  }
   if (command === 'local') {
     const action = positionals[1] ?? 'status';
     if (positionals.length > 2 || !['status', 'install'].includes(action)) throw new InstallerError('Use machinal local status or machinal local install.');
@@ -168,12 +187,30 @@ export async function run(argv = process.argv.slice(2), runtime = {}) {
     return manageLocal(action, values, context);
   }
   if (values.uploads !== undefined || values.downloads !== undefined) throw new InstallerError('--uploads and --downloads belong to machinal place.');
-  if (command === 'key' && positionals.length === 2 && ['set', 'delete'].includes(positionals[1]) && !forwarded.length) {
-    const allowed = positionals[1] === 'set' ? ['url'] : ['yes'];
-    if (Object.keys(values).some((option) => !allowed.includes(option))) {
-      throw new InstallerError('key set accepts only --url; key delete accepts only --yes. Run --help.');
+  if (command === 'key' && !forwarded.length) {
+    const subcommand = positionals[1];
+    if (subcommand === 'openrouter' && positionals.length <= 3) {
+      only(['url']);
+      const settings = await readSettings(context);
+      const endpoint = normalizeEndpoint(values.url ?? settings.lastLocalUrl ?? (settings.connection?.mode === 'local' ? settings.connection.url : null) ?? DEFAULT_LOCAL_URL);
+      const localConfig = (settings.connection?.mode === 'local' && settings.connection.url === endpoint && settings.connection.localConfig)
+        ? settings.connection.localConfig
+        : endpointFiles(endpoint, context, { local: true }).localConfig;
+      return setLocalOpenRouterKey(positionals[2], endpoint, localConfig, context);
     }
-    return manageKey(positionals[1], values, context);
+    if (subcommand === 'api' && positionals.length <= 3) {
+      only(['url']);
+      const settings = await readSettings(context);
+      const endpoint = values.url ?? settings.lastCloudUrl ?? (settings.connection?.mode && settings.connection.mode !== 'local' ? settings.connection.url : null) ?? MACHINAL_SERVER_URL;
+      return setApiKey(positionals[2], { url: endpoint }, context);
+    }
+    if (positionals.length === 2 && ['set', 'delete'].includes(subcommand)) {
+      const allowed = subcommand === 'set' ? ['url'] : ['yes'];
+      if (Object.keys(values).some((option) => !allowed.includes(option))) {
+        throw new InstallerError('key set accepts only --url; key delete accepts only --yes. Run --help.');
+      }
+      return manageKey(subcommand, values, context);
+    }
   }
   if (command === 'setup' && positionals.length <= 1 && !forwarded.length) {
     if (values.transport && !['stdio', 'http'].includes(values.transport)) throw new InstallerError('Choose --transport stdio (default) or http (advanced).');

@@ -1,4 +1,5 @@
 import { SceneLibrary, LIBRARY_TOOLS, LIBRARY_TOPICS, libraryInstructions } from './scene-library.mjs';
+import { attachLocalOpenRouterToQuickstart } from './openrouter.mjs';
 
 const discovered = new Map();
 export function hasSceneCandidates(sessionID) { return discovered.has(sessionID); }
@@ -9,9 +10,23 @@ function recordDiscovery(sessionID, data) {
   if (discovered.size > 128) discovered.delete(discovered.keys().next().value);
 }
 
-export async function installSceneLibrary(ctx, servers = [], { mode = 'cloud' } = {}) {
+export async function installSceneLibrary(ctx, servers = [], { mode = 'cloud', getLocalOpenRouterStatus } = {}) {
   const library = new SceneLibrary(undefined, { mode });
   const names = [...servers];
+  const enrichIfQuickstart = async (toolName, input, result) => {
+    const isQuickstart = toolName === 'production_quickstart'
+      || ((toolName === 'get_library_reference' || toolName === 'get_editing_reference') && input?.topic === 'quickstart');
+    if (!isQuickstart || result.isError || mode !== 'local' || !getLocalOpenRouterStatus || !result.structuredContent?.data) {
+      return result;
+    }
+    const openRouter = await getLocalOpenRouterStatus();
+    if (!openRouter) return result;
+    const structuredContent = {
+      ...result.structuredContent,
+      data: attachLocalOpenRouterToQuickstart(result.structuredContent.data, openRouter),
+    };
+    return { ...result, content: [{ type: 'text', text: JSON.stringify(structuredContent) }], structuredContent };
+  };
   await ctx.tool.transform(editor => {
     for (const server of names) {
       editor.update(`${server}_get_editing_reference`.replace(/[^a-z\d_-]/gi, '_'), tool => {
@@ -24,7 +39,7 @@ export async function installSceneLibrary(ctx, servers = [], { mode = 'cloud' } 
         }
         tool.execute = async (input, context) => {
           if (!library.handles('get_editing_reference', input)) return original(input, context);
-          const result = await library.call('get_editing_reference', input);
+          const result = await enrichIfQuickstart('get_editing_reference', input, await library.call('get_editing_reference', input));
           recordDiscovery(context?.sessionID, result.structuredContent.data);
           return { content: JSON.stringify(result.structuredContent), output: result.structuredContent, ...(result.isError ? { isError: true } : {}) };
         };
@@ -40,7 +55,7 @@ export async function installSceneLibrary(ctx, servers = [], { mode = 'cloud' } 
       editor.add({
         name: nativeNames[tool.name], description: tool.description, input: tool.inputSchema, options: { codemode: false },
         async execute(input, context) {
-          const result = await library.call(tool.name, input);
+          const result = await enrichIfQuickstart(tool.name, input, await library.call(tool.name, input));
           recordDiscovery(context?.sessionID, result.structuredContent.data);
           return { content: JSON.stringify(result.structuredContent), ...(result.isError ? { isError: true } : {}) };
         },

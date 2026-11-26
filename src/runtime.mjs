@@ -4,14 +4,14 @@ import { cp, lstat, mkdir, readFile, readdir, rename, rm, writeFile } from 'node
 import { isAbsolute, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { VERSION } from './version.mjs';
-import { stateDirectory } from './paths.mjs';
+import { endpointFiles, stateDirectory } from './paths.mjs';
 
-export { stateDirectory } from './paths.mjs';
+export { endpointFiles, stateDirectory } from './paths.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
-const FILES = ['bin/machinal-stdio.mjs', 'src/bridge.mjs', 'src/connection.mjs', 'src/credential-store.mjs',
-  'src/credits.mjs', 'src/deployment.mjs', 'src/endpoints.mjs', 'src/errors.mjs', 'src/presentation.mjs', 'src/paths.mjs',
-  'src/private-json.mjs', 'src/request-scheduler.mjs', 'src/scene-library.mjs', 'src/component-discovery.mjs',
+const FILES = ['bin/machinal-stdio.mjs', 'src/bridge.mjs', 'src/brief-gate.mjs', 'src/connection.mjs', 'src/credential-store.mjs',
+  'src/credits.mjs', 'src/deployment.mjs', 'src/endpoints.mjs', 'src/errors.mjs', 'src/openrouter.mjs', 'src/presentation.mjs', 'src/paths.mjs',
+  'src/private-json.mjs', 'src/request-scheduler.mjs', 'src/recipe-validation.mjs', 'src/scene-library.mjs', 'src/scene-validation.mjs', 'src/settings.mjs', 'src/component-discovery.mjs',
   'src/stdio-files.mjs', 'src/template-compile.mjs', 'src/hybrid-edit.mjs', 'src/version.mjs', 'package.json'];
 
 export function isManagedRuntimeCommand(command, context = {}) {
@@ -24,13 +24,6 @@ export function isManagedRuntimeCommand(command, context = {}) {
 export function sameManagedRuntime(left, right, context) {
   return isManagedRuntimeCommand(left, context) && isManagedRuntimeCommand(right, context)
     && isDeepStrictEqual([left[0], ...left.slice(2)], [right[0], ...right.slice(2)]);
-}
-
-export function endpointFiles(url, context, { local = false } = {}) {
-  const id = createHash('sha256').update(url).digest('hex').slice(0, 24);
-  const root = stateDirectory(context);
-  const catalogFile = join(root, 'catalogs', local ? `${id}.local.json` : `${id}.json`);
-  return { catalogFile, localConfig: join(root, 'local', id, 'providers.env') };
 }
 
 // A stable, private runtime avoids npm-cache eviction and Windows .cmd spawning bugs.

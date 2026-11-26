@@ -19,6 +19,7 @@ Topic `examples` returns complete YAML composition strings; use `id` to retrieve
 | `generated-media` | Single-request stage syntax: image + speech before and captions after; not a timing-first visual-planning workflow | Pending image/speech/captions requirements, no provider call |
 | `narration-timing` | Pass 1: Romanian speech, audio placement and requested captions only; wait and retrieve the result before authoring visuals | Pending speech/captions requirements, no provider call |
 | `narrated-documentary` | Pass 2: retain synthetic resolved voice/caption fixtures, then add an image and a partial-narration Three.js scene at measured times, plus a safe FHD heading | Pending image/scene requirements only, no provider call |
+| `narrated-2d-scenes-sfx` | Complete portrait 9:16 multi-track recipe: compiled Svelte 2D scenes, 300ms wipe transition, film-grain effect, preserved Pass 1 captions/narration, and separate narration/ambience/spot-SFX audio tracks | Finished composition, synthetic pinned assets, no generation |
 
 Read the relevant topical reference for the demonstrated fields and fetch current catalog entries before adopting exact values. Returned examples **never execute**. Unit tests parse them through the same strict API parser and run the real compiler with synthetic metadata; pending examples assert requirements rather than generating assets. No test requires a real API key, paid provider or renderer.
 

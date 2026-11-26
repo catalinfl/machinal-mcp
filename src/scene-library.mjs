@@ -59,7 +59,7 @@ export const QUICKSTART_TOOL = {
     properties: {
       purpose: { type: 'string', enum: ['create', 'edit'], default: 'create', description: 'Whether starting a new video or editing an existing project.' },
       profile: { type: 'string', maxLength: 64, description: 'Optional editing style profile ID (e.g. documentary, cinematic, social, educational, product, tutorial, sports, minimal) to include its exact catalog presets.' },
-      includeBriefGuide: { type: 'boolean', default: true, description: 'Include the full collaborative brief guide inline so a separate topic=brief read is not needed.' },
+      includeBriefGuide: { type: 'boolean', description: 'Omit for a compact brief summary (keeps quickstart small so clients never truncate it to disk); pass true for the full markdown brief guide or false to omit.' },
     },
   },
   annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
@@ -257,61 +257,137 @@ export class SceneLibrary {
         throw new Error(`Unknown style profile "${input.profile}". Available: ${styles.map(entry => entry.id).join(', ')}.`);
       }
     }
-    const includeBriefGuide = input.includeBriefGuide ?? true;
-    const briefGuide = includeBriefGuide ? (await this.bytes('guides/brief.md')).toString('utf8') : undefined;
+    const compactBriefGuide = [
+      '# Collaborative Brief (REQUIRED before create_project / generate_assets / compile_scene / render_video)',
+      '1. A short prompt naming only topic, style, or 2D/3D is INCOMPLETE on BOTH Cloud and Local mode.',
+      '2. Ask ALL unanswered choices in ONE native question tool call (`ask_question`/`question`) and wait for reply: (a) destination + aspect & resolution (9:16 vs 16:9), (b) duration, (c) visuals (AI images vs existing vs procedural), (d) narration, language & TTS speech model from `list_speech_models` (EN: Kokoro, Flash-Lite, Flash; RO: Flash, Flash-Lite), (e) captions, (f) separate sound-effects question (CC0 SFX vs none), (g) explicit approval. Never self-approve `userApproved:true`.',
+      '3. Call `confirm_brief` after reply to unlock `create_project`. Full narration rule: ALWAYS set narration `outPoint` to exact measured duration and extend video to cover full speech. Full guide: `get_library_reference(topic="brief")`.',
+    ].join('\n');
+    const briefGuide = input.includeBriefGuide === true
+      ? (await this.bytes('guides/brief.md')).toString('utf8')
+      : input.includeBriefGuide === false
+        ? undefined
+        : compactBriefGuide;
     const local = this.mode === 'local';
     const deployment = describeDeployment({ local, url: this.mode === 'cloud' ? MACHINAL_SERVER_URL : undefined });
     const localFileShortcuts = {
-      get_job_result: 'Pass recipeFile (.edit.yaml) and checkpointFile (.checkpoint.json) to save resolved YAML and hashes directly to disk without echoing large YAML into context.',
-      validate_recipe: 'Pass compositionFile, captionBaselineRecipeFile or captionBaselineFile, and checkpointFile instead of repeating YAML inline.',
-      compile_recipe: 'Pass compositionFile, captionBaselineRecipeFile/captionBaselineFile, productionContractFile (set compositionVersion: "auto" to auto-compute the normalized SHA-256), productionBaselineFile and checkpointFile.',
-      generate_assets: 'Pass compositionFile (or sourceJobId/recipeRef) and checkpointFile/captionBaselineFile.',
-      render_video: 'Pass compositionFile (or sourceJobId/recipeRef) and the ready preflight checkpointFile + captionBaselineFile.',
-      render_preview: 'Pass compositionFile (or recipeRef) and the ready preflight checkpointFile.',
-      compile_scene: 'Pass componentFile (.svelte path) or templateId + templateEdits instead of repeating Svelte source inline.',
+      get_job_result: 'Pass recipeFile (.edit.yaml) + checkpointFile (.checkpoint.json) to save YAML/hashes to disk.',
+      validate_recipe: 'Pass compositionFile + captionBaselineRecipeFile/captionBaselineFile + checkpointFile.',
+      compile_recipe: 'Pass compositionFile + captionBaselineFile + productionContractFile (compositionVersion:"auto") + checkpointFile.',
+      generate_assets: 'Pass compositionFile (or sourceJobId/recipeRef) + checkpointFile.',
+      render_video: 'Pass compositionFile (or sourceJobId/recipeRef) + ready checkpointFile.',
+      render_preview: 'Pass compositionFile (or recipeRef) + ready checkpointFile.',
+      compile_scene: 'Pass componentFile (.svelte) or templateId + templateEdits.',
     };
     const yamlRules = [
-      'Use numeric version: 2, but string compatibility pins: catalogVersion: "1" and compilerVersion: "1".',
-      'Always satisfy outPoint = inPoint + timelineDuration * playbackRate; account for outgoing transition overlap handles.',
-      'For image.generate use ratio strings like "9:16", "16:9", "1:1" — never output aliases like "portrait".',
-      'Preserve ALL resolved caption/text entries and resultTextIds verbatim; edit local .edit.yaml files and verify with captionBaselineRecipeFile/captionBaselineFile.',
-      'For new TikTok captions use fontFamily: montserrat and fontWeight: 700 unless the user chooses another font.',
+      'Envelope: wrap DSL inside `document:` with siblings `bindings: {}` and `assets: []`. Put output dimensions under `document.output: { aspect: portrait|landscape|classic, resolution: 1080p, fps: 30, format: mp4 }`.',
+      'Use numeric `version: 2`, quoted strings `catalogVersion: "1"`, `compilerVersion: "1"` (or omit pins).',
+      'outPoint = inPoint + timelineDuration * playbackRate; overlap handles: `leftEnd - rightStart == transition.duration`. NEVER guess audio `outPoint` or truncate narration — always match exact full measured duration and extend visuals to cover full speech.',
+      'Pass 1 narration: `speech.generate` in `document.before`, its placement in `document.placements` (REQUIRED to avoid 422 invalid_duration), `captions.generate` in `document.after` (NEVER `document.captions`/`document.jobs`).',
+      'image.generate: use ratio strings ("9:16", "16:9", "4:3", "1:1"), NEVER "portrait"/"landscape". Transparent cutouts: `background: transparent` + `model: openai/gpt-image-2.5-sunburst`. Always include `placements` or existing tracks.',
+      'Audio tracks CANNOT overlap on the same track — put narration, ambience, and spot SFX on SEPARATE audio tracks. Volume is 0–200 PERCENT (never 0.0–1.0).',
+      'Prefer `patch_recipe(sourceJobId, operations: [upsertAssets, upsertTracks, setTransitions, setEffects])` to preserve Pass 1 narration/captions verbatim.',
+      'New TikTok captions: `fontFamily: montserrat`, `fontWeight: 700` unless user chooses another.',
+    ];
+    const yamlTemplates = {
+      pass1TimingSpeechAndCaptions: [
+        'document:',
+        '  version: 2',
+        '  mode: assemble',
+        '  before:',
+        '    - { id: voice-main, type: speech.generate, language: en, model: google/gemini-3.8-flash-tts, voice: Kore, text: "Approved script." }',
+        '  placements:',
+        '    - { job: voice-main, track: { type: audio, role: narration }, start: 0.4s }',
+        '  after:',
+        '    - id: captions-main',
+        '      type: captions.generate',
+        '      language: en',
+        '      maxWords: 4',
+        '      style: { fontFamily: montserrat, fontWeight: 700, fontSize: 52, x: 540, y: 1620, anchor: center, align: center, color: "#FFFFFF", strokeColor: "#10151C", strokeWidth: 4, highlightMode: word }',
+        '  output: { aspect: portrait, resolution: 1080p, fps: 30, format: mp4 }',
+        'bindings: {}',
+        'assets: []',
+      ].join('\n'),
+      pass2ImageBatch: [
+        'document:',
+        '  version: 2',
+        '  mode: assemble',
+        '  before:',
+        '    - { id: img_bg_1, type: image.generate, aspect: "9:16", background: opaque, prompt: "2D illustration, no text." }',
+        '    - { id: img_cutout_1, type: image.generate, model: openai/gpt-image-2.5-sunburst, aspect: "1:1", background: transparent, prompt: "Isolated cutout, no text." }',
+        '  placements:',
+        '    - { job: img_bg_1, track: { type: video, role: main }, start: 0s, duration: 2s }',
+        '  output: { aspect: portrait, resolution: 1080p, fps: 30, format: mp4 }',
+        'bindings: {}',
+        'assets: []',
+      ].join('\n'),
+      pass3PatchRecipeAssembly: {
+        tool: 'patch_recipe',
+        arguments: {
+          projectId: '<projectId>',
+          sourceJobId: '<pass1TimingJobId>',
+          operations: [
+            { op: 'upsertAssets', assets: [{ id: 'scene_1', file: '<compiled.scene.json>', version: '<sha256:...>', kind: 'video', duration: 8, width: 1080, height: 1920 }] },
+            {
+              op: 'upsertTracks',
+              tracks: [
+                { id: 'main_video', type: 'video', clips: [{ id: 'clip_s1', assetId: 'scene_1', start: 0, inPoint: 0, outPoint: 8, playbackRate: 1, volume: 0 }] },
+                { id: 'audio_sfx', type: 'audio', clips: [{ id: 'hit_1', assetId: 'sfx_hit', start: 0.85, inPoint: 0, outPoint: 0.55, playbackRate: 1, volume: 30 }] },
+              ],
+            },
+            { op: 'setTransitions', transitions: [{ id: 't_1_2', trackId: 'main_video', leftClipId: 'clip_s1', rightClipId: 'clip_s2', preset: 'wipe-left', duration: 0.3 }] },
+          ],
+        },
+        fullExample: 'get_library_reference(topic="examples", id="narrated-2d-scenes-sfx")',
+      },
+    };
+    const toolSignatures = {
+      confirm_brief: '{ purpose, askedUser, format, duration, visuals, narration, captions, soundEffects, userApproval } — REQUIRED before create_project/generate_assets/compile_scene/render_video.',
+      generate_assets: '{ projectId, composition|compositionFile, idempotencyKey, userApproved: true } — parameter is `composition` (NOT `yaml`); include `placements`; call `wait_for_job`.',
+      search_sound_effects: '{ query, license: "cc0", limit, userApproved: true }.',
+      import_sound_effect: '{ projectId, id, sourceVersion, userApproved: true } — pass `id` (NOT `soundId`).',
+      get_asset_metadata: '{ projectId, files: [{ id, file }], userApproved: true } — pass `files` array (NOT `file`).',
+      get_project: '{ projectId, fullResult: true } for full timeline/captions.',
+      patch_recipe: '{ projectId, sourceJobId|baseRecipeRef, operations } — preserves Pass 1 captions/narration.',
+      wait_for_job: '{ projectId, jobId, timeoutSeconds: 120 } — repeat for SAME jobId until terminal.',
+    };
+    const sceneRuntimeRules = [
+      'NEVER pass frame, fps, durationInFrames, time, progress, width, height, image_1..4, video_1..2, or model_1..2 in $props()/export let — they stay frozen/empty!',
+      'Import { SceneCanvas, useScene } from "@direction/scene-svelte", call const scene = useScene(), derive motion with $derived(scene.frame.time) (never destructure const { frame } = useScene()).',
+      'Valid $props() are ONLY images, videos, models, parameters (read images.image_1 etc.). Wrap in <SceneCanvas>.',
+      'Inspect compiled scenes via inspect_scene across frame 0, midpoint, and hold before render_video.',
     ];
     const liveBootstrapBatch = local
       ? ['get_workflow_preferences', 'get_recipe_schema', 'get_capabilities', 'list_speech_models']
       : ['get_workflow_preferences', 'get_recipe_schema', 'get_capabilities', 'get_credits', 'list_speech_models'];
     const mandatoryBriefQuestions = [
-      'Platform / destination, aspect ratio AND output resolution (e.g. TikTok/Reels 9:16 1080x1920 vs YouTube/web 16:9 1920x1080)',
-      'Approximate duration (e.g. ~30s, ~60s, 2–3 min)',
-      'Visual materials & presentation (AI-generated images via BYOK/provider vs existing photos/footage vs pure procedural 2D/3D — asking for "2D only" still leaves generated/existing 2D imagery vs pure vector/DOM unanswered)',
-      'Audio, spoken language, TTS speech model (from list_speech_models: e.g. Kokoro, Gemini 3.8 Flash-Lite, Gemini 3.8 Flash) and captions/subtitles',
-      'Sound effects as its own separate question (discrete CC0 SFX vs none)',
-      'Explicit user approval for the covered scope (never self-approve userApproved:true, even on local zero-credit Docker mode)',
+      'Platform, aspect ratio & resolution (TikTok/Reels 9:16 1080p vs YouTube 16:9 1080p)',
+      'Approximate duration (~30s, ~60s, etc.)',
+      'Visual materials (AI images vs existing media vs pure procedural 2D/3D)',
+      'Narration, language, TTS speech model from list_speech_models (Kokoro / Gemini Flash-Lite / Flash) & captions',
+      'Sound effects (separate question: discrete CC0 SFX vs none)',
+      'Explicit user approval (never self-approve userApproved:true)',
     ];
     const incompleteBriefRule = local
-      ? 'STRICT LOCAL PARITY: Zero Machinal credits and local hardware rendering do NOT skip the brief and do NOT authorize userApproved:true. A short prompt naming only the subject, visual style, or 2D/3D constraint is INCOMPLETE. You MUST ask all missing items in mandatoryBriefQuestions using ONE native question form (ask_question/question) and wait for the user reply before calling create_project, compile_scene, generate_assets or render_video, unless the user explicitly answered them or delegated with "you decide".'
-      : 'A short prompt naming only the subject, visual style, or 2D/3D constraint is INCOMPLETE. You MUST ask all missing items in mandatoryBriefQuestions using ONE native question form (ask_question/question) and wait for the user reply before calling create_project, compile_scene, generate_assets or render_video, unless the user explicitly answered them or delegated with "you decide".';
+      ? 'STRICT LOCAL PARITY: Zero credits never skips the brief or authorizes userApproved:true. A short topic/style/2D prompt is INCOMPLETE — ask all missing items in ONE ask_question/question form, wait for reply, then call confirm_brief.'
+      : 'A short topic/style/2D prompt is INCOMPLETE — ask all missing items in ONE ask_question/question form, wait for reply, then call confirm_brief before create_project, compile_scene, generate_assets or render_video.';
     const stageChecklist = purpose === 'edit'
       ? [
           local
-            ? '1. Batch free metadata reads in parallel: get_project (compact first, fullResult=true before editing), get_capabilities, and production_quickstart. (Local Docker mode: no get_credits or S3.)'
-            : '1. Batch free metadata reads in parallel: get_project (compact first, fullResult=true before editing), get_capabilities, get_credits, and production_quickstart.',
-          '2. Save baseline recipe/checkpoint locally via get_job_result(recipeFile, checkpointFile) when continuing a job, or edit a local working copy.',
-          '3. Preserve existing captions, pins and unrelated tracks; recompile modified scenes via compile_scene(componentFile, sourceFile) (up to 2 concurrent).',
-          '4. Run validate_recipe + compile_recipe using compositionFile and captionBaselineFile/captionBaselineRecipeFile, saving a fresh checkpointFile.',
-          '5. Submit render_video using compositionFile + checkpointFile and poll wait_for_job(timeoutSeconds<=120) until terminal.',
+            ? '1. Batch free reads: get_project (fullResult=true before editing), get_capabilities, production_quickstart.'
+            : '1. Batch free reads: get_project (fullResult=true before editing), get_capabilities, get_credits, production_quickstart.',
+          '2. Confirm scope via confirm_brief(purpose="edit", projectId). Save baseline recipe/checkpoint via get_job_result.',
+          '3. Preserve captions/narration; compile modified scenes (up to 2 concurrent) via compile_scene.',
+          '4. Validate via validate_recipe + compile_recipe, then render_video + wait_for_job(<=120s).',
         ]
       : [
           local
-            ? '1. Batch free bootstrap calls in ONE turn: production_quickstart + get_workflow_preferences + get_recipe_schema + get_capabilities + list_speech_models. (Local Docker mode: BYOK provider key, local hardware rendering, storage=volume only; do NOT call get_credits.)'
-            : '1. Batch free bootstrap calls in ONE turn: production_quickstart + get_workflow_preferences + get_recipe_schema + get_capabilities + get_credits + list_speech_models.',
-          local
-            ? '2. STOP if ANY brief decision is missing (platform/destination + aspect & resolution such as TikTok 9:16 vs YouTube 16:9, duration, visuals/AI-generated images vs procedural, narration/language/TTS model, captions, and a separate sound-effects question) and ask them ALL in ONE native question form. Zero Machinal credits does NOT skip the brief or authorize self-approving userApproved:true; reuse existing explicit approvals.'
-            : '2. STOP if ANY brief decision is missing (platform/destination + aspect & resolution such as TikTok 9:16 vs YouTube 16:9, duration, visuals/AI-generated images vs procedural, narration/language/TTS model, captions, and a separate sound-effects question) and ask them ALL in ONE native question form; reuse existing explicit approvals.',
-          '3. For narration, submit timing-first pass (speech.generate + requested captions.generate ONLY), wait with wait_for_job(timeoutSeconds<=120), then save resolved YAML via get_job_result(recipeFile, checkpointFile).',
-          '4. For image-led cinematic/documentary edits call plan_hybrid_edit (supports dissolve or custom transition presets); run component-discovery per animated beat; compile scenes up to 2 concurrently with compile_scene(componentFile | templateId).',
-          '5. Patch the local .edit.yaml file (never rewrite full YAML in tool arguments), run validate_recipe + compile_recipe with compositionFile + captionBaselineRecipeFile/captionBaselineFile + checkpointFile.',
-          '6. Run render_video(compositionFile, checkpointFile, userApproved, idempotencyKey), poll wait_for_job(timeoutSeconds<=120) for the SAME jobId until completed, then deliver via get_video_result.',
+            ? '1. Batch free bootstrap: production_quickstart + get_workflow_preferences + get_recipe_schema + get_capabilities + list_speech_models (no get_credits in local mode).'
+            : '1. Batch free bootstrap: production_quickstart + get_workflow_preferences + get_recipe_schema + get_capabilities + get_credits + list_speech_models.',
+          '2. STOP if ANY brief choice is missing (platform/aspect+resolution, duration, visuals, narration/voice/TTS model, captions, separate SFX, approval). Ask ALL in ONE ask_question/question form, wait for reply, then call confirm_brief BEFORE create_project.',
+          '3. Pass 1 narration: speech.generate (before) + placement (placements) + captions.generate (after) -> wait_for_job -> get_job_result(recipeFile, checkpointFile). Keep FULL measured duration (never truncate outPoint).',
+          '4. Compile scenes (up to 2 concurrent) with useScene() + $derived(scene.frame.time) + <SceneCanvas>; verify via inspect_scene.',
+          '5. Patch via patch_recipe / compositionFile -> validate_recipe + compile_recipe -> render_video -> wait_for_job -> get_video_result.',
         ];
     const onDemandTopics = {
       brief: 'get_library_reference(topic="brief")',
@@ -332,6 +408,9 @@ export class SceneLibrary {
       'Follow the structured `stageChecklist`, `localFileShortcuts`, `yamlRules`, `waitAndConcurrency` and `onDemandTopics` fields directly; fetch full standalone markdown via `machinal://reference/quickstart` only if needed.',
     ].join('\n');
     return {
+      ...(purpose === 'create' ? {
+        STOP_BEFORE_BUILDING: 'STOP. Do NOT call create_project, compile_scene, generate_assets, or render_video yet. Ask the user for every missing choice (platform + aspect & resolution, duration, visual materials, narration + language + TTS speech model from list_speech_models, captions, sound effects, and approval) in ONE ask_question/question form, wait for their reply, then call confirm_brief to unlock production.',
+      } : {}),
       topic: 'quickstart',
       origin: 'installed-client-library',
       libraryVersion: manifest.version,
@@ -344,6 +423,9 @@ export class SceneLibrary {
       stageChecklist,
       localFileShortcuts,
       yamlRules,
+      yamlTemplates,
+      toolSignatures,
+      sceneRuntimeRules,
       waitAndConcurrency: { maxWaitSecondsDefault: 120, compileSceneConcurrency: 2, inspectSceneConcurrency: 1, soundSearchConcurrency: 1 },
       ...(styleProfile ? { styleProfile } : { availableProfiles: styles.map(entry => entry.id) }),
       guide,
@@ -367,6 +449,24 @@ export class SceneLibrary {
       '',
       '## Critical YAML & Wait Rules',
       ...data.yamlRules.map(rule => `- ${rule}`),
+      '',
+      '## Exact Tool Parameter Signatures',
+      ...Object.entries(data.toolSignatures ?? {}).map(([tool, sig]) => `- **${tool}**: ${sig}`),
+      '',
+      '## Copy-Ready YAML Templates',
+      '### Pass 1: Timing-First Speech + Captions',
+      '```yaml',
+      data.yamlTemplates?.pass1TimingSpeechAndCaptions ?? '',
+      '```',
+      '### Pass 2: Image Generation Batch (ratio strings + positive placement)',
+      '```yaml',
+      data.yamlTemplates?.pass2ImageBatch ?? '',
+      '```',
+      '### Pass 3: Complete Multi-Track Assembly Example',
+      '- Use `patch_recipe(sourceJobId: <pass1JobId>, operations: [...])` or fetch `get_library_reference(topic="examples", id="narrated-2d-scenes-sfx")` for a complete portrait 9:16 recipe with compiled 2D scenes, transitions, film grain, preserved captions, and separate narration/ambience/SFX audio tracks.',
+      '',
+      '## Critical Svelte 5 Scene Runtime Rules',
+      ...(data.sceneRuntimeRules ?? []).map(rule => `- ${rule}`),
       '- **wait_for_job**: stdio bridge caps each call to <=120s by default to prevent MCP client transport timeouts; call wait_for_job again for the SAME jobId while still running.',
       '- **Concurrency**: up to 2 compile_scene calls can run concurrently; inspect_scene and search_sound_effects run 1 at a time.',
       '',

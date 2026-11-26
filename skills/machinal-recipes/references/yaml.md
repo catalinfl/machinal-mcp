@@ -67,6 +67,13 @@ To place a clip for timeline duration `D`, set `outPoint = inPoint + D * playbac
 - For every explicit transition compute `leftEnd = left.start + (left.outPoint - left.inPoint) / left.playbackRate` and require `leftEnd - right.start == transition.duration` at microsecond precision; also obey the duration bounds and no-triple-overlap rule in topic `transitions`.
 - Submit the exact complete YAML string to `validate_recipe` after every edit, including after generation adds visuals. It checks timeline geometry when bindings/assets/jobs are resolved, without paid generation or rendering. Pending requirements mean geometry is not yet fully checked: resolve them and validate again. Use `compile_recipe` to inspect the normalized editing plan and duration. A successful transport response alone is not validation success: inspect `statusCode`, error diagnostics and requirements.
 - Before final `render_video`, require no error diagnostics and no unresolved requirements for that same YAML. Any edit invalidates the previous check. Never use a paid render as a syntax, type, overlap or timing test.
+- **Settings matrix & common traps (blocked locally before upstream RPC)**:
+  - Never put `version`, `jobs`, `tracks`, `captions`, `width`, `height`, `fps`, or `duration` at root or put `width`/`height`/`fps`/`duration` directly under `document:` — wrap the DSL inside `document:` with siblings `bindings: {}` and `assets: []`, and configure `document.output: { aspect: portrait|landscape|classic, resolution: 1080p, fps: 30, format: mp4 }`.
+  - Put `captions.generate` under `document.after` (never `document.captions` or `document.jobs`).
+  - `image.generate` jobs MUST use explicit ratio strings (`'9:16'`, `'16:9'`, `'4:3'`, `'3:4'`, `'1:1'`) — NEVER `aspect: portrait` or `aspect: landscape`. Use `background: transparent` (never `transparent: true`) with `model: openai/gpt-image-2.5-sunburst` for isolated cutouts.
+  - When submitting an image batch to `generate_assets` without existing tracks, always include at least one `placements` entry with positive duration (e.g. `duration: 1s`) so post-generation compilation does not fail with `422 invalid_duration`.
+  - Audio tracks NEVER allow overlapping clips on the same track — place simultaneous layers (narration, ambience/music, spot SFX) on SEPARATE audio tracks, and use 0–200 percent `volume` (never 0.0–1.0).
+  - See `examples/narrated-2d-scenes-sfx` for a complete multi-track portrait production recipe with compiled Svelte 2D scenes, transitions, film grain, preserved captions, and separate audio tracks.
 
 ## Montage version 3
 

@@ -3,8 +3,10 @@ import { isAbsolute } from 'node:path';
 import { filePermission, readBoundedUTF8 } from './opencode-recipes.mjs';
 import { SceneLibrary } from './scene-library.mjs';
 import { templateCompileSchema, resolveTemplateCompile, templateCompileHelp } from './template-compile.mjs';
+import { SCENE_RUNTIME_CONTRACT_SUMMARY, validateSceneComponent } from './scene-validation.mjs';
 import { RequestScheduler } from './request-scheduler.mjs';
 import { hasSceneCandidates, clearSceneCandidates } from './opencode-library.mjs';
+import { formatOpenRouterAlert } from './openrouter.mjs';
 
 export const productionSkills = ['machinal-editing', 'machinal-recipes', 'machinal-scenes', 'machinal-cinema', 'machinal-review', 'machinal-credits', 'machinal-motion', 'machinal-choreography', 'machinal-spatial', 'machinal-visual-review', 'machinal-sound'];
 export const startupSkills = ['machinal-editing', 'machinal-cinema'];
@@ -32,7 +34,7 @@ async function installedSkills(ctx) {
   }
 }
 
-export async function installWorkflowStartup(ctx, servers = [], { mode = 'cloud' } = {}) {
+export async function installWorkflowStartup(ctx, servers = [], { mode = 'cloud', getLocalOpenRouterStatus } = {}) {
   const names = [...servers];
   const prepared = new Map();
   const library = new SceneLibrary(undefined, { mode });
@@ -82,8 +84,15 @@ export async function installWorkflowStartup(ctx, servers = [], { mode = 'cloud'
         prepared.set(context.sessionID, { skills, contextLoaded: false });
         clearSceneCandidates(context.sessionID);
         if (prepared.size > 128) prepared.delete(prepared.keys().next().value);
-        return { content: JSON.stringify({ status: 'ready', purpose: input.purpose, loadedSkills: startupSkills,
-          next: `${hybridWorkflow} ${briefAndComponents} ${templateCompileHelp} If not already authorized, offer exact transcription fixes against approved narration in the initial brief. Fetch stage-specific guides only as needed and resume existing jobs/assets.` }) };
+        const openRouter = mode === 'local' && getLocalOpenRouterStatus ? await getLocalOpenRouterStatus() : null;
+        const openRouterWarning = formatOpenRouterAlert(openRouter);
+        const baseNext = `${hybridWorkflow} ${briefAndComponents} ${templateCompileHelp} If not already authorized, offer exact transcription fixes against approved narration in the initial brief. Fetch stage-specific guides only as needed and resume existing jobs/assets.`;
+        return { content: JSON.stringify({
+          status: 'ready', purpose: input.purpose, loadedSkills: startupSkills,
+          ...(openRouter ? { openRouter } : {}),
+          ...(openRouterWarning ? { openRouterWarning } : {}),
+          next: openRouterWarning ? `${openRouterWarning} ${baseNext}` : baseNext,
+        }) };
       },
     });
     for (const server of names) {
@@ -97,7 +106,7 @@ export async function installWorkflowStartup(ctx, servers = [], { mode = 'cloud'
               componentFile: { type: 'string', description: 'Absolute client-local .svelte source (UTF-8, at most 64000 bytes). Use instead of inline component. Reads with host permission; attachments/sourceFile stay on the project server.' },
               customSceneReason: { type: 'string', maxLength: 400, description: 'For a new hand-authored scene after discovery: name the missing action or identify the template manually adapted in componentFile. An implementation note, not a user question.' },
             } });
-            tool.description += ` Supply exactly one of component, componentFile or templateId. ${templateCompileHelp}`;
+            tool.description += ` ${SCENE_RUNTIME_CONTRACT_SUMMARY} Supply exactly one of component, componentFile or templateId. ${templateCompileHelp}`;
           }
           tool.execute = async (input, context) => {
             if (!prepared.get(context.sessionID)?.contextLoaded) return { content: JSON.stringify({ status: 'blocked', nextTool: 'machinal_prepare_video', error: 'Load video production guidance, including cinema, into the next model context before this action. Do not batch preparation and production in one model turn. No action was executed; no paid job was submitted.' }) };
@@ -115,6 +124,7 @@ export async function installWorkflowStartup(ctx, servers = [], { mode = 'cloud'
               args.component = await readBoundedUTF8(componentFile, context.signal, maxComponentBytes, 'Svelte source');
             }
             if (typeof args.component !== 'string' || !args.component.trim() || Buffer.byteLength(args.component) > maxComponentBytes) throw new Error('Svelte source must contain 1–64000 UTF-8 bytes and must not be blank. No compilation started.');
+            validateSceneComponent(args.component, { images: args.images, videos: args.videos, models: args.models });
             return scheduler.run('scene', () => execute(args, context), context.signal);
           };
         });
